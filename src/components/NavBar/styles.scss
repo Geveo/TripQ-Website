@@ -1,0 +1,86 @@
+.cus_navbar {
+  background-color: #2c2c76;
+  min-height: 100px;
+  padding-left: 50px !important;
+  padding-right: 50px !important;
+  z-index: 9999;
+  position: fixed;
+  width: 100%;
+  top: 0;
+
+  .list_button {
+    color: #ffff !important;
+    border-color: #fff;
+    margin-right: 10px;
+    width: 160px;
+  }
+
+  .signin_button {
+    color: #000 !important;
+    background-color: #f9f7f7;
+    margin-right: 80px;
+    width: 80px;
+  }
+
+  .community_txt {
+    margin-right: 80px;
+    margin-left: 20px;
+  }
+
+  .vacation_txt {
+    margin-left: 20px;
+  }
+
+  .explore_txt {
+    margin-left: auto;
+  }
+}
+
+.white-text {
+  color: #fff !important;
+}
+
+.help_button {
+  color: #ffff !important;
+  border-color: #fff;
+  margin-left: auto;
+  width: 60px;
+}
+
+.faq-text {
+  color: #ffff !important;
+  margin-right: 70px;
+}
+
+.setting-button {
+  border-radius: 0.5rem;
+}
+
+.dropdown-menu.show{
+  width: 560px;
+}
+
+.wallet_address_title {
+  font-family: "Inter", serif;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.wallet_address {
+  font-family: "Inter", serif;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+.copy_button{
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.copy_button:hover{
+  cursor: pointer;
+}
+
+.copy_button:active{
+  color: #908f8f;
+}
