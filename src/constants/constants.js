@@ -1,4 +1,4 @@
-export const cancellation_policies = [
+const cancellation_policies = [
     {
         Id: 1,
         Name: "None"
@@ -17,7 +17,7 @@ export const cancellation_policies = [
     },
 ]
 
-export const bed_types = [
+const bed_types = [
     {
         Id: 1,
         Name: "Single"
@@ -37,9 +37,20 @@ export const bed_types = [
 
 ]
 
-export const LocalStorageKeys ={
+const LocalStorageKeys ={
     PublicKey: "public-key",
     PrivateKey: "private-key",
     AccountAddress: "account-address",
-  }
+}
+
+const XRPLAccountEventTypes = {
+    PAYMENT: 'payment'
+}
+
+module.exports = {
+    XRPLAccountEventTypes,
+    LocalStorageKeys,
+    bed_types,
+    cancellation_policies
+}
 
