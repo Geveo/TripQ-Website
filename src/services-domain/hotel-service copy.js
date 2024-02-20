@@ -60,7 +60,7 @@ export default class HotelService {
     async registerHotel(data) {
         const submitObject = {
             type: constants.RequestTypes.HOTEL,
-            subType: constants.RequestSubTypes.REQUEST_TOKEN_OFFER,
+            subType: constants.RequestSubTypes.REGISTER_HOTEL,
             data: data
         }
 

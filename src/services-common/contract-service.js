@@ -3,7 +3,6 @@ import { LocalStorageKeys } from "../constants/constants";
 const nodeIp = process.env.REACT_APP_CONTRACT_NODE_IP;
 const nodePort = process.env.REACT_APP_CONTRACT_NODE_PORT;
 const HotPocket = window.HotPocket;
-const rippleKeyPair = require("ripple-keypairs");
 
 export default class ContractService {
   // Provide singleton instance
@@ -74,31 +73,15 @@ export default class ContractService {
 
   submitInputToContract(service, action, data) {
     let resolver, rejecter;
-    const publicKey = localStorage.getItem(LocalStorageKeys.PublicKey);
-    const privateKey = localStorage.getItem(LocalStorageKeys.PrivateKey);
-    const accountAddress = localStorage.getItem(
-      LocalStorageKeys.AccountAddress
-    );
 
     const request = {
       Service: service,
       Action: action,
-      requesterAddress: accountAddress,
       data,
     };
 
-    const requestHex = this.#generateRequestHex(request);
-    // Sign the message
-    const signature = rippleKeyPair.sign(requestHex, privateKey);
-    console.log("sIG " + signature);
-
-    const req = {
-      publicKey: publicKey,
-      requestHex: requestHex,
-      signature: signature,
-    };
     const promiseId = this.#getUniqueId();
-    const inpString = JSON.stringify({ id: promiseId, ...req });
+    const inpString = JSON.stringify({ id: promiseId, ...request });
 
     this.client.submitContractInput(inpString).then((input) => {
       input?.submissionStatus.then((s) => {

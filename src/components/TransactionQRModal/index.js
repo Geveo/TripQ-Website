@@ -16,19 +16,27 @@ const TransactionQRModal = ({ qrMessage, isOpen, onClose }) => {
     }, [qrMessage, isOpen])
 
     return (
-        <Modal isOpen={isOpen} toggle={onClose}  centered={true} backdrop={'static'} keyboard={false}>
-                <ModalHeader  toggle={onClose}>Scan using Xaman wallet to pay</ModalHeader>
-                <ModalBody>
-                    <div style={{ height: "auto", maxWidth: '512px', width: "auto" }}>
-                        <QRCode
-                        size={512}
-                        style={{ height: "256px", maxWidth: "100%", width: "100%" }}
-                        value={qrMessage}
-                        viewBox={`0 0 256 256`}
-                        />
-                    </div>
-                </ModalBody>
-                {/* <ModalFooter>
+      <Modal
+        isOpen={isOpen}
+        toggle={onClose}
+        centered={true}
+        backdrop={"static"}
+        keyboard={false}
+      >
+        <ModalHeader toggle={onClose}>
+          Scan using Xaman wallet to pay
+        </ModalHeader>
+        <ModalBody>
+          <div style={{ height: "auto", maxWidth: "512px", width: "auto"}}>
+            <QRCode
+              size={512}
+              style={{ height: "256px", maxWidth: "100%", width: "100%", marginTop: "50" , marginBottom: "50"}}
+              value={qrMessage}
+              viewBox={`0 0 256 256`}
+            />
+          </div>
+        </ModalBody>
+            {/* <ModalFooter>
                     <Button color="primary" onClick={onClose}>
                         Do Something
                     </Button>{' '}
@@ -36,7 +44,7 @@ const TransactionQRModal = ({ qrMessage, isOpen, onClose }) => {
                         Cancel
                     </Button>
                 </ModalFooter> */}
-            </Modal>
+      </Modal>
     );
 }
 
