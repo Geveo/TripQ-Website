@@ -2,7 +2,7 @@ import MainContainer from "../layout/MainContainer";
 import Card1 from "../layout/Card";
 import "../styles/text_styles.scss";
 import "../styles/layout_styles.scss";
-import React, {useState, useCallback} from "react";
+import React, { useState, useCallback } from "react";
 import {
   Dropdown,
   DropdownItem,
@@ -26,6 +26,10 @@ import ImagePreviewSection from "../components/RegisterHotelComponents/ImagePrev
 import { toast } from "react-hot-toast";
 import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
 import ToastViewHotelWallet from "../components/ToastViewHotelWallet/ToastViewHotelWallet";
+import TransactionQRModal from "../components/TransactionQRModal";
+import { HotelDto } from "../dto/HotelDto";
+import { ContactDetailsDto } from "../dto/ContactDetailsDto";
+import { LocationDetailsDto } from "../dto/LocationDto";
 
 function RegisterHotel() {
   const hotelService = HotelService.instance;
@@ -67,6 +71,7 @@ function RegisterHotel() {
     useState(false);
   const [hotelFacilitiesInvaid, setHotelFacilitiesInvaid] = useState(false);
   const [uploadedImagesInvaid, setUploadedImagesInvaid] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
 
   const toggleDropDown = () => {
     setDropDownOpen((prevState) => !prevState);
@@ -126,6 +131,10 @@ function RegisterHotel() {
     }
   };
 
+  const onCloseQRModel = () => {
+    setShowQRModal(false);
+  };
+
   // Form submit
   const submitForm = useCallback(async () => {
     setRegisterButtonDisable(true);
@@ -137,39 +146,40 @@ function RegisterHotel() {
     }
 
     try {
-      // 1 - Upload Images
+      // Upload Images
       let imageUrls = [];
       let res;
 
       if (uploadedImages.length > 0)
         imageUrls = await FirebaseService.uploadFiles(Name, uploadedImages);
 
-      // 2 - Generate a wallet Address
-      const newWallet = await hotelService.createNewHotelWallet();
-      localStorage.setItem("isCustomer", "false");
-      localStorage.setItem("seed", newWallet.seed);
+      setShowQRModal(true);
 
-      console.log(newWallet);
+      // Create request object
+      let contactDetails = new ContactDetailsDto({
+        FullName: OwnerName,
+        Email: Email,
+        PhoneNumber: ContactNumber1,
+        AlternativePhoneNumber: ContactNumber2,
+      });
 
-      // 3 - Create request object
-      const submissionData = {
-        HotelWalletAddress: newWallet.address,
+      let locationDto = new LocationDetailsDto({
+        AddressLine01: AddressLine1,
+        AddressLine02: AddressLine2,
+        City: City,
+        DistanceFromCity: DistanceFromCenter,
+      });
+
+      let hotelData = new HotelDto({
+        Id: 0,
         Name: Name,
         Description: Description,
-        OwnerName: OwnerName,
-        Email: Email,
-        AddressLine1: AddressLine1,
-        AddressLine2: AddressLine2,
-        City: City,
-        ContactNumber1: ContactNumber1,
-        ContactNumber2: ContactNumber2,
-        DistanceFromCenter: DistanceFromCenter,
-      };
-
-      if (imageUrls.length > 0) submissionData.ImageUrls = imageUrls;
-
-      if (HotelFacilities.length > 0)
-        submissionData.Facilities = HotelFacilities;
+        StarRate: parseInt(StarRate[0],10),
+        ContactDetails: contactDetails,
+        Location: locationDto,
+        Facilities: JSON.stringify(HotelFacilities),
+        ImageURLs: imageUrls
+      });
 
       // only if the required validations are met, form will submit
       if (
@@ -180,13 +190,13 @@ function RegisterHotel() {
         AddressLine1 &&
         City &&
         (ContactNumber1.length === 10 || ContactNumber1.length === 11) &&
-        phoneNoRegex.test(ContactNumber1) &&
-        DistanceFromCenter &&
-        HotelFacilities.length > 0 &&
-        uploadedImages.length > 2
+         phoneNoRegex.test(ContactNumber1) &&
+         DistanceFromCenter &&
+         HotelFacilities.length > 0 &&
+         uploadedImages.length > 2
       ) {
-        // 4 - Submit for registration
-        res = await hotelService.registerHotel(submissionData);
+        // Submit for registration
+        res = await hotelService.registerHotel(hotelData);
         console.log("res", res);
         if (res.hotelId > 0) {
           //alert("Successful");
@@ -194,51 +204,63 @@ function RegisterHotel() {
             duration: 10000,
           });
           toast(
-              (element) => (
-                  <ToastViewHotelWallet
-                      warningMessage={"You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."}
-                      walletSecret={newWallet.seed}
-                      walletAddress={newWallet.address}
-                      id={element.id}  />
-              ),
-              {
-                duration: Infinity,
-              }
+            (element) => (
+              <ToastViewHotelWallet
+                warningMessage={
+                  "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
+                }
+                // walletSecret={newWallet.seed}
+                // walletAddress={newWallet.address}
+                // id={element.id}
+              />
+            ),
+            {
+              duration: Infinity,
+            }
           );
 
           navigate(`/hotel/${res.hotelId}`);
         } else {
           toast(
-              (element) => (
-                  <ToastInnerElement message={"Registration failed!"} id={element.id}/>
-              ),
-              {
-                  duration: Infinity,
-              }
+            (element) => (
+              <ToastInnerElement
+                message={"Registration failed!"}
+                id={element.id}
+              />
+            ),
+            {
+              duration: Infinity,
+            }
           );
           //alert("Registration failed!");
         }
       } else {
         setRegisterButtonDisable(false);
         toast(
-            (element) => (
-                <ToastInnerElement message={"Check the details again!"} id={element.id}/>
-            ),
-            {
-                duration: Infinity,
-            }
+          (element) => (
+            <ToastInnerElement
+              message={"Check the details again!"}
+              id={element.id}
+            />
+          ),
+          {
+            duration: Infinity,
+          }
         );
       }
     } catch (err) {
       setRegisterButtonDisable(false);
       console.log(err);
       toast(
-          (element) => (
-              <ToastInnerElement message={"Error occurred in Registration.!"} id={element.id}/>
-          ),
-          {
-              duration: Infinity,
-          }
+        (element) => (
+          <ToastInnerElement
+            message={"Error occurred in Registration.!"}
+            id={element.id}
+          />
+        ),
+        {
+          duration: Infinity,
+        }
       );
       //alert("Error occurred in Registration.!");
     }
@@ -261,6 +283,13 @@ function RegisterHotel() {
   return (
     <>
       <MainContainer>
+        {showQRModal && (
+          <TransactionQRModal
+            qrMessage={"qrMessage"} // ToDo: Add contract wallet address here
+            isOpen={showQRModal}
+            onClose={onCloseQRModel}
+          />
+        )}
         {/* {!newWallet ? <div className="spinnerWrapper">
           <Spinner
             color="primary"
