@@ -175,8 +175,8 @@ function RegisterHotel() {
         Name: Name,
         Description: Description,
         StarRate: parseInt(StarRate[0],10),
-        ContactDetails: contactDetails,
-        Location: locationDto,
+        ContactDetails: JSON.stringify(contactDetails),
+        Location: JSON.stringify(locationDto),
         Facilities: JSON.stringify(HotelFacilities),
         ImageURLs: imageUrls
       });
@@ -209,9 +209,6 @@ function RegisterHotel() {
                 warningMessage={
                   "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
                 }
-                // walletSecret={newWallet.seed}
-                // walletAddress={newWallet.address}
-                // id={element.id}
               />
             ),
             {
@@ -466,10 +463,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-            disabled={
-              registerButtonDisable ||
-              !(isCondition1Checked && isCondition2Checked)
-            }
+            // disabled={
+            //   registerButtonDisable ||
+            //   !(isCondition1Checked && isCondition2Checked)
+            // }
             onClick={submitForm}
           >
             Complete Hotel Registration
