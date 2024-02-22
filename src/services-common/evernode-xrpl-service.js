@@ -8,7 +8,6 @@ let xrplApi;
 const clients = [];
 
 export async function init() {
-    console.log(process.env.REACT_APP_RIPPLED_SERVER)
     xrplApi = new evernode.XrplApi(process.env.REACT_APP_RIPPLED_SERVER, { autoReconnect: true });
     evernode.Defaults.set({
         xrplApi: xrplApi,
@@ -59,7 +58,6 @@ export async function listenToTransactionsByAddress(accountAddress, txFilter = n
                 const tempArray = listenedTransactions.hasOwnProperty(accountAddress) && listenedTransactions[accountAddress].length > 0 ? [...listenedTransactions[accountAddress], tx] : [tx]
                 store.dispatch(add({ key: accountAddress, value: tempArray }));
             }
-            console.log(listenedTransactions)
         }); 
 
         await client.subscribe();

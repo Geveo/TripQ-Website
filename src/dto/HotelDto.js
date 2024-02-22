@@ -8,6 +8,7 @@ export class HotelDto {
         Location,
         Facilities,
         ImageURLs,
+        WalletAddress,
     }){
         this.Id=Id;
         this.Name = Name;
@@ -17,6 +18,7 @@ export class HotelDto {
         this.Location = Location;
         this.Facilities = Facilities;
         this.ImageURLs = ImageURLs;
+        this.WalletAddress= WalletAddress;
     }
 }
 

@@ -10,7 +10,7 @@ function ContactDetails(props) {
         <div className="title_2">Contact details</div>
         <Card1>
           <FormGroup>
-            <Label>Full Name</Label>
+            <Label>Full Name<span style={{ color: "red" }}>*</span></Label>
             <Input
               type="text"
               className="form-control input_full"
@@ -23,7 +23,7 @@ function ContactDetails(props) {
             </FormFeedback>
           </FormGroup>
           <FormGroup>
-            <Label className="mt-3" for="email">Email</Label>
+            <Label className="mt-3" for="email">Email<span style={{ color: "red" }}>*</span></Label>
             <Input
               type="email"
               className="form-control input_full"
@@ -39,7 +39,7 @@ function ContactDetails(props) {
           <div className={"row mt-3"}>
             <div className={"col"}>
               <FormGroup>
-                <Label>Phone Number</Label>
+                <Label>Phone Number<span style={{ color: "red" }}>*</span></Label>
                 <Input
                   type="text"
                   className="form-control input_half"
@@ -75,7 +75,7 @@ function ContactDetails(props) {
           <div className={"row"}>
             <div className={"col"}>
               <FormGroup>
-                <Label>Address line 01</Label>
+                <Label>Address line 01<span style={{ color: "red" }}>*</span></Label>
                 <Input
                   type="text"
                   className="form-control input_half"
@@ -105,7 +105,7 @@ function ContactDetails(props) {
           <div className={"row mt-3"}>
             <div className={"col"}>
               <FormGroup>
-                <Label>City</Label>
+                <Label>City<span style={{ color: "red" }}>*</span></Label>
                 <Input
                   type="text"
                   className="form-control input_half"
@@ -121,7 +121,7 @@ function ContactDetails(props) {
 
             <div className={"col"}>
               <FormGroup>
-                <Label>Distance from City (Km)</Label>
+                <Label>Distance from City (Km)<span style={{ color: "red" }}>*</span></Label>
                 <Input
                   type="number"
                   className="form-control input_half"

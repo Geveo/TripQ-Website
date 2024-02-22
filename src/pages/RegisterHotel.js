@@ -3,6 +3,7 @@ import Card1 from "../layout/Card";
 import "../styles/text_styles.scss";
 import "../styles/layout_styles.scss";
 import React, { useState, useCallback, useEffect } from "react";
+import QRScanner from "../components/QRScanner";
 import {
   Dropdown,
   DropdownItem,
@@ -75,12 +76,24 @@ function RegisterHotel() {
   const [hotelFacilitiesInvaid, setHotelFacilitiesInvaid] = useState(false);
   const [uploadedImagesInvaid, setUploadedImagesInvaid] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [scannedText, setScannedText] = useState("");
   const [ownerWalletAddress, setOwnerWalletAddress] = useState("rsDEfCNEYbjGEje2fgqP1rRPVD7bmhih15");
   const [isTransactionFound, setIsTransactionfound]  = useState(false);
-  
-
   const listenedTransactions = useSelector(state => state.listenedTransactions);
+
   const contractWalletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
+
+  const handleScanSuccess = (decodedText) => {
+    setScannedText(decodedText);
+    setShowQRModal(false);
+    setShowQRScanner(false);
+  
+    if (decodedText !== "") {
+      setOwnerWalletAddress((prevOwnerWalletAddress) => decodedText);
+    }
+  };
+
   const toggleDropDown = () => {
     setDropDownOpen((prevState) => !prevState);
   };
@@ -178,26 +191,26 @@ function RegisterHotel() {
         Id: 0,
         Name: Name,
         Description: Description,
-        StarRate: parseInt(StarRate[0],10),
-        ContactDetails: contactDetails,
-        Location: locationDto,
+        StarRate: parseInt(StarRate[0], 10),
+        ContactDetails: JSON.stringify(contactDetails),
+        Location: JSON.stringify(locationDto),
         Facilities: JSON.stringify(HotelFacilities),
-        ImageURLs: imageUrls
+        ImageURLs: imageUrls,
+        WalletAddress: scannedText,
       });
 
       // only if the required validations are met, form will submit
       if (
         Name &&
-        Description &&
         OwnerName &&
         emailRegex.test(Email) &&
         AddressLine1 &&
         City &&
         (ContactNumber1.length === 10 || ContactNumber1.length === 11) &&
-         phoneNoRegex.test(ContactNumber1) &&
-         DistanceFromCenter &&
-         HotelFacilities.length > 0 &&
-         uploadedImages.length > 2
+        phoneNoRegex.test(ContactNumber1) &&
+        DistanceFromCenter &&
+        HotelFacilities.length > 0 &&
+        uploadedImages.length > 2
       ) {
         // Submit for registration
         res = await hotelService.registerHotel(hotelData);
@@ -213,9 +226,6 @@ function RegisterHotel() {
                 warningMessage={
                   "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
                 }
-                // walletSecret={newWallet.seed}
-                // walletAddress={newWallet.address}
-                // id={element.id}
               />
             ),
             {
@@ -236,7 +246,6 @@ function RegisterHotel() {
               duration: Infinity,
             }
           );
-          //alert("Registration failed!");
         }
       } else {
         setRegisterButtonDisable(false);
@@ -266,7 +275,6 @@ function RegisterHotel() {
           duration: Infinity,
         }
       );
-      //alert("Error occurred in Registration.!");
     }
   }, [
     Name,
@@ -282,7 +290,13 @@ function RegisterHotel() {
     DistanceFromCenter,
     HotelFacilities,
     uploadedImages,
+    ownerWalletAddress
   ]);
+
+  const openQRScanner = () => {
+    setScannedText("");
+    setShowQRScanner(true);
+  };
 
   async function onProceedToPayment() {
     await init();
@@ -354,8 +368,9 @@ function RegisterHotel() {
               <Col md={6}>
                 <FormGroup>
                   <Label for="property_name" className="noMargin">
-                    Name of Your Property
+                    Name of Your Property<span style={{ color: "red" }}>*</span>
                   </Label>
+
                   <div className="subtext">
                     Guests will see this name when they search for a place to
                     stay.
@@ -453,7 +468,6 @@ function RegisterHotel() {
           hotelFacilitiesInvaid={hotelFacilitiesInvaid}
         />
 
-        {/* <PropertyPhotos setImages={setImages} /> */}
         <PropertyPhotos
           onChangeUploadImages={onChangeUploadImages}
           uploadedImagesInvaid={uploadedImagesInvaid}
@@ -461,6 +475,31 @@ function RegisterHotel() {
         {uploadedImages.length !== 0 && (
           <ImagePreviewSection images={uploadedImages} />
         )}
+
+        <section>
+          <div className="title_2">
+            Scan Your QR Code<span style={{ color: "red" }}>*</span>
+          </div>
+          <div className="subtext">
+            Upload the QR code of your wallet address or scan it directly with
+            your camera
+          </div>
+          <Card1>
+            {showQRScanner && (
+              <QRScanner onClose onScanSuccess={handleScanSuccess} />
+            )}
+            <div style={{ textAlign: "center" }}>
+              {scannedText !== "" && (
+                <h6>Your wallet address : {scannedText}</h6>
+              )}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}>
+              <Button className="secondaryButton" onClick={openQRScanner}>
+                Open QR Scanner
+              </Button>
+            </div>
+          </Card1>
+        </section>
 
         <section>
           <h5 style={{ lineHeight: "25px" }}>
@@ -483,7 +522,7 @@ function RegisterHotel() {
                   with all necessary licenses and permits, which can be shown
                   upon first request.
                   <br /> VoyageLanka reserves the right to verify and
-                  investigate any details provided in this registration.
+                   investigate any details provided in this registration. 
                 </p>
               </Label>
             </FormGroup>
@@ -518,10 +557,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-            disabled={
-              registerButtonDisable ||
-              !(isCondition1Checked && isCondition2Checked)
-            }
+             disabled={
+               registerButtonDisable ||
+               !(isCondition1Checked && isCondition2Checked)
+             }
             onClick={submitForm}
           >
             Complete Hotel Registration
