@@ -12,11 +12,9 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
  */
 const TransactionQRModal = ({ qrMessage, isOpen, onClose }) => {
 
-    useEffect(() => {
-    }, [qrMessage, isOpen])
 
     return (
-      <Modal
+      <Modal zIndex={9999}
         isOpen={isOpen}
         toggle={onClose}
         centered={true}

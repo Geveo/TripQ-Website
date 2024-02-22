@@ -2,7 +2,7 @@ import MainContainer from "../layout/MainContainer";
 import Card1 from "../layout/Card";
 import "../styles/text_styles.scss";
 import "../styles/layout_styles.scss";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Dropdown,
   DropdownItem,
@@ -30,6 +30,9 @@ import TransactionQRModal from "../components/TransactionQRModal";
 import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
+import { init, deinit, listenToTransactionsByAddress, stopListeningToTransactionsByAddress} from "../services-common/evernode-xrpl-service"
+const { useSelector } = require("react-redux");
+
 
 function RegisterHotel() {
   const hotelService = HotelService.instance;
@@ -72,7 +75,12 @@ function RegisterHotel() {
   const [hotelFacilitiesInvaid, setHotelFacilitiesInvaid] = useState(false);
   const [uploadedImagesInvaid, setUploadedImagesInvaid] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [ownerWalletAddress, setOwnerWalletAddress] = useState("rsDEfCNEYbjGEje2fgqP1rRPVD7bmhih15");
+  const [isTransactionFound, setIsTransactionfound]  = useState(false);
+  
 
+  const listenedTransactions = useSelector(state => state.listenedTransactions);
+  const contractWalletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
   const toggleDropDown = () => {
     setDropDownOpen((prevState) => !prevState);
   };
@@ -129,10 +137,6 @@ function RegisterHotel() {
     if (uploadedImages.length < 3) {
       setUploadedImagesInvaid(true);
     }
-  };
-
-  const onCloseQRModel = () => {
-    setShowQRModal(false);
   };
 
   // Form submit
@@ -280,16 +284,56 @@ function RegisterHotel() {
     uploadedImages,
   ]);
 
+  async function onProceedToPayment() {
+    await init();
+    listenToTransactionsByAddress(contractWalletAddress, {account: ownerWalletAddress});
+    setShowQRModal(true);
+    setIsTransactionfound(false)
+  }
+
+  async function onCloseQRModel() {
+    setShowQRModal(false);
+    await stopListeningToTransactionsByAddress(ownerWalletAddress);
+    await deinit();
+  }
+
+  useEffect(() => {
+    let tmId = 0;
+    const checkTransactions = () => {
+        if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
+            const transactionFound = listenedTransactions[contractWalletAddress].some(
+                (transaction) => transaction.Account === ownerWalletAddress
+            );
+            
+            if (transactionFound) {
+                // ToDo: Check the transaction 'Amount field whether the right amount has been paid.
+                
+                setIsTransactionfound(true);
+                setShowQRModal(false);
+                stopListeningToTransactionsByAddress(contractWalletAddress);
+                deinit();
+                clearTimeout(tmId)
+            } else {
+                clearTimeout(tmId)
+                tmId = setTimeout(checkTransactions, 1000);
+            }
+        }
+    };
+
+    if (!isTransactionFound) {
+        checkTransactions();
+    }
+
+    return () => {
+      clearTimeout(tmId);
+    };
+
+  }, [listenedTransactions, isTransactionFound]); 
+
   return (
     <>
+      {showQRModal && (<TransactionQRModal isOpen={showQRModal} qrMessage={contractWalletAddress} onClose={onCloseQRModel} />) }
       <MainContainer>
-        {showQRModal && (
-          <TransactionQRModal
-            qrMessage={"qrMessage"} // ToDo: Add contract wallet address here
-            isOpen={showQRModal}
-            onClose={onCloseQRModel}
-          />
-        )}
         {/* {!newWallet ? <div className="spinnerWrapper">
           <Spinner
             color="primary"
@@ -463,6 +507,14 @@ function RegisterHotel() {
         </section>
 
         <div className={"row center_div pt-3"}>
+          <Button
+            className="secondaryButton"
+            style={{ width: "650px" }}
+            disabled={false}
+            onClick={onProceedToPayment}
+          >
+            Proceed to payments
+          </Button>
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
