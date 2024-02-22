@@ -468,7 +468,7 @@ function RegisterHotel() {
                   with all necessary licenses and permits, which can be shown
                   upon first request.
                   <br /> VoyageLanka reserves the right to verify and
-                  {/* investigate any details provided in this registration. */}
+                   investigate any details provided in this registration. 
                 </p>
               </Label>
             </FormGroup>
