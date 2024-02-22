@@ -28,7 +28,7 @@ function Facilities(props) {
 
     return (
         <section>
-            <div className="title_2">Facilities That Are Popular With Guests</div>
+            <div className="title_2">Facilities That Are Popular With Guests<span style={{ color: "red" }}>*</span></div>
             <div className="subtext">Guests look for these facilities the most when they’re searching for properties.
             </div>
             <Card1>
