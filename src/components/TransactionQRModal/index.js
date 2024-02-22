@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
-import style from "./index.module.scss";
 import QRCode from "react-qr-code";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Modal, ModalHeader, ModalBody} from 'reactstrap';
 
 /**
  * 
@@ -12,11 +10,8 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
  */
 const TransactionQRModal = ({ qrMessage, isOpen, onClose }) => {
 
-    useEffect(() => {
-    }, [qrMessage, isOpen])
-
     return (
-      <Modal
+      <Modal zIndex={9999}
         isOpen={isOpen}
         toggle={onClose}
         centered={true}

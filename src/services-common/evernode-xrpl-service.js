@@ -1,12 +1,13 @@
+import evernode from 'evernode-js-client'
+import { add, remove, removeAll } from "../features/transactionListener/transactionListenerSlice";
+import { store } from './../app/store'; 
 const { XRPLAccountEventTypes } = require('./../constants/constants')
-const evernode = require("evernode-js-client");
+
 
 let xrplApi;
 const clients = [];
-const listenedTransactions = []; // Ex: [ 'accounAddress': [{Account, Amount, Destination}, {}, {}], 'accountAddres2': [{}, {},...]]
 
-async function init() {
-    console.log(process.env.REACT_APP_RIPPLED_SERVER)
+export async function init() {
     xrplApi = new evernode.XrplApi(process.env.REACT_APP_RIPPLED_SERVER, { autoReconnect: true });
     evernode.Defaults.set({
         xrplApi: xrplApi,
@@ -24,65 +25,65 @@ async function init() {
     
 }
 
-
-async function deinit() {
+export async function deinit() {
     try{
         await Promise.all(clients.map(c => { c.unsubscribe(); })); // Cleanup clients.
-
-        // Added this timeout since some tests failed with not connected error.
-        // await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for five seconds before disconnecting.
         await xrplApi.disconnect();
     } catch (e) {
         console.log("Error occurred in disconnecting XRPL connection: ", e);
     }
 }
 
-async function listenToTransactionsByAddress(accountAddress) {
+/**
+ * 
+ * @param {*} accountAddress Address listened to
+ * @param {*} txFilter {account: <transaction source address>} || null by default
+ */
+export async function listenToTransactionsByAddress(accountAddress, txFilter = null) {
     const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
     clients.push(client)
-    listenedTransactions[accountAddress] = [];
+    store.dispatch(add({ key: accountAddress, value: [] }));
+
     try {
-        console.log("Listening to transactions of ", accountAddress)
+        console.log("Listening to the transactions of ", accountAddress)
         client.on(XRPLAccountEventTypes.PAYMENT, (tx, error) =>  {
-            listenedTransactions[accountAddress].push(tx);
-            console.log(listenedTransactions)
+            const listenedTransactions = store.getState().listenedTransactions;
+            
+            if(txFilter && txFilter.account) {
+                if(tx.Account === txFilter.account) {
+                    const tempArray = listenedTransactions.hasOwnProperty(accountAddress) && listenedTransactions[accountAddress].length > 0 ? [...listenedTransactions[accountAddress], tx] : [tx]
+                    store.dispatch(add({ key: accountAddress, value: tempArray }));
+                }
+            } else {
+                const tempArray = listenedTransactions.hasOwnProperty(accountAddress) && listenedTransactions[accountAddress].length > 0 ? [...listenedTransactions[accountAddress], tx] : [tx]
+                store.dispatch(add({ key: accountAddress, value: tempArray }));
+            }
         }); 
 
         await client.subscribe();
 
     } catch (error) {
-        throw error
-        throw new Error("Transaction listerner failed unexpectedly.")
+        throw error;
 
     }
 }
 
-async function stopListeningToTransactionsByAddress(accountAddress = null) {
+export async function stopListeningToTransactionsByAddress(accountAddress = null) {
     try {
             for(let c of clients) {
-                if(accountAddress && c.address == accountAddress) {
+                if(accountAddress && c.address === accountAddress) {
                     console.log("Stop listening to transactions of ", accountAddress)
                     c.off(XRPLAccountEventTypes.PAYMENT)
                     await c.unsubscribe();
-                    listenedTransactions[accountAddress] = [];
+                    store.dispatch(remove(accountAddress));
                 } else {
-                    c.off(evernode.XrplTransactionTypes.PAYMENT)
+                    c.off(XRPLAccountEventTypes.PAYMENT)
                     await c.unsubscribe();
-                    listenedTransactions = [];
+                    store.dispatch(removeAll());
                 }
             }
 
     } catch (error) {
-        throw new Error("Transaction unsubscribing failed unexpectedly.")
+        throw error;
     }
-}
-
-module.exports = {
-    clients,
-    deinit,
-    init,
-    listenToTransactionsByAddress,
-    stopListeningToTransactionsByAddress,
-    xrplApi,
-    listenedTransactions
 }

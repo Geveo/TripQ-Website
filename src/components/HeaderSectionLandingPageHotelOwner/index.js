@@ -12,7 +12,7 @@ import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
 
 const HeaderSectionLandingPageHotelOwner = () => {
   const navigate = useNavigate();
-  const visibility = useSelector((state) => state.visibility.value);
+  const visibility = useSelector((state) => state.value);
   const dispatch = useDispatch();
   const xrplService = XrplService.xrplInstance;
   const hotelService = HotelService.instance;
