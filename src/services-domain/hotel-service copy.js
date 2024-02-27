@@ -67,12 +67,11 @@ export default class HotelService {
         let result;
         try {
             result = await this.contractService.submitInputToContract(submitObject);
-            // result: { {"rowId":4,"offerId":"266BF70C1E820CCD8597B99B1A31E682E7E883D4C0C2385CE71A3405C180DF79"} }
-            console.log(result);
+            console.log("result",result);
 
-            SharedStateService.instance.currentHotelId = result.rowId;
+            SharedStateService.instance.currentHotelId = result.rowId.lastId;
             //accepting the NFT offer...
-            result = await this.#acceptHotelRegistrationOffer(result);
+           // result = await this.#acceptHotelRegistrationOffer(result);
         } catch (error) {
             console.log(error);
             throw error;
