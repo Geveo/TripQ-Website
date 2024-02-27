@@ -31,9 +31,13 @@ import TransactionQRModal from "../components/TransactionQRModal";
 import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
-import { init, deinit, listenToTransactionsByAddress, stopListeningToTransactionsByAddress} from "../services-common/evernode-xrpl-service"
+import {
+  init,
+  deinit,
+  listenToTransactionsByAddress,
+  stopListeningToTransactionsByAddress,
+} from "../services-common/evernode-xrpl-service";
 const { useSelector } = require("react-redux");
-
 
 function RegisterHotel() {
   const hotelService = HotelService.instance;
@@ -78,17 +82,34 @@ function RegisterHotel() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [scannedText, setScannedText] = useState("");
-  const [ownerWalletAddress, setOwnerWalletAddress] = useState("rsDEfCNEYbjGEje2fgqP1rRPVD7bmhih15");
-  const [isTransactionFound, setIsTransactionfound]  = useState(false);
-  const listenedTransactions = useSelector(state => state.listenedTransactions);
-
+  const [ownerWalletAddress, setOwnerWalletAddress] = useState(
+    "rsDEfCNEYbjGEje2fgqP1rRPVD7bmhih15"
+  );
+  const [isTransactionFound, setIsTransactionfound] = useState(false);
+  const listenedTransactions = useSelector(
+    (state) => state.listenedTransactions
+  );
+  const [isTransactionDone, setIsTransactionDone] = useState(false);
+  const [isinputFieldsValidated, setIsinputFieldsValidated] = useState(false);
+  const [hotelData, setHotelData] = useState({
+    Id: "",
+    Name: "",
+    Description: "",
+    StarRate: 0,
+    ContactDetails: "",
+    Location: "",
+    Facilities: [],
+    ImageURLs: [],
+    WalletAddress: "",
+  });
   const contractWalletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
+  const hotelRegiFee = process.env.REACT_APP_HOTEL_REGISTRATION_FEE;
 
   const handleScanSuccess = (decodedText) => {
     setScannedText(decodedText);
     setShowQRModal(false);
     setShowQRScanner(false);
-  
+
     if (decodedText !== "") {
       setOwnerWalletAddress((prevOwnerWalletAddress) => decodedText);
     }
@@ -165,12 +186,9 @@ function RegisterHotel() {
     try {
       // Upload Images
       let imageUrls = [];
-      let res;
 
       if (uploadedImages.length > 0)
         imageUrls = await FirebaseService.uploadFiles(Name, uploadedImages);
-
-      setShowQRModal(true);
 
       // Create request object
       let contactDetails = new ContactDetailsDto({
@@ -199,6 +217,7 @@ function RegisterHotel() {
         WalletAddress: scannedText,
       });
 
+      setHotelData(hotelData);
       // only if the required validations are met, form will submit
       if (
         Name &&
@@ -212,41 +231,8 @@ function RegisterHotel() {
         HotelFacilities.length > 0 &&
         uploadedImages.length > 2
       ) {
-        // Submit for registration
-        res = await hotelService.registerHotel(hotelData);
-        console.log("res", res);
-        if (res.hotelId > 0) {
-          //alert("Successful");
-          toast.success("Registered successfully!", {
-            duration: 10000,
-          });
-          toast(
-            (element) => (
-              <ToastViewHotelWallet
-                warningMessage={
-                  "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
-                }
-              />
-            ),
-            {
-              duration: Infinity,
-            }
-          );
-
-          navigate(`/hotel/${res.hotelId}`);
-        } else {
-          toast(
-            (element) => (
-              <ToastInnerElement
-                message={"Registration failed!"}
-                id={element.id}
-              />
-            ),
-            {
-              duration: Infinity,
-            }
-          );
-        }
+        setIsinputFieldsValidated(true);
+        await onProceedToPayment();
       } else {
         setRegisterButtonDisable(false);
         toast(
@@ -290,8 +276,52 @@ function RegisterHotel() {
     DistanceFromCenter,
     HotelFacilities,
     uploadedImages,
-    ownerWalletAddress
+    scannedText,
   ]);
+
+  async function sendHotelRegistrationRequest() {
+    if (isinputFieldsValidated) {
+      try {
+        // Submit for registration
+        let res = await hotelService.registerHotel(hotelData);
+        console.log("res", res);
+
+        if (res.rowId.lastId > 0) {
+          toast.success("Registered successfully!", {
+            duration: 10000,
+          });
+          // toast(
+          //   (element) => (
+          //     <ToastViewHotelWallet
+          //       warningMessage={
+          //         "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
+          //       }
+          //     />
+          //   ),
+          //   {
+          //     duration: Infinity,
+          //   }
+          // );
+
+          navigate(`/hotel/${res.hotelId}`);
+        } else {
+          toast(
+            (element) => (
+              <ToastInnerElement
+                message={"Registration failed!"}
+                id={element.id}
+              />
+            ),
+            {
+              duration: Infinity,
+            }
+          );
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+      }
+    }
+  }
 
   const openQRScanner = () => {
     setScannedText("");
@@ -300,9 +330,11 @@ function RegisterHotel() {
 
   async function onProceedToPayment() {
     await init();
-    listenToTransactionsByAddress(contractWalletAddress, {account: ownerWalletAddress});
+    await listenToTransactionsByAddress(contractWalletAddress, {
+      account: ownerWalletAddress,
+    });
+
     setShowQRModal(true);
-    setIsTransactionfound(false)
   }
 
   async function onCloseQRModel() {
@@ -314,53 +346,52 @@ function RegisterHotel() {
   useEffect(() => {
     let tmId = 0;
     const checkTransactions = () => {
-        if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
-            const transactionFound = listenedTransactions[contractWalletAddress].some(
-                (transaction) => transaction.Account === ownerWalletAddress
-            );
-            
-            if (transactionFound) {
-                // ToDo: Check the transaction 'Amount field whether the right amount has been paid.
-                
-                setIsTransactionfound(true);
-                setShowQRModal(false);
-                stopListeningToTransactionsByAddress(contractWalletAddress);
-                deinit();
-                clearTimeout(tmId)
-            } else {
-                clearTimeout(tmId)
-                tmId = setTimeout(checkTransactions, 1000);
-            }
+      if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
+        const transactionFound = listenedTransactions[
+          contractWalletAddress
+        ].filter((transaction) => transaction.Account === ownerWalletAddress);
+
+        if (
+          transactionFound.length > 0 &&
+          transactionFound[transactionFound.length - 1].Account ===
+            scannedText &&
+          parseFloat(transactionFound[transactionFound.length - 1].Amount) >=
+            hotelRegiFee
+        ) {
+          setIsTransactionfound(true);
+          setShowQRModal(false);
+          setIsTransactionDone(true);
+
+          stopListeningToTransactionsByAddress(contractWalletAddress);
+          sendHotelRegistrationRequest();
+          deinit();
+          clearTimeout(tmId);
+        } else {
+          clearTimeout(tmId);
+          tmId = setTimeout(checkTransactions, 1000);
         }
+      }
     };
 
     if (!isTransactionFound) {
-        checkTransactions();
+      checkTransactions();
     }
 
     return () => {
       clearTimeout(tmId);
     };
-
-  }, [listenedTransactions, isTransactionFound]); 
+  }, [listenedTransactions, isTransactionFound]);
 
   return (
     <>
-      {showQRModal && (<TransactionQRModal isOpen={showQRModal} qrMessage={contractWalletAddress} onClose={onCloseQRModel} />) }
+      {showQRModal && (
+        <TransactionQRModal
+          isOpen={showQRModal}
+          qrMessage={contractWalletAddress}
+          onClose={onCloseQRModel}
+        />
+      )}
       <MainContainer>
-        {/* {!newWallet ? <div className="spinnerWrapper">
-          <Spinner
-            color="primary"
-            style={{
-              height: "3rem",
-              width: "3rem",
-            }}
-            type="grow"
-          >
-            Loading...
-          </Spinner>
-        </div>: null} */}
-
         <section>
           <div className="title_1">Welcome {user}!</div>
           <Card1>
@@ -493,7 +524,9 @@ function RegisterHotel() {
                 <h6>Your wallet address : {scannedText}</h6>
               )}
             </div>
-            <div style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}>
+            <div
+              style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
+            >
               <Button className="secondaryButton" onClick={openQRScanner}>
                 Open QR Scanner
               </Button>
@@ -522,7 +555,7 @@ function RegisterHotel() {
                   with all necessary licenses and permits, which can be shown
                   upon first request.
                   <br /> VoyageLanka reserves the right to verify and
-                   investigate any details provided in this registration. 
+                  investigate any details provided in this registration.
                 </p>
               </Label>
             </FormGroup>
@@ -549,18 +582,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-            disabled={false}
-            onClick={onProceedToPayment}
-          >
-            Proceed to payments
-          </Button>
-          <Button
-            className="secondaryButton"
-            style={{ width: "650px" }}
-             disabled={
-               registerButtonDisable ||
-               !(isCondition1Checked && isCondition2Checked)
-             }
+            disabled={
+              registerButtonDisable ||
+              !(isCondition1Checked && isCondition2Checked)
+            }
             onClick={submitForm}
           >
             Complete Hotel Registration
