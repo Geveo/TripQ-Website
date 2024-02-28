@@ -1,5 +1,5 @@
 import evernode from 'evernode-js-client'
-import { add, remove, removeAll } from "../features/transactionListener/transactionListenerSlice";
+import { add as txListenerAdd, remove as txListenerRemove, removeAll as txListenerRemoveAll }  from "../features/transactionListener/transactionListenerSlice";
 import { store } from './../app/store'; 
 const { XRPLAccountEventTypes } = require('./../constants/constants')
 
@@ -42,7 +42,7 @@ export async function deinit() {
 export async function listenToTransactionsByAddress(accountAddress, txFilter = null) {
     const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
     clients.push(client)
-    store.dispatch(add({ key: accountAddress, value: [] }));
+    store.dispatch(txListenerAdd({ key: accountAddress, value: [] }));
 
     try {
         console.log("Listening to the transactions of ", accountAddress)
@@ -52,11 +52,11 @@ export async function listenToTransactionsByAddress(accountAddress, txFilter = n
             if(txFilter && txFilter.account) {
                 if(tx.Account === txFilter.account) {
                     const tempArray = listenedTransactions.hasOwnProperty(accountAddress) && listenedTransactions[accountAddress].length > 0 ? [...listenedTransactions[accountAddress], tx] : [tx]
-                    store.dispatch(add({ key: accountAddress, value: tempArray }));
+                    store.dispatch(txListenerAdd({ key: accountAddress, value: tempArray }));
                 }
             } else {
                 const tempArray = listenedTransactions.hasOwnProperty(accountAddress) && listenedTransactions[accountAddress].length > 0 ? [...listenedTransactions[accountAddress], tx] : [tx]
-                store.dispatch(add({ key: accountAddress, value: tempArray }));
+                store.dispatch(txListenerAdd({ key: accountAddress, value: tempArray }));
             }
         }); 
 
@@ -75,13 +75,54 @@ export async function stopListeningToTransactionsByAddress(accountAddress = null
                     console.log("Stop listening to transactions of ", accountAddress)
                     c.off(XRPLAccountEventTypes.PAYMENT)
                     await c.unsubscribe();
-                    store.dispatch(remove(accountAddress));
+                    store.dispatch(txListenerRemove(accountAddress));
                 } else {
                     c.off(XRPLAccountEventTypes.PAYMENT)
                     await c.unsubscribe();
-                    store.dispatch(removeAll());
+                    store.dispatch(txListenerRemoveAll());
                 }
             }
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * 
+ * @param {*} accountAddress 
+ * @param {*} currency 
+ * @param {*} issuer 
+ * @returns An array of trustline objects | Empty array if not
+ */
+export async function getTrustlines(accountAddress, currency, issuer) {
+
+    const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
+    clients.push(client)
+
+    try {
+        console.log("Getting trustlines of ", accountAddress);
+        const trustlines = await client.getTrustLines(currency, issuer);
+        return trustlines;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * 
+ * @param {*} accountAddress 
+ * @returns An array of transaction objects
+ */
+export async function getTransactions(accountAddress) {
+    const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
+    clients.push(client)
+
+    try {
+        console.log("Getting transactions of ", accountAddress);
+        const trxs = await client.getAccountTrx();
+        return trxs;
 
     } catch (error) {
         throw error;
