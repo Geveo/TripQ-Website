@@ -42,7 +42,7 @@ export default class ContractService {
       this.client.on(HotPocket.events.disconnect, () => {
         console.log("Disconnected");
         this.isConnectionSucceeded = false;
-        window.location.reload();
+        // window.location.reload();
       });
 
       // This will get fired as servers connects/disconnects.
@@ -76,7 +76,7 @@ export default class ContractService {
       if (!this.isConnectionSucceeded) {
         if (!(await this.client.connect())) {
           console.log("Connection failed.");
-          window.location.reload();
+          // window.location.reload();
           return false;
         }
         console.log("HotPocket Connected.");

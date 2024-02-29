@@ -1,0 +1,26 @@
+.page-header {
+    color: black;
+    font-size: 2rem;
+    font-weight: 500;
+
+    span.account-address {
+        font-size: 1.3rem;
+        font-weight: 400;
+        color: rgb(0, 0, 0);
+        background-color: rgba(229, 225, 225, 0.763);
+        border-radius: 5px;
+    }
+
+}
+
+.cell-texts {
+    margin: 5px 0;
+}
+
+.text-red {
+    color: red;
+}
+
+.text-green {
+    color: green;
+}
