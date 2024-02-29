@@ -280,46 +280,44 @@ function RegisterHotel() {
   ]);
 
   async function sendHotelRegistrationRequest() {
-    if (isinputFieldsValidated) {
-      try {
-        // Submit for registration
-        let res = await hotelService.registerHotel(hotelData);
-        console.log("res", res);
+    try {
+      // Submit for registration
+      let res = await hotelService.registerHotel(hotelData);
+      console.log("res", res);
 
-        if (res.rowId.lastId > 0) {
-          toast.success("Registered successfully!", {
-            duration: 10000,
-          });
-          // toast(
-          //   (element) => (
-          //     <ToastViewHotelWallet
-          //       warningMessage={
-          //         "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
-          //       }
-          //     />
-          //   ),
-          //   {
-          //     duration: Infinity,
-          //   }
-          // );
+      if (res.rowId.lastId > 0) {
+        toast.success("Registered successfully!", {
+          duration: 10000,
+        });
+        // toast(
+        //   (element) => (
+        //     <ToastViewHotelWallet
+        //       warningMessage={
+        //         "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
+        //       }
+        //     />
+        //   ),
+        //   {
+        //     duration: Infinity,
+        //   }
+        // );
 
-          navigate(`/hotel/${res.hotelId}`);
-        } else {
-          toast(
-            (element) => (
-              <ToastInnerElement
-                message={"Registration failed!"}
-                id={element.id}
-              />
-            ),
-            {
-              duration: Infinity,
-            }
-          );
-        }
-      } catch (error) {
-        console.error("Error occurred:", error);
+        navigate(`/hotel/${res.hotelId}`);
+      } else {
+        toast(
+          (element) => (
+            <ToastInnerElement
+              message={"Registration failed!"}
+              id={element.id}
+            />
+          ),
+          {
+            duration: Infinity,
+          }
+        );
       }
+    } catch (error) {
+      console.error("Error occurred:", error);
     }
   }
 
@@ -582,10 +580,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-             disabled={
-               registerButtonDisable ||
-               !(isCondition1Checked && isCondition2Checked)
-             }
+            //  disabled={
+            //    registerButtonDisable ||
+            //    !(isCondition1Checked && isCondition2Checked)
+            //  }
             onClick={submitForm}
           >
             Complete Hotel Registration
