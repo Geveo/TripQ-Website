@@ -15,6 +15,7 @@ const RequestSubTypes = {
     IS_REGISTERED_HOTEL: "IsRegisteredHotel",
     SEARCH_HOTELS_WITH_ROOM: "SearchHotelsWithRoom",
     GET_SINGLE_HOTEL_WITH_ROOMS: "GetSingleHotelWithRooms",
+    GET_HOTELS_BY_WALLET_ADDRESS: "GetHotelsListByWalletAddress",
 
     GET_ROOMS: "GetRooms",
     GET_ROOMS_BY_HOTELID: "GetRoomTypes",

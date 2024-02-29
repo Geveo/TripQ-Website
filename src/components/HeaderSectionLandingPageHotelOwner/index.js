@@ -9,6 +9,7 @@ import XrplService from "../../services-common/xrpl-service";
 import HotelService from "../../services-domain/hotel-service copy";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
+import LoginModal from "../Login/LoginModal";
 
 const HeaderSectionLandingPageHotelOwner = () => {
   const navigate = useNavigate();
@@ -20,11 +21,32 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const [secret, setSecret] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
 
-  const noSecret = () => {
+  const openLoginModal = () => {
+    setLoginOpen(true);
+  };
+
+  const closeLoginModal = (loginSuccessful) => {
+    setLoginOpen(false);
+    if(loginSuccessful){
+      navigate("/hotel-list");
+    }
+  };
+
+  const registerHotel = () => {
     dispatch(hide());
     navigate("/register-hotel");
   };
+
+  const openQRScanner = () => {
+    dispatch(hide());
+    if(localStorage.getItem("Account")){
+      navigate("/hotel-list");
+    }else{
+      openLoginModal();
+    }
+};
 
   const submit = async (e) => {
     e.preventDefault();
@@ -86,15 +108,16 @@ const HeaderSectionLandingPageHotelOwner = () => {
           <div>
             <Button
               className={`primaryButton smallMarginTopBottom ${styles.buttonOverride}`}
-              onClick={() => dispatch(show())}
+              onClick={() => openQRScanner()}
             >
-              I have a secret
+              View Hotel Details
             </Button>
+            <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />
             <Button
               className="secondaryButton smallMarginTopBottom"
-              onClick={() => noSecret()}
+              onClick={() => registerHotel()}
             >
-              I don't have a secret
+              Register Hotel
             </Button>
           </div>
           {visibility ? (

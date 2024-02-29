@@ -15,6 +15,10 @@ const HeaderSectionLandingPageCustomer = () => {
         dispatch(hide());
         navigate("/register-customer");
     };
+    const haveSecret = () => {
+        dispatch(hide());
+        navigate("/scan-qr-code");
+    };
 
     const submit = () => {
         dispatch(hide());
@@ -39,7 +43,7 @@ const HeaderSectionLandingPageCustomer = () => {
                     <div>
                         <Button
                             className={`primaryButton smallMarginTopBottom ${styles.buttonOverride}`}
-                            onClick={() => dispatch(show())}
+                            onClick={() => haveSecret()}
                         >
                             I have a secret
                         </Button>
