@@ -1,17 +1,20 @@
 import Card1 from "../../layout/Card";
 import React, { useEffect, useState } from "react";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
+//import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 import RoomFacilities from "./RoomFacilities";
-import { v4 as uuid } from 'uuid';
-import { bed_types } from "../../constants/constants";
+//import { v4 as uuid } from 'uuid';
+//import { bed_types } from "../../constants/constants";
 
 function CreateRoomModal(props) {
+    const { onSubmitRoom } = props;
     const [roomName, setRoomName] = useState("");
     const [description, setDescription] = useState("");
     const [numOfRooms, setNumOfRooms] = useState(0);
-    const [bedType, setBedType] = useState("Single");
-    const [numOfBeds, setNumOfBeds] = useState(0);
-    const [pricePerNight, setPricePerNight] = useState(0.0);
+    const [numOfSingleBeds, setNumOfSingleBeds] = useState(0);
+    const [numOfDoubleBeds, setNumOfDoubleBeds] = useState(0);
+    const [numOfTripleBeds, setNumOfTripleBeds] = useState(0);
+    const [sqft, setSqft] = useState(0);
+    const [pricePerDay, setPricePerDay] = useState(0.0);
     const [roomCreateDisabled, setRoomCreateDisabled] = useState(true);
 
     const [checkedFacilities, setCheckedFacilities] = useState([]);
@@ -28,23 +31,45 @@ function CreateRoomModal(props) {
         if (event.target.value < 0) {
             return;
         }
-        setNumOfRooms(event.target.value);
+        setNumOfRooms(parseInt(event.target.value, 10));
     }
 
-    const onChangeNumOfBeds = (event) => {
+    const onChangeNumOfSingleBeds = (event) => {
         if (event.target.value < 0) {
             return;
         }
-        setNumOfBeds(event.target.value);
+        setNumOfSingleBeds(parseInt(event.target.value, 10));
     }
 
-    const onChangePricePerNight = (event) => {
+    const onChangeNumOfDoubleBeds = (event) => {
+        if (event.target.value < 0) {
+            return;
+        }
+        setNumOfDoubleBeds(parseInt(event.target.value, 10));
+    }
+
+    const onChangeNumOfTripleBeds = (event) => {
+        if (event.target.value < 0) {
+            return;
+        }
+        setNumOfTripleBeds(parseInt(event.target.value, 10));
+    }
+
+    const onChangeSqft = (event) => {
+        if (event.target.value < 0) {
+            return;
+        }
+        setSqft(parseInt(event.target.value, 10));
+    }
+
+    const onChangePricePerDay = (event) => {
         let regexp = /^[+]?\d*\.?\d*$/;
 
         if (!regexp.test(event.target.value)) {
             return;
         }
-        setPricePerNight(event.target.value);
+        console.log(event.target.value)
+        setPricePerDay(event.target.value);
     }
 
     const onChangeFacility = (checked, facility) => {
@@ -61,49 +86,63 @@ function CreateRoomModal(props) {
         }
     }
 
+    const onSubmitRoomModal = () => {
+        try {
+            const data = {
+                "HotelId": 0,
+                "Code": roomName,
+                "Sqft": sqft,
+                "Description": description,
+                "RoomsCount": numOfRooms,
+                "SingleBedCount": numOfSingleBeds,
+                "DoubleBedCount": numOfDoubleBeds,
+                "TripleBedCount": numOfTripleBeds,
+                "Price": pricePerDay,
+                "Facilities": checkedFacilities.map(fc => ({ RFacilityId: fc.Id, ...fc }))
+            };
+            onSubmitRoom(data);
+        }
+        catch (error) {
+            console.log(error);
+            throw error;
+        }
 
-    const [bedTypeDropDownOpen, setBedTypeDropDownOpen] = useState(false);
-
-    const onSubmitRoom = () => {
-        props.onSubmitRoom({
-            "Name": roomName,
-            "Description": description,
-            "MaxRoomCount": numOfRooms,
-            "BedType": bedType,
-            "NoOfBeds": numOfBeds,
-            "CostPerNight": pricePerNight,
-            "Facilities": checkedFacilities.map(fc => ({ RFacilityId: fc.Id, ...fc }))
-        });
     }
 
+
+
+    /* 
     const toggleBedTypeDropDown = () => {
         setBedTypeDropDownOpen(prevState => !prevState)
-    }
 
     const changeBedType = (value) => {
-
         setBedType(value);
     }
+    const [bedTypeDropDownOpen, setBedTypeDropDownOpen] = useState(false);
+    }*/
+
+
+
 
     //disable create room button logic
     useEffect(() => {
-        if (roomName && description && numOfRooms && bedType && numOfBeds && pricePerNight && checkedFacilities.length > 0) {
+        if (roomName && description && numOfRooms && numOfSingleBeds && numOfDoubleBeds && pricePerDay && numOfTripleBeds && checkedFacilities.length > 0) {
             setRoomCreateDisabled(false);
         }
         else {
-            setRoomCreateDisabled(true);
+            setRoomCreateDisabled(false);
         }
-    }, [roomName, description, numOfRooms, bedType, numOfBeds, pricePerNight, checkedFacilities])
+    }, [roomName, description, numOfRooms, numOfSingleBeds, numOfDoubleBeds, pricePerDay, numOfTripleBeds, checkedFacilities])
 
     return (
         <div className={"room_modal pt-0 mt-0"}>
             <Card1 width={"850px"} className={"mt-0"}>
 
                 <div className={"title_2"}>
-                    Create Room
+                    Create Room Type
                 </div>
 
-                <div className="title_3_sub mt-3">Room Name</div>
+                <div className="title_3_sub mt-3">Room Type Name</div>
                 <input type="text" className="form-control input_full" id="room_name"
                     style={{ backgroundColor: '#ffffff', borderColor: "#908F8F" }} value={roomName}
                     onChange={onChangeRoomName} />
@@ -112,18 +151,36 @@ function CreateRoomModal(props) {
                 <textarea className={"text_area"} name="description" rows={5} value={description}
                     onChange={onChangeDescription} />
 
+                <div className="title_3_sub mt-3">Room Size in Sqft</div>
+                <input type="number" className="form-control input_half" id="sqfts"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "30%" }} value={sqft}
+                    onChange={onChangeSqft} />
+
                 <div className="title_3_sub mt-3">Number of Rooms</div>
                 <input type="number" className="form-control input_half" id="num_of_rooms"
                     style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "30%" }} value={numOfRooms}
                     onChange={onChangeNumOfRooms} />
 
+
                 <div className="title_3 mt-4">Bed Options</div>
                 <div className={"subtext"} style={{ lineHeight: "20px" }}>Tell us only about the existing beds in a
-                    room (don't include extra
-                    beds).
+                    room (don't include extra beds).
                 </div>
+                <div className="title_3_sub mt-3">Number of Single Beds</div>
+                <input type="number" className="form-control input_half" id="numOfSingleBeds"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "30%" }} value={numOfSingleBeds}
+                    onChange={onChangeNumOfSingleBeds} />
+                <div className="title_3_sub mt-3">Number of Double Beds</div>
+                <input type="number" className="form-control input_half" id="numOfDoubleBeds"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "30%" }} value={numOfDoubleBeds}
+                    onChange={onChangeNumOfDoubleBeds} />
+                <div className="title_3_sub mt-3">Number of Triple Beds</div>
+                <input type="number" className="form-control input_half" id="numOfDoubleBeds"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "30%" }} value={numOfTripleBeds}
+                    onChange={onChangeNumOfTripleBeds} />
 
-                <div className={"row left_div"}>
+
+                {/*  <div className={"row left_div"}>
                     <div className={"col"} style={{ width: "100%" }}>
                         <div className="title_3_sub mt-3">Bed Type</div>
                         <Dropdown isOpen={bedTypeDropDownOpen} toggle={toggleBedTypeDropDown}
@@ -157,21 +214,23 @@ function CreateRoomModal(props) {
                             style={{ backgroundColor: '#ffffff', borderColor: "#908F8F" }} value={numOfBeds}
                             onChange={onChangeNumOfBeds} />
                     </div>
-                </div>
+                </div>*/}
 
-                <div className="title_3 mt-4">Base price per night</div>
+
+
+                <div className="title_3 mt-4">Base price per day</div>
                 <div className={"subtext"} style={{ lineHeight: "20px" }}>
                     Tell us only about the existing beds in a room (don't include extra beds).
                 </div>
 
-                <div className="title_3_sub mt-3">Price for one person per night ($)</div>
-                <input type="text" className="form-control input_half" id="price_per_night"
-                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "50%" }} value={pricePerNight}
-                    onChange={onChangePricePerNight} />
+                <div className="title_3_sub mt-3">Price per day ($)</div>
+                <input type="text" className="form-control input_half" id="price_per_day"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "50%" }} value={pricePerDay}
+                    onChange={onChangePricePerDay} />
                 <RoomFacilities onChange={onChangeFacility} />
 
                 <div className={"row center_div pt-3"}>
-                    <button className={"create_room_button"} style={{ width: "500px" }} onClick={onSubmitRoom} disabled={roomCreateDisabled}>
+                    <button className={"create_room_button"} style={{ width: "500px" }} onClick={onSubmitRoomModal} disabled={roomCreateDisabled}>
                         Create Room
                     </button>
                 </div>
