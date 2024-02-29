@@ -13,6 +13,7 @@ import ConfirmBooking from "./pages/ConfirmBooking";
 import AvailabilityPage from "./pages/AvailabilityPage";
 import { useEffect, useState } from "react";
 import { Spinner } from 'reactstrap'
+import AccountTransactions from "./pages/AccountTransactions/AccountTransactions";
 
 function App() {
     const [isContractInitiated, setIsContractInitiated] = useState(false);
@@ -55,6 +56,7 @@ function App() {
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
+                    <Route path="/my-transactions" element={<AccountTransactions />} exact />
 
                 </Routes>
             )}
