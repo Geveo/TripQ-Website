@@ -338,5 +338,31 @@ export default class HotelService {
             throw(error);
         }
     }
+
+    /**
+     *
+     * @returns An hotel object || null
+     */
+    async getHotelsList(walletAddress) {
+        const submitObject = {
+            type: constants.RequestTypes.HOTEL,
+            subType: constants.RequestSubTypes.GET_HOTELS_BY_WALLET_ADDRESS,
+            filters: {
+                WalletAddress: walletAddress
+            }
+        }
+        try {
+            const res = await this.contractService?.submitReadRequest(submitObject);
+            if (res && res.length > 0) {
+                return res;
+            } else {
+                console.log("No hotel found.");
+                return null;
+            }
+        } catch (error) {
+            console.log(error);
+            throw (error);
+        }
+    }
 }
 

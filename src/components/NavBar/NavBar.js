@@ -23,6 +23,9 @@ function NavBar(props) {
 
     const isCustomer = localStorage.getItem("customer");
     const [isCopiedAddress, setIsCopiedAddress] = useState(false);
+    const openQRScanner = () => {
+        navigate("/login");
+    };
     return (
         <>
             <div>
@@ -75,6 +78,14 @@ function NavBar(props) {
                     >
                         My Reservations
                     </Button>
+                    <Button
+                        outline
+                        className="primaryButton smallMarginLeftRight"
+                        onClick={() => openQRScanner()}
+                    >
+                        Login
+                    </Button>
+                    
                     <Dropdown isOpen={dropdownOpen} toggle={toggle} direction={'down'}
                         className="primaryButton setting-button">
                         <DropdownToggle className="primaryButton setting-button" style={{ height: '100%' }}>

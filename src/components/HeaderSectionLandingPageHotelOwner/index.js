@@ -21,10 +21,15 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
 
-  const noSecret = () => {
+  const registerHotel = () => {
     dispatch(hide());
     navigate("/register-hotel");
   };
+
+  const openQRScanner = () => {
+    dispatch(hide());
+    navigate("/scan-qr-code");
+};
 
   const submit = async (e) => {
     e.preventDefault();
@@ -86,15 +91,15 @@ const HeaderSectionLandingPageHotelOwner = () => {
           <div>
             <Button
               className={`primaryButton smallMarginTopBottom ${styles.buttonOverride}`}
-              onClick={() => dispatch(show())}
+              onClick={() => openQRScanner()}
             >
-              I have a secret
+              View Hotel Details
             </Button>
             <Button
               className="secondaryButton smallMarginTopBottom"
-              onClick={() => noSecret()}
+              onClick={() => registerHotel()}
             >
-              I don't have a secret
+              Register Hotel
             </Button>
           </div>
           {visibility ? (
