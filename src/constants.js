@@ -17,8 +17,8 @@ const RequestSubTypes = {
     GET_SINGLE_HOTEL_WITH_ROOMS: "GetSingleHotelWithRooms",
 
     GET_ROOMS: "GetRooms",
-    GET_ROOMS_BY_HOTELID: "GetRoomsByHotelId",
-    CREATE_ROOM: "CreateRoom",
+    GET_ROOMS_BY_HOTELID: "GetRoomTypes",
+    CREATE_ROOMTYPE: "CreateRoomType",
     EDIT_ROOM: "EditRoom",
     DELETE_ROOM: "DeleteRoom",
 

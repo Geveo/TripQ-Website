@@ -29,6 +29,8 @@ function HotelHomePage() {
         setIsDataLoading(true);
         if (id && id > 0) {
             try {
+
+                //IMPLEMENT BACK END
                 const res = await hotelService.getMyHotel(id);
                 if (!res) {
                     toast(
@@ -66,16 +68,7 @@ function HotelHomePage() {
         setIsDataLoading(false);
     }
 
-    // Load room details
-    async function getRooms() {
-        if (id && id > 0) {
-            const res = await HotelService.instance.getMyHotelRoomList(id);
-            if (res.roomList && res.roomList.length > 0) {
-                setRooms(res.roomList)
-            }
-        }
-
-    }
+  
 
     async function innnit() {
         await ContractService.instance.init();
@@ -85,7 +78,7 @@ function HotelHomePage() {
     useEffect(() => {
         innnit();
         getHotelDetails();
-        getRooms();
+        getRoomTypes();
     }, []);
 
     const [images, setImages] = useState([]);
@@ -140,26 +133,48 @@ function HotelHomePage() {
     const onSubmitRoom = async (room_data) => {
 
         // If there is a roomdata,  send a request to submit the room for creation.
-        // on successfull return id, call the fetch room query method   
-        const res = await HotelService.instance.createRoom(id, room_data);
-        if (res.roomId && res.roomId > 0) {
-            await getRooms();
-            // setRooms(prevState => {
-            //     return [...prevState, room_data]
-            // })
+        // on successfull return id, call the fetch room query method 
 
-        }
-
-        setCreatingRoom(false);
+        room_data.HotelId = parseInt(id, 10);  
+        try{
+            const res = await HotelService.instance.createRoom(room_data);
+            console.log(" res:", res)
+            if (res > 0) {
+                toast.success("Room type created successfully!", {
+                    duration: 10000,
+                  });
+    
+            }}
+            catch (error) {
+                console.log(error);
+                throw (error);
+            } finally{
+                setCreatingRoom(false);
+                await getRoomTypes();
+            }
+       
     }
 
+
+     // Load roomType details
+     async function getRoomTypes() {
+        if (parseInt(id, 10) && parseInt(id, 10) > 0) {
+            const res = await HotelService.instance.getHotelRoomTypes(parseInt(id, 10));
+            console.log(" resRooms:", res)
+            if (res && res.length > 0) {
+                setRooms(res)
+            }
+        }
+
+    }
+  
     const onDeleteRoom = async () => {
 
         // delete the room and call to get rooms again
         const res = await HotelService.instance.deleteMyRoom(deleteRoomDetails.Id);
         console.log(res);
 
-        await getRooms();
+       // await getRooms();
         // setRooms(prevState => {
         //     return prevState.filter(cur_room => {
         //         return cur_room.Id !== deleteRoomDetails.Id;
@@ -336,17 +351,15 @@ function HotelHomePage() {
                         </section>
 
                         <section id={"room_layout_section"} ref={roomLayoutSection}>
-                            <div className="title_2 pt-2 pb-2">Room Layout</div>
+                            <div className="title_2 pt-2 pb-2">Room Types</div>
                             <div className={"subtext"}>Details about your rooms.</div>
-
-                            <button className={"create_room_button mt-5"} style={{width: "200px"}}
-                                    onClick={onOpenCreateRoomModal}>
-                                <FaPlusCircle size={26}/> <span>&nbsp;Add Room</span>
-                            </button>
-
                             {rooms.length !== 0 &&
                             <RoomDetails rooms={rooms} onOpenDeleteRoomModal={onOpenDeleteRoomModal}/>}
 
+                            <button className={"create_room_button mt-5"} style={{width: "200px"}}
+                                    onClick={onOpenCreateRoomModal}>
+                                <FaPlusCircle size={26}/> <span>&nbsp;Add Room Type</span>
+                            </button>
                         </section>
                     </>
                 )}

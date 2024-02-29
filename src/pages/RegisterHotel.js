@@ -303,7 +303,7 @@ function RegisterHotel() {
           //   }
           // );
 
-          navigate(`/hotel/${res.hotelId}`);
+          navigate(`/hotel/${res.rowId.lastId}`);
         } else {
           toast(
             (element) => (

@@ -80,6 +80,24 @@ export default class HotelService {
         return result;
     }
 
+    async createRoom(data) {
+        const submitObject = {
+            type: constants.RequestTypes.ROOM,
+            subType: constants.RequestSubTypes.CREATE_ROOMTYPE,
+            data: data
+        }
+        let result;
+        try {
+            result = await this.contractService.submitInputToContract(submitObject);
+            console.log("res ",result);
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        
+        return result
+    }
+
 
     /**
      *
@@ -173,13 +191,13 @@ export default class HotelService {
      * @param {number} hotelId | Hotel Id
      * @returns | An array of rooms || []
      */
-    async getMyHotelRoomList(hotelId) {
+    async getHotelRoomTypes(hotelId) {
         const submitObject = {
             type: constants.RequestTypes.ROOM,
             subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
-            filters: {HotelId: hotelId}
+            data: {HotelId: hotelId}
         };
-
+        console.log(submitObject);
     let result;
     try {
       result = await this.contractService.submitReadRequest(submitObject);
@@ -241,38 +259,7 @@ export default class HotelService {
      * @param {object} data |
      * @returns A object { roomId: 2}
      */
-    async createRoom(hotelId, data) {
-        const submitObject = {
-            type: constants.RequestTypes.ROOM,
-            subType: constants.RequestSubTypes.CREATE_ROOM,
-            data: {
-                HotelId: hotelId,
-                ...data
-
-            }
-        }
-
-        // make the transaction and set the transaction id to the object before sending
-        const hotelSeed = localStorage.getItem("seed");
-        const res = await this.#xrplService.makePayment(hotelSeed, roomCreationCost, contractWalletAddress);
-
-        if (res.meta.TransactionResult === "tesSUCCESS") {
-            submitObject.data.TransactionId = res.hash;
-            let result;
-            try {
-                result = await this.contractService.submitInputToContract(submitObject);
-                console.log(result)
-            } catch (error) {
-                console.log(error);
-                throw error;
-            }
-            console.log(result)
-            return result;
-
-        } else {
-
-        }
-    }
+ 
 
   async makeReservation(data) {
 
