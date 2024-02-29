@@ -18,8 +18,8 @@ const RequestSubTypes = {
     GET_HOTELS_BY_WALLET_ADDRESS: "GetHotelsListByWalletAddress",
 
     GET_ROOMS: "GetRooms",
-    GET_ROOMS_BY_HOTELID: "GetRoomsByHotelId",
-    CREATE_ROOM: "CreateRoom",
+    GET_ROOMS_BY_HOTELID: "GetRoomTypes",
+    CREATE_ROOMTYPE: "CreateRoomType",
     EDIT_ROOM: "EditRoom",
     DELETE_ROOM: "DeleteRoom",
 
