@@ -74,7 +74,6 @@ function HotelHomePage() {
                 setRooms(res.roomList)
             }
         }
-
     }
 
     async function innnit() {

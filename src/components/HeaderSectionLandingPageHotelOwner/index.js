@@ -9,6 +9,7 @@ import XrplService from "../../services-common/xrpl-service";
 import HotelService from "../../services-domain/hotel-service copy";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
+import LoginModal from "../Login/LoginModal";
 
 const HeaderSectionLandingPageHotelOwner = () => {
   const navigate = useNavigate();
@@ -20,6 +21,18 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const [secret, setSecret] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  const openLoginModal = () => {
+    setLoginOpen(true);
+  };
+
+  const closeLoginModal = (loginSuccessful) => {
+    setLoginOpen(false);
+    if(loginSuccessful){
+      navigate("/hotel-list");
+    }
+  };
 
   const registerHotel = () => {
     dispatch(hide());
@@ -28,7 +41,11 @@ const HeaderSectionLandingPageHotelOwner = () => {
 
   const openQRScanner = () => {
     dispatch(hide());
-    navigate("/scan-qr-code");
+    if(localStorage.getItem("Account")){
+      navigate("/hotel-list");
+    }else{
+      openLoginModal();
+    }
 };
 
   const submit = async (e) => {
@@ -95,6 +112,7 @@ const HeaderSectionLandingPageHotelOwner = () => {
             >
               View Hotel Details
             </Button>
+            <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />
             <Button
               className="secondaryButton smallMarginTopBottom"
               onClick={() => registerHotel()}

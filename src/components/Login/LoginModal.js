@@ -46,7 +46,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       localStorage.setItem("Account", manualInput);
       toast.success("You have successfully logged in.");
       setManualInput("");
-      onClose();
+      onClose(true);
     }else{
       toast.error("Invalid wallet address!")
     }

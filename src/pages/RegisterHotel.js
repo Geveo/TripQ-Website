@@ -233,6 +233,7 @@ function RegisterHotel() {
       ) {
         setIsinputFieldsValidated(true);
         //await onProceedToPayment();
+        await sendHotelRegistrationRequest();
       } else {
         setRegisterButtonDisable(false);
         toast(
@@ -581,10 +582,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-            disabled={
-              registerButtonDisable ||
-              !(isCondition1Checked && isCondition2Checked)
-            }
+             disabled={
+               registerButtonDisable ||
+               !(isCondition1Checked && isCondition2Checked)
+             }
             onClick={submitForm}
           >
             Complete Hotel Registration
