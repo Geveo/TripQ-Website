@@ -214,7 +214,7 @@ function RegisterHotel() {
         Location: JSON.stringify(locationDto),
         Facilities: JSON.stringify(HotelFacilities),
         ImageURLs: imageUrls,
-        WalletAddress: scannedText,
+        WalletAddress: localStorage.getItem("Account"),
       });
 
       setHotelData(hotelData);
@@ -232,7 +232,7 @@ function RegisterHotel() {
         uploadedImages.length > 2
       ) {
         setIsinputFieldsValidated(true);
-        await onProceedToPayment();
+        //await onProceedToPayment();
       } else {
         setRegisterButtonDisable(false);
         toast(
@@ -276,7 +276,6 @@ function RegisterHotel() {
     DistanceFromCenter,
     HotelFacilities,
     uploadedImages,
-    scannedText,
   ]);
 
   async function sendHotelRegistrationRequest() {
@@ -328,69 +327,69 @@ function RegisterHotel() {
     setShowQRScanner(true);
   };
 
-  async function onProceedToPayment() {
-    await init();
-    await listenToTransactionsByAddress(contractWalletAddress, {
-      account: ownerWalletAddress,
-    });
+  // async function onProceedToPayment() {
+  //   await init();
+  //   await listenToTransactionsByAddress(contractWalletAddress, {
+  //     account: ownerWalletAddress,
+  //   });
 
-    setShowQRModal(true);
-  }
+  //   //setShowQRModal(true);
+  // }
 
-  async function onCloseQRModel() {
-    setShowQRModal(false);
-    await stopListeningToTransactionsByAddress(ownerWalletAddress);
-    await deinit();
-  }
+  // async function onCloseQRModel() {
+  //   setShowQRModal(false);
+  //   await stopListeningToTransactionsByAddress(ownerWalletAddress);
+  //   await deinit();
+  // }
 
-  useEffect(() => {
-    let tmId = 0;
-    const checkTransactions = () => {
-      if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
-        const transactionFound = listenedTransactions[
-          contractWalletAddress
-        ].filter((transaction) => transaction.Account === ownerWalletAddress);
+  // useEffect(() => {
+  //   let tmId = 0;
+  //   const checkTransactions = () => {
+  //     if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
+  //       const transactionFound = listenedTransactions[
+  //         contractWalletAddress
+  //       ].filter((transaction) => transaction.Account === ownerWalletAddress);
 
-        if (
-          transactionFound.length > 0 &&
-          transactionFound[transactionFound.length - 1].Account ===
-            scannedText &&
-          parseFloat(transactionFound[transactionFound.length - 1].Amount) >=
-            hotelRegiFee
-        ) {
-          setIsTransactionfound(true);
-          setShowQRModal(false);
-          setIsTransactionDone(true);
+  //       if (
+  //         transactionFound.length > 0 &&
+  //         transactionFound[transactionFound.length - 1].Account ===
+  //           scannedText &&
+  //         parseFloat(transactionFound[transactionFound.length - 1].Amount) >=
+  //           hotelRegiFee
+  //       ) {
+  //         setIsTransactionfound(true);
+  //         setShowQRModal(false);
+  //         setIsTransactionDone(true);
 
-          stopListeningToTransactionsByAddress(contractWalletAddress);
-          sendHotelRegistrationRequest();
-          deinit();
-          clearTimeout(tmId);
-        } else {
-          clearTimeout(tmId);
-          tmId = setTimeout(checkTransactions, 1000);
-        }
-      }
-    };
+  //         stopListeningToTransactionsByAddress(contractWalletAddress);
+  //         sendHotelRegistrationRequest();
+  //         deinit();
+  //         clearTimeout(tmId);
+  //       } else {
+  //         clearTimeout(tmId);
+  //         tmId = setTimeout(checkTransactions, 1000);
+  //       }
+  //     }
+  //   };
 
-    if (!isTransactionFound) {
-      checkTransactions();
-    }
+  //   if (!isTransactionFound) {
+  //     checkTransactions();
+  //   }
 
-    return () => {
-      clearTimeout(tmId);
-    };
-  }, [listenedTransactions, isTransactionFound]);
+  //   return () => {
+  //     clearTimeout(tmId);
+  //   };
+  // }, [listenedTransactions, isTransactionFound]);
 
   return (
     <>
-      {showQRModal && (
+      {/* {showQRModal && (
         <TransactionQRModal
           isOpen={showQRModal}
           qrMessage={contractWalletAddress}
           onClose={onCloseQRModel}
         />
-      )}
+      )} */}
       <MainContainer>
         <section>
           <div className="title_1">Welcome {user}!</div>
@@ -507,7 +506,7 @@ function RegisterHotel() {
           <ImagePreviewSection images={uploadedImages} />
         )}
 
-        <section>
+        {/* <section>
           <div className="title_2">
             Scan Your QR Code<span style={{ color: "red" }}>*</span>
           </div>
@@ -532,7 +531,7 @@ function RegisterHotel() {
               </Button>
             </div>
           </Card1>
-        </section>
+        </section> */}
 
         <section>
           <h5 style={{ lineHeight: "25px" }}>
