@@ -16,6 +16,7 @@ import { Spinner } from 'reactstrap';
 import ScanQRCode from "./pages/ScanQRCode";
 import HotelsList from "./pages/HotelsList";
 import Login from "./pages/Login";
+import AccountTransactions from "./pages/AccountTransactions/AccountTransactions";
 
 function App() {
     const [isContractInitiated, setIsContractInitiated] = useState(false);
@@ -58,10 +59,9 @@ function App() {
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
-                    <Route path="/scan-qr-code" element={<ScanQRCode/>} exact />
-                    <Route path="/hotel-list" element={<HotelsList/>} exact />
-                    <Route path="/login" element={<Login/>} exact />
-
+                    <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
+                    <Route path="/hotel-list" element={<HotelsList />} exact />
+                    <Route path="/login" element={<Login />} exact />
                 </Routes>
             )}
             {!isContractInitiated && (
