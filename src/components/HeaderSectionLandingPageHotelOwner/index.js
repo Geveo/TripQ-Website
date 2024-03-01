@@ -22,6 +22,7 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [regiHotel, setRegiHotel] = useState(false);
 
   const openLoginModal = () => {
     setLoginOpen(true);
@@ -30,16 +31,26 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const closeLoginModal = (loginSuccessful) => {
     setLoginOpen(false);
     if(loginSuccessful){
-      navigate("/hotel-list");
+      if(regiHotel){
+        setRegiHotel(false);
+        navigate("/register-hotel");
+      }else{
+        navigate("/hotel-list");
+      }
     }
   };
 
   const registerHotel = () => {
     dispatch(hide());
-    navigate("/register-hotel");
+    setRegiHotel(true);
+    if(localStorage.getItem("Account")){
+      navigate("/register-hotel");
+    }else{
+      openLoginModal();
+    }
   };
 
-  const openQRScanner = () => {
+  const viewHotelDetails = () => {
     dispatch(hide());
     if(localStorage.getItem("Account")){
       navigate("/hotel-list");
@@ -108,7 +119,7 @@ const HeaderSectionLandingPageHotelOwner = () => {
           <div>
             <Button
               className={`primaryButton smallMarginTopBottom ${styles.buttonOverride}`}
-              onClick={() => openQRScanner()}
+              onClick={() => viewHotelDetails()}
             >
               View Hotel Details
             </Button>
