@@ -75,7 +75,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       </ModalHeader>
       <ModalBody>
         <Card1>
-          {showManualInput && (
+          {!showQRScanner && (
             <>
               <div style={{ textAlign: "center" }}>
                 <label style={{ margin: 20, fontWeight: "bold" }}>
@@ -105,9 +105,9 @@ const LoginModal = ({ isOpen, onClose }) => {
               marginBottom: 20,
             }}
           >
-            <span className="clickable-text" onClick={openQRScanner}>
+            {!showQRScanner && (<span className="clickable-text" onClick={openQRScanner}>
               Open QR Scanner
-            </span>
+            </span>)}
           </div>
         </Card1>
         <div style={{ textAlign: "center", marginTop: 20 }}>
