@@ -7,6 +7,9 @@ import { Button } from "reactstrap";
 import "./styles.scss";
 import XrplService from "../../services-common/xrpl-service";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { loginSuccessfully } from "../../features/LoginState/LoginStateSlice";
+
 /**
  *
  * @param string  qrMessage : Message to be encoded
@@ -20,6 +23,8 @@ const LoginModal = ({ isOpen, onClose }) => {
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const xrplService = XrplService.xrplInstance;
+
+  const dispatch = useDispatch();
 
   const handleManualInput = (event) => {
     const inputText = event.target.value;
@@ -45,6 +50,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     if(isValidAddress){
       localStorage.setItem("Account", manualInput);
       toast.success("You have successfully logged in.");
+      dispatch(loginSuccessfully(manualInput));
       setManualInput("");
       onClose(true);
     }else{
@@ -106,7 +112,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         </Card1>
         <div style={{ textAlign: "center", marginTop: 20 }}>
           <Button className="secondaryButton" onClick={handleLogin}>
-            Login
+            Submit
           </Button>
         </div>
       </ModalBody>

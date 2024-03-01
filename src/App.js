@@ -16,15 +16,25 @@ import { Spinner } from 'reactstrap';
 import ScanQRCode from "./pages/ScanQRCode";
 import HotelsList from "./pages/HotelsList";
 import AccountTransactions from "./pages/AccountTransactions/AccountTransactions";
+import {useDispatch, useSelector} from 'react-redux';
+import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";
 
 function App() {
-    const [isContractInitiated, setIsContractInitiated] = useState(false);
 
+    const dispatch = useDispatch();
+    const loginState = useSelector((state) => state.loginState);
+
+    const [isContractInitiated, setIsContractInitiated] = useState(false);
 
     useEffect(() => {
         ContractService.instance.init().then(res => {
             setIsContractInitiated(true);
         });
+
+        const acc = localStorage.getItem('Account');
+        if(acc && acc.length > 0) {
+            dispatch(loginSuccessfully(acc));
+        }
 
         const handleBackButton = () => {
             // Do something when the back button is clicked
@@ -38,7 +48,6 @@ function App() {
         return () => {
             window.removeEventListener("popstate", handleBackButton);
         };
-
 
     }, []);
 
@@ -60,6 +69,11 @@ function App() {
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
                     <Route path="/hotel-list" element={<HotelsList />} exact />
+                    {loginState.isLoggedIn && (
+                        <Route path="/my-transactions" element={<AccountTransactions />} exact />
+                    )}
+                    <Route path="*" element={<CustomerDashboard />} />
+                    
                 </Routes>
             )}
             {!isContractInitiated && (

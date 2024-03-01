@@ -54,10 +54,16 @@
 
 .setting-button {
   border-radius: 0.5rem;
+  border-color: #0000;
 }
 
 .dropdown-menu.show{
-  width: 560px;
+  width: auto;
+}
+
+.address-text {
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .wallet_address_title {

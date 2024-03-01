@@ -1,34 +1,41 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
 import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
 import './styles.scss';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {deinit, init, getTransactions} from './../../services-common/evernode-xrpl-service'
 
 const  AccountTransactions = () => {
     
-    const [accountAddress, setAccountAddress] = useState('rsDEfCNEYbjGEje2fgqP1rRPVD7bmhih15');
+    const [accountAddress, setAccountAddress] = useState(null);
     const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
-        loadTransactions();
+        const acc = localStorage.getItem("Account");
+        if(acc && acc.length > 0) {
+            setAccountAddress(acc);
+        }
+
+        if(accountAddress)
+            loadTransactions();
     }, [accountAddress]);
 
     const loadTransactions =  () => {
-        init().then(res => {
-            getTransactions(accountAddress).then(res => {
-                const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
-                setTransactions(sortedtrx);
-                deinit().catch(e => {throw e});
-            }).catch(e => {throw e})
-        }).catch(error => {
-            console.log(error)
-        })
+        if(accountAddress) {
+            init().then(res => {
+                getTransactions(accountAddress).then(res => {
+                    const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
+                    setTransactions(sortedtrx);
+                    deinit().catch(e => {throw e});
+                }).catch(e => {throw e})
+            }).catch(error => {
+                console.log(error)
+            })
+        }
     }
 
 
@@ -69,7 +76,7 @@ const  AccountTransactions = () => {
     
     return (
         <>
-            <Container>
+            <Container style={{minHeight: '85vh'}}>
                 <Row>
                     <Col lg={10}>
                         <div className='page-header mt-4'>

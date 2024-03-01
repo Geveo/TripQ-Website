@@ -15,21 +15,27 @@ import { RiFileSettingsFill } from "react-icons/ri";
 import { FaCopy } from "react-icons/fa";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import LoginModal from "../Login/LoginModal";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutSuccessfully } from "../../features/LoginState/LoginStateSlice";
+
 
 const isUnderConstruction = process.env.REACT_APP_IS_UNDER_CONSTRUCTION
-  ? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
-    ? true
-    : false
-  : false;
-const underConstructionMsg =
-  process.env.REACT_APP_UNDER_CONSTRUCTION_MESSAGE ?? "";
+? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
+? true
+: false
+: false;
+const underConstructionMsg = process.env.REACT_APP_UNDER_CONSTRUCTION_MESSAGE ?? "";
 
 function NavBar(props) {
   const navigate = useNavigate();
+  const loginState = useSelector((state) => state.loginState);
+  const dispatch = useDispatch();
+
   const walletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
   const isCustomer = localStorage.getItem("customer");
@@ -42,6 +48,18 @@ function NavBar(props) {
   const closeLoginModal = () => {
     setLoginOpen(false);
   };
+
+  const goToMyTransactionsPage = () => {
+    navigate('/my-transactions');
+  }
+
+  const logout = () => {
+    localStorage.removeItem('Account');
+    dispatch(logoutSuccessfully())
+    navigate('/')
+  }
+
+
   return (
     <>
       <div>
@@ -114,15 +132,45 @@ function NavBar(props) {
           >
             My Reservations
           </Button>
-          <Button
-            outline
-            className="primaryButton smallMarginLeftRight"
-            onClick={() => openLoginModal()}
-          >
-            Login
-          </Button>
-          <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />
+
+          {loginState.isLoggedIn ? (
           <Dropdown
+            isOpen={dropdownOpen}
+            toggle={toggle}
+            direction={"down"}
+            className="primaryButton setting-button"
+          >
+            <DropdownToggle
+              className="primaryButton setting-button"
+              style={{ height: "100%" }}
+            >
+              {`${loginState.loggedInAddress.slice(0,7)}...`}
+            </DropdownToggle>
+            <DropdownMenu style={{ marginTop: " 15px" }}>
+              <DropdownItem text className="address-text">
+              {loginState.loggedInAddress}
+              </DropdownItem>
+              <DropdownItem divider />
+              <DropdownItem onClick={() => goToMyTransactionsPage()}>
+                My transactions
+              </DropdownItem>
+              <DropdownItem onClick={() => logout()}>
+                Log out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+
+          ) : (
+            <Button
+              outline
+              className="primaryButton smallMarginLeftRight"
+              onClick={() => openLoginModal()}
+            >
+              Login
+            </Button>
+          )}
+          { loginOpen && <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />} 
+          {/* <Dropdown
             isOpen={dropdownOpen}
             toggle={toggle}
             direction={"down"}
@@ -152,7 +200,7 @@ function NavBar(props) {
                 ) : null}
               </DropdownItem>
             </DropdownMenu>
-          </Dropdown>
+          </Dropdown> */}
         </Navbar>
       </div>
     </>
