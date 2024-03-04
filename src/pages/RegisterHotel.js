@@ -213,7 +213,7 @@ function RegisterHotel() {
         ContactDetails: JSON.stringify(contactDetails),
         Location: JSON.stringify(locationDto),
         Facilities: JSON.stringify(HotelFacilities),
-        ImageURLs: imageUrls,
+        ImageURLs: JSON.stringify(imageUrls),
         WalletAddress: localStorage.getItem("Account"),
       });
 
@@ -231,9 +231,27 @@ function RegisterHotel() {
         HotelFacilities.length > 0 &&
         uploadedImages.length > 2
       ) {
-        setIsinputFieldsValidated(true);
         //await onProceedToPayment();
-        await sendHotelRegistrationRequest();
+        let res = await hotelService.registerHotel(hotelData);
+
+        if (res.rowId.lastId > 0) {
+          toast.success("Registered successfully!", {
+            duration: 10000,
+          });
+          navigate(`/hotel/${res.rowId.lastId}`);
+        } else {
+          toast(
+            (element) => (
+              <ToastInnerElement
+                message={"Registration failed!"}
+                id={element.id}
+              />
+            ),
+            {
+              duration: Infinity,
+            }
+          );
+        }
       } else {
         setRegisterButtonDisable(false);
         toast(
@@ -278,48 +296,6 @@ function RegisterHotel() {
     HotelFacilities,
     uploadedImages,
   ]);
-
-  async function sendHotelRegistrationRequest() {
-    try {
-      // Submit for registration
-      let res = await hotelService.registerHotel(hotelData);
-      console.log("res", res);
-
-      if (res.rowId.lastId > 0) {
-        toast.success("Registered successfully!", {
-          duration: 10000,
-        });
-        // toast(
-        //   (element) => (
-        //     <ToastViewHotelWallet
-        //       warningMessage={
-        //         "You can close this, if you have copied and saved these secrets somewhere safely. You  cannot get these once closed."
-        //       }
-        //     />
-        //   ),
-        //   {
-        //     duration: Infinity,
-        //   }
-        // );
-
-        navigate(`/hotel/${res.hotelId}`);
-      } else {
-        toast(
-          (element) => (
-            <ToastInnerElement
-              message={"Registration failed!"}
-              id={element.id}
-            />
-          ),
-          {
-            duration: Infinity,
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Error occurred:", error);
-    }
-  }
 
   const openQRScanner = () => {
     setScannedText("");

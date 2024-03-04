@@ -14,7 +14,7 @@ import AvailabilityPage from "./pages/AvailabilityPage";
 import { useEffect, useState } from "react";
 import { Spinner } from 'reactstrap';
 import ScanQRCode from "./pages/ScanQRCode";
-import HotelsList from "./pages/HotelsList";
+import HotelsList from "./pages/HotelsList/HotelsList";
 import AccountTransactions from "./pages/AccountTransactions/AccountTransactions";
 import {useDispatch, useSelector} from 'react-redux';
 import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";

@@ -351,5 +351,32 @@ export default class HotelService {
             throw (error);
         }
     }
+
+     /**
+     *
+     * @returns hotel images || null
+     */
+     async getHotelImagesById(id) {
+        const submitObject = {
+            type: constants.RequestTypes.HOTEL,
+            subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,
+            filters: {
+                Id: id
+            }
+        }
+        try {
+            const res = await this.contractService?.submitReadRequest(submitObject);
+            if (res && res.length > 0) {
+                res = JSON.parse(res);
+                return res;
+            } else {
+                console.log("No hotel images found.");
+                return null;
+            }
+        } catch (error) {
+            console.log(error);
+            throw (error);
+        }
+    }
 }
 

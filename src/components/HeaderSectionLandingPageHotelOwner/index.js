@@ -30,7 +30,7 @@ const HeaderSectionLandingPageHotelOwner = () => {
 
   const closeLoginModal = (loginSuccessful) => {
     setLoginOpen(false);
-    if(loginSuccessful){
+    if(loginSuccessful == true){
       if(regiHotel){
         setRegiHotel(false);
         navigate("/register-hotel");

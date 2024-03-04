@@ -19,12 +19,18 @@ root.render(
       <div style={{ marginTop: "100px" }}>
         <App />
       </div>
-      <Footer />
-      <Toaster position="top-right" reverseOrder={false} toastOptions={{
-        style: {
-          padding: "20px"
-        },
-      }} />
+      <div style={{ marginTop: "400px" }}>
+        <Footer />
+      </div>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          style: {
+            padding: "20px",
+          },
+        }}
+      />
     </Provider>
   </BrowserRouter>
 );

@@ -10,7 +10,7 @@ import { toast } from "react-hot-toast";
 import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
 import TransactionQRModal from "../components/TransactionQRModal";
 import HotelService from "./../services-domain/hotel-service copy";
-import HotelsList from "./HotelsList"
+import HotelsList from "./HotelsList/HotelsList"
 
 function ScanQRCode() {
   const navigate = useNavigate();
