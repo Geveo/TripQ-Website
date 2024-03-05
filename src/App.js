@@ -17,7 +17,8 @@ import ScanQRCode from "./pages/ScanQRCode";
 import HotelsList from "./pages/HotelsList";
 import AccountTransactions from "./pages/AccountTransactions/AccountTransactions";
 import {useDispatch, useSelector} from 'react-redux';
-import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";
+import {LocalStorageKeys} from "./constants/constants";
+import {xummAuthorize} from "./services-common/xumm-api-service";
 
 function App() {
 
@@ -31,9 +32,14 @@ function App() {
             setIsContractInitiated(true);
         });
 
-        const acc = localStorage.getItem('Account');
-        if(acc && acc.length > 0) {
-            dispatch(loginSuccessfully(acc));
+        const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
+        const pk = localStorage.getItem(LocalStorageKeys.pkce_state);
+        const xpk = localStorage.getItem(LocalStorageKeys.XummPkceJwt);
+
+
+        if(acc && acc.length > 0 && pk && pk.length > 0 && xpk && xpk.length > 0) {
+            xummAuthorize();
+            // dispatch(loginSuccessfully(acc));
         }
 
         const handleBackButton = () => {
