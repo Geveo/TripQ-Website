@@ -11,7 +11,7 @@ import { Modal, ModalHeader, ModalBody} from 'reactstrap';
 const TransactionQRModal = ({ qrMessage, isOpen, onClose }) => {
 
     return (
-      <Modal zIndex={9999}
+      <Modal
         isOpen={isOpen}
         toggle={onClose}
         centered={true}

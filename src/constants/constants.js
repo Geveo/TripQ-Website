@@ -41,6 +41,8 @@ const LocalStorageKeys ={
     PublicKey: "public-key",
     PrivateKey: "private-key",
     AccountAddress: "account-address",
+    XummPkceJwt: 'XummPkceJwt',
+    pkce_state: 'pkce_state'
 }
 
 const XRPLAccountEventTypes = {

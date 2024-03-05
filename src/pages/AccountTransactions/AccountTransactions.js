@@ -7,15 +7,20 @@ import Button from 'react-bootstrap/Button';
 
 import './styles.scss';
 import { useEffect, useState } from 'react';
-import {deinit, init, getTransactions} from './../../services-common/evernode-xrpl-service'
+import {deinit, init, getTransactions} from '../../services-common/evernode-xrpl-service'
+import {LocalStorageKeys} from "../../constants/constants";
+import {useSelector} from 'react-redux'
+import TransactionQRViewModal from "../../components/TransactionQRModal/index-view";
 
 const  AccountTransactions = () => {
     
     const [accountAddress, setAccountAddress] = useState(null);
     const [transactions, setTransactions] = useState([]);
 
+    const loginState = useSelector(state => state.loginState)
+
     useEffect(() => {
-        const acc = localStorage.getItem("Account");
+        const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
         if(acc && acc.length > 0) {
             setAccountAddress(acc);
         }
@@ -73,9 +78,21 @@ const  AccountTransactions = () => {
         return time;
     }
 
-    
+    const [openPayModal, setOpenPayModal] = useState(false)
+    const pay = async () => {
+        setOpenPayModal(true);
+    }
+
+    const onPaymentModalClose = (isPaymentCompleted) => {
+        setOpenPayModal(false);
+        console.log("The payment state : ", isPaymentCompleted);
+    }
+
     return (
         <>
+        {openPayModal && <TransactionQRViewModal sourceAddress={loginState.loggedInAddress} destinationAddress={`raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`}
+                                            amount={'8'} currency={process.env.REACT_APP_CURRENCY} issuer={process.env.REACT_APP_CURRENCY_ISSUER}
+                                            isOpen={openPayModal} onClose={onPaymentModalClose}  /> }
             <Container style={{minHeight: '85vh'}}>
                 <Row>
                     <Col lg={10}>
@@ -85,16 +102,21 @@ const  AccountTransactions = () => {
                     </Col>
                     <Col lg={2}>
                         <div className='page-header mt-4'>
-                            <Button variant="warning" onClick={loadTransactions} style={{ color: 'white', fontWeight: 700}}>Refresh</Button>
+                            <Button variant="warning" onClick={loadTransactions}
+                                    style={{color: 'white', fontWeight: 700}}>Refresh</Button>
+                        </div>
+                        <div className='page-header mt-4'>
+                            <Button variant="warning" onClick={() => pay()}
+                                    style={{color: 'white', fontWeight: 700}}>Pay</Button>
                         </div>
                     </Col>
                 </Row>
 
                 <Row className='mt-3'>
                     <Col>
-                        <Table >
+                        <Table>
                             <tbody>
-                                {transactions.map((trx, index) => {
+                            {transactions.map((trx, index) => {
                                     if(trx.validated && trx.tx.TransactionType === 'Payment') {
                                         const tx = trx.tx;
                                     

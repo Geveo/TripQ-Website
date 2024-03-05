@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {
   Button,
   Navbar,
@@ -16,9 +16,12 @@ import { FaCopy } from "react-icons/fa";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import LoginModal from "../Login/LoginModal";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutSuccessfully } from "../../features/LoginState/LoginStateSlice";
+import {loginSuccessfully, logoutSuccessfully} from "../../features/LoginState/LoginStateSlice";
+import {Xumm} from 'xumm'
+import {LocalStorageKeys} from "../../constants/constants";
+import {xummAuthorize, xummLogout} from "../../services-common/xumm-api-service";
 
-
+const xumm = new Xumm(process.env.REACT_APP_XUMM_APIKEY)
 const isUnderConstruction = process.env.REACT_APP_IS_UNDER_CONSTRUCTION
 ? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
 ? true
@@ -41,6 +44,15 @@ function NavBar(props) {
   const isCustomer = localStorage.getItem("customer");
   const [isCopiedAddress, setIsCopiedAddress] = useState(false);
 
+
+  const login = async () => {
+    try {
+      await xummAuthorize();
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   const openLoginModal = () => {
     setLoginOpen(true);
   };
@@ -53,9 +65,8 @@ function NavBar(props) {
     navigate('/my-transactions');
   }
 
-  const logout = () => {
-    localStorage.removeItem('Account');
-    dispatch(logoutSuccessfully())
+  const logout = async () => {
+    await xummLogout();
     navigate('/')
   }
 
@@ -164,7 +175,7 @@ function NavBar(props) {
             <Button
               outline
               className="primaryButton smallMarginLeftRight"
-              onClick={() => openLoginModal()}
+              onClick={() => login()}
             >
               Login
             </Button>
