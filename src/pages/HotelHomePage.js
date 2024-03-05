@@ -377,28 +377,28 @@ function HotelHomePage() {
                   }
                   onClick={onClickRoomLayoutSectionButton}
                 >
-                  Room Layout
+                  Room Types
                 </button>
               </div>
             </section>
             <section ref={infoSection} id="info_section" className={"pt-2"}>
               <div>
                 <img
-                  style={{ margin: 10, width: 400, height: 300 }}
+                  style={{ margin: 10, width: 350, height: 250 }}
                   src={
                     "https://firebasestorage.googleapis.com/v0/b/voyagelankav1.appspot.com/o/hotel_images%2FCity%20Hotel%2FCity%20Hotel_18fa20a4-6ae6-4ba0-aace-be80463d3a8e.jpg?alt=media&token=c2e3f2cc-2ac7-4c70-bd89-25e35f35051a"
                   }
                   alt="Displayed Image"
                 />
                 <img
-                  style={{ margin: 10, width: 400, height: 300 }}
+                  style={{ margin: 10, width: 350, height: 250 }}
                   src={
                     "https://firebasestorage.googleapis.com/v0/b/voyagelankav1.appspot.com/o/hotel_images%2Fwww%2Fwww_3735d871-4dcd-4d48-88b1-a64ee3286ec7.jfif?alt=media&token=4240dc43-34d5-40a2-b467-e9dfce9d3590"
                   }
                   alt="Displayed Image"
                 />
                 <img
-                  style={{ margin: 10, width: 400, height: 300 }}
+                  style={{ margin: 10, width: 350, height: 250 }}
                   src={
                     "https://firebasestorage.googleapis.com/v0/b/voyagelankav1.appspot.com/o/hotel_images%2Fwww%2Fwww_5dd0fe99-513e-4d34-9b5c-c3195e750835.jfif?alt=media&token=7733d811-62f2-4087-a74a-f5a607bf9c2b"
                   }
