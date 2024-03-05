@@ -16,6 +16,7 @@ import {
   Col,
   Row,
   FormFeedback,
+  Spinner,
 } from "reactstrap";
 import Facilities from "../components/RegisterHotelComponents/Facilities";
 import ContactDetails from "../components/RegisterHotelComponents/ContactDetails";
@@ -46,6 +47,7 @@ function RegisterHotel() {
   const navigate = useNavigate();
 
   let user = "User";
+  const [isDataLoading, setIsDataLoading] = useState(false);
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const [registerButtonDisable, setRegisterButtonDisable] = useState(false);
 
@@ -102,6 +104,7 @@ function RegisterHotel() {
     ImageURLs: [],
     WalletAddress: "",
   });
+
   const contractWalletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
   const hotelRegiFee = process.env.REACT_APP_HOTEL_REGISTRATION_FEE;
 
@@ -174,7 +177,8 @@ function RegisterHotel() {
   };
 
   // Form submit
-  const submitForm = useCallback(async () => {
+  const submitForm = (async () => {
+    setIsDataLoading(true);
     setRegisterButtonDisable(true);
 
     validationForm();
@@ -233,7 +237,7 @@ function RegisterHotel() {
       ) {
         //await onProceedToPayment();
         let res = await hotelService.registerHotel(hotelData);
-
+        setIsDataLoading(false);
         if (res.rowId.lastId > 0) {
           toast.success("Registered successfully!", {
             duration: 10000,
@@ -253,6 +257,7 @@ function RegisterHotel() {
           );
         }
       } else {
+        setIsDataLoading(false);
         setRegisterButtonDisable(false);
         toast(
           (element) => (
@@ -267,6 +272,7 @@ function RegisterHotel() {
         );
       }
     } catch (err) {
+      setIsDataLoading(false);
       setRegisterButtonDisable(false);
       console.log(err);
       toast(
@@ -366,6 +372,20 @@ function RegisterHotel() {
         />
       )} */}
       <MainContainer>
+        {isDataLoading && (
+          <div className="spinnerWrapper">
+            <Spinner
+              color="primary"
+              style={{
+                height: "3rem",
+                width: "3rem",
+              }}
+              type="grow"
+            >
+              Loading...
+            </Spinner>
+          </div>
+        )}
         <section>
           <div className="title_1">Welcome {user}!</div>
           <Card1>
@@ -446,7 +466,7 @@ function RegisterHotel() {
                 invalid={propertyDescriptionInvaid}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <FormFeedback>Hotel description is required!</FormFeedback>
+              {/* <FormFeedback>Hotel description is required!</FormFeedback> */}
             </FormGroup>
           </Card1>
         </section>
