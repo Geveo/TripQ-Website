@@ -1,7 +1,8 @@
-// import { Modal, ModalHeader, ModalBody} from 'reactstrap';/
+/***  DEPRECIATED ****/
+
 import {useEffect, useState} from "react";
 import eventEmitter from "../../services-common/eventEmitter";
-import {createPayload} from "../../services-common/xumm-api-service";
+import {createPayloadAndSubmit} from "../../services-common/xumm-api-service";
 import Modal from 'react-bootstrap/Modal';
 import Spinner from 'react-bootstrap/Spinner';
 
@@ -21,46 +22,82 @@ import Spinner from 'react-bootstrap/Spinner';
 const TransactionQRViewModal = ({ isOpen, onClose, sourceAddress, destinationAddress, amount, currency, issuer }) => {
   const [qRCodeImg, setQRCodeImg] = useState(null);
   const [paymentCompleted, setPaymentCompleted] = useState(false)
+  const [intervalTimer, setIntervalTimer] = useState(0)
 
   const paymentResultCallback =  (event) => {
     // Return if signed or not signed (rejected)
     // setLastPayloadUpdate(JSON.stringify(event.data, null, 2))
 
+
+    eventEmitter.on('PaymentResult', message => {
+      if(message === 'Payment aborted') {
+        event.resolve("Aborted");
+      }
+    })
+
+
     console.log(event)
     if (Object.keys(event.data).indexOf('signed') > -1 && event.data.signed) {
       eventEmitter.emit('PaymentResult', "Payment done")
+      event.resolve("success");
       return true;
     } else if (Object.keys(event.data).indexOf('signed') > -1 && !event.data.signed) {
       eventEmitter.emit('PaymentResult', "Payment rejected")
+      event.resolve("event failed");
       return true;
     }
-    return true;
   }
 
 
   useEffect(() => {
     console.log("Use effect calls")
         setPaymentCompleted(false);
-        createPayload(sourceAddress, destinationAddress, paymentResultCallback, amount, currency, issuer).then(payloadInfo => {
+        let itimer = 0;
+        createPayloadAndSubmit(sourceAddress, destinationAddress, paymentResultCallback, amount, currency, issuer).then(payloadInfo => {
           console.log(payloadInfo)
           setQRCodeImg(payloadInfo.created.refs.qr_png);
+
+          const newWindow = window.open(payloadInfo.created.next.no_push_msg_received, 'Xaman Pay','height=700,width=1000, right=300, resizable=no, left=300,top=100');
+          console.log(newWindow)
+
+          itimer = setInterval(() => {
+            if(newWindow.closed) {
+              console.log("waw")
+              eventEmitter.emit('PaymentResult', "Payment aborted");
+            }
+          }, 1000);
 
           eventEmitter.on('PaymentResult', (message) => {
             if(message === "Payment done") {
               eventEmitter.off('PaymentResult');
               setPaymentCompleted(true);
               onClose(true)
+              newWindow.close();
             } else if(message === "Payment failed") {
               eventEmitter.off('PaymentResult');
               setPaymentCompleted(false);
-              onClose(true)
+              onClose(false)
+              newWindow.close()
+            } else if(message === 'Payment aborted') {
+              eventEmitter.off('PaymentResult');
+              setPaymentCompleted(false);
+              onClose(false)
             }
           })
 
+        }).catch( e => {
+          console.log(e)
         });
 
 
-  }, [sourceAddress, destinationAddress,amount, currency, issuer]);
+        return () => {
+          if (itimer > 0) {
+            clearInterval(itimer)
+          }
+          eventEmitter.off('PaymentResult');
+        }
+
+  }, [isOpen, sourceAddress, destinationAddress,amount, currency, issuer]);
 
   const onModalClose = () => {
     onClose(paymentCompleted);
@@ -68,7 +105,7 @@ const TransactionQRViewModal = ({ isOpen, onClose, sourceAddress, destinationAdd
 
     return (
       <Modal
-        show={isOpen}
+        show={false}
         centered={true}
         backdrop={"static"}
         keyboard={false}

@@ -1,3 +1,6 @@
+/***  DEPRECIATED ****/
+
+
 import QRCode from "react-qr-code";
 import { Modal, ModalHeader, ModalBody} from 'reactstrap';
 
