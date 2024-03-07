@@ -80,6 +80,17 @@ function HotelHomePage() {
               selectedFacilitiesIDs.push(element.Id);
             });
             setSelectedFacilityIds(selectedFacilitiesIDs);
+
+            // Get hotel images
+            hotelService
+              .getHotelImagesById(id)
+              .then((data) => {
+                setImages(data);
+              })
+              .catch((err) => {
+                console.log(err.thrownError);
+                toast.error("Error in fetching hotel images.");
+              });
           } else {
             setIsDataLoading(false);
           }
@@ -89,17 +100,6 @@ function HotelHomePage() {
         setIsDataLoading(false);
         console.log(err.thrownError);
         toast.error("Error in fetching hotels list.");
-      });
-
-    // Get hotel images
-    hotelService
-      .getHotelImagesById(id)
-      .then((data) => {
-        setImages(data);
-      })
-      .catch((err) => {
-        console.log(err.thrownError);
-        toast.error("Error in fetching hotel images.");
       });
   }, []);
 
