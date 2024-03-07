@@ -14,8 +14,10 @@ export async function xummAuthorize() {
             localStorage.setItem(LocalStorageKeys.AccountAddress, res.me.account);
             store.dispatch(loginSuccessfully(res.me.account));
         }
+        return true;
     } catch (e) {
         console.log(e)
+        return false;
     }
 }
 
@@ -23,7 +25,8 @@ export async function xummLogout() {
     localStorage.clear();
     store.dispatch(logoutSuccessfully())
     try {
-        await xumm.logout()
+        await xumm.logout();
+        xumm = null;
     } catch (e) {
         console.log(e)
     }
