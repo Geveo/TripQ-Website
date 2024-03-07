@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
   Button,
   Navbar,
@@ -11,17 +11,10 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import "./styles.scss";
-import { RiFileSettingsFill } from "react-icons/ri";
-import { FaCopy } from "react-icons/fa";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import LoginModal from "../Login/LoginModal";
 import { useSelector, useDispatch } from "react-redux";
-import {loginSuccessfully, logoutSuccessfully} from "../../features/LoginState/LoginStateSlice";
-import {Xumm} from 'xumm'
-import {LocalStorageKeys} from "../../constants/constants";
 import {xummAuthorize, xummLogout} from "../../services-common/xumm-api-service";
 
-const xumm = new Xumm(process.env.REACT_APP_XUMM_APIKEY)
 const isUnderConstruction = process.env.REACT_APP_IS_UNDER_CONSTRUCTION
 ? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
 ? true
@@ -32,9 +25,6 @@ const underConstructionMsg = process.env.REACT_APP_UNDER_CONSTRUCTION_MESSAGE ??
 function NavBar(props) {
   const navigate = useNavigate();
   const loginState = useSelector((state) => state.loginState);
-  const dispatch = useDispatch();
-
-  const walletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -42,7 +32,6 @@ function NavBar(props) {
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
   const isCustomer = localStorage.getItem("customer");
-  const [isCopiedAddress, setIsCopiedAddress] = useState(false);
 
 
   const login = async () => {
