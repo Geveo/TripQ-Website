@@ -92,7 +92,7 @@ function CustomerDashboard() {
     <>
       <div className="main-image-div">
         <Container className="main-txt">
-          <h3>Enjoy your next stay in Sri Lanka</h3>
+          <h3>Enjoy your next stay</h3>
           <p>Search low prices on hotels, homes and much more</p>
         </Container>
       </div>

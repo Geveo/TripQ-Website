@@ -3,7 +3,6 @@ import Card1 from "../layout/Card";
 import "../styles/text_styles.scss";
 import "../styles/layout_styles.scss";
 import React, { useState, useCallback, useEffect } from "react";
-import QRScanner from "../components/QRScanner";
 import {
   Dropdown,
   DropdownItem,
@@ -27,17 +26,9 @@ import { useNavigate } from "react-router-dom";
 import ImagePreviewSection from "../components/RegisterHotelComponents/ImagePreviewSection";
 import { toast } from "react-hot-toast";
 import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
-import ToastViewHotelWallet from "../components/ToastViewHotelWallet/ToastViewHotelWallet";
-import TransactionQRModal from "../components/TransactionQRModal";
 import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
-import {
-  init,
-  deinit,
-  listenToTransactionsByAddress,
-  stopListeningToTransactionsByAddress,
-} from "../services-common/evernode-xrpl-service";
 const { useSelector } = require("react-redux");
 
 function RegisterHotel() {
@@ -177,7 +168,7 @@ function RegisterHotel() {
   };
 
   // Form submit
-  const submitForm = (async () => {
+  const submitForm = async () => {
     setIsDataLoading(true);
     setRegisterButtonDisable(true);
 
@@ -189,87 +180,88 @@ function RegisterHotel() {
 
     try {
       // Upload Images
-      let imageUrls = [];
+      if (uploadedImages.length > 0) {
+        const urls = await FirebaseService.uploadFiles(Name, uploadedImages);
 
-      if (uploadedImages.length > 0)
-        imageUrls = await FirebaseService.uploadFiles(Name, uploadedImages);
-
-      // Create request object
-      let contactDetails = new ContactDetailsDto({
-        FullName: OwnerName,
-        Email: Email,
-        PhoneNumber: ContactNumber1,
-        AlternativePhoneNumber: ContactNumber2,
-      });
-
-      let locationDto = new LocationDetailsDto({
-        AddressLine01: AddressLine1,
-        AddressLine02: AddressLine2,
-        City: City,
-        DistanceFromCity: DistanceFromCenter,
-      });
-
-      let hotelData = new HotelDto({
-        Id: 0,
-        Name: Name,
-        Description: Description,
-        StarRate: parseInt(StarRate[0], 10),
-        ContactDetails: JSON.stringify(contactDetails),
-        Location: JSON.stringify(locationDto),
-        Facilities: JSON.stringify(HotelFacilities),
-        ImageURLs: JSON.stringify(imageUrls),
-        WalletAddress: localStorage.getItem("Account"),
-      });
-
-      setHotelData(hotelData);
-      // only if the required validations are met, form will submit
-      if (
-        Name &&
-        OwnerName &&
-        emailRegex.test(Email) &&
-        AddressLine1 &&
-        City &&
-        (ContactNumber1.length === 10 || ContactNumber1.length === 11) &&
-        phoneNoRegex.test(ContactNumber1) &&
-        DistanceFromCenter &&
-        HotelFacilities.length > 0 &&
-        uploadedImages.length > 2
-      ) {
-        //await onProceedToPayment();
-        let res = await hotelService.registerHotel(hotelData);
-        setIsDataLoading(false);
-        if (res.rowId.lastId > 0) {
-          toast.success("Registered successfully!", {
-            duration: 10000,
+        if (urls.length > 0) {
+          // Create request object
+          let contactDetails = new ContactDetailsDto({
+            FullName: OwnerName,
+            Email: Email,
+            PhoneNumber: ContactNumber1,
+            AlternativePhoneNumber: ContactNumber2,
           });
-          navigate(`/hotel/${res.rowId.lastId}`);
-        } else {
-          toast(
-            (element) => (
-              <ToastInnerElement
-                message={"Registration failed!"}
-                id={element.id}
-              />
-            ),
-            {
-              duration: Infinity,
-            }
-          );
-        }
-      } else {
-        setIsDataLoading(false);
-        setRegisterButtonDisable(false);
-        toast(
-          (element) => (
-            <ToastInnerElement
-              message={"Check the details again!"}
-              id={element.id}
-            />
-          ),
-          {
-            duration: Infinity,
+
+          let locationDto = new LocationDetailsDto({
+            AddressLine01: AddressLine1,
+            AddressLine02: AddressLine2,
+            City: City,
+            DistanceFromCity: DistanceFromCenter,
+          });
+
+          let hotelData = new HotelDto({
+            Id: 0,
+            Name: Name,
+            Description: Description,
+            StarRate: parseInt(StarRate[0], 10),
+            ContactDetails: JSON.stringify(contactDetails),
+            Location: JSON.stringify(locationDto),
+            Facilities: JSON.stringify(HotelFacilities),
+            ImageURLs: urls,
+            WalletAddress: localStorage.getItem("Account"),
+          });
+          setHotelData(hotelData);
+          // only if the required validations are met, form will submit
+          if (
+            Name &&
+            OwnerName &&
+            emailRegex.test(Email) &&
+            AddressLine1 &&
+            City &&
+            (ContactNumber1.length === 10 || ContactNumber1.length === 11) &&
+            phoneNoRegex.test(ContactNumber1) &&
+            DistanceFromCenter &&
+            HotelFacilities.length > 0 &&
+            uploadedImages.length > 2
+          ) {
+            setIsDataLoading(false);
+            hotelService.registerHotel(hotelData).then((res) => {
+
+              if (res.rowId.lastId > 0) {
+                toast.success("Registered successfully!", {
+                  duration: 10000,
+                });
+                navigate(`/hotel/${res.rowId.lastId}`);
+              } else {
+                toast(
+                  (element) => (
+                    <ToastInnerElement
+                      message={"Registration failed!"}
+                      id={element.id}
+                    />
+                  ),
+                  {
+                    duration: Infinity,
+                  }
+                );
+              }
+            });
+          } else {
+            setIsDataLoading(false);
+            setRegisterButtonDisable(false);
+            toast(
+              (element) => (
+                <ToastInnerElement
+                  message={"Check the details again!"}
+                  id={element.id}
+                />
+              ),
+              {
+                duration: Infinity,
+              }
+            );
           }
-        );
+        }
       }
     } catch (err) {
       setIsDataLoading(false);
@@ -287,21 +279,7 @@ function RegisterHotel() {
         }
       );
     }
-  }, [
-    Name,
-    StarRate,
-    Description,
-    OwnerName,
-    Email,
-    AddressLine1,
-    AddressLine2,
-    City,
-    ContactNumber1,
-    ContactNumber2,
-    DistanceFromCenter,
-    HotelFacilities,
-    uploadedImages,
-  ]);
+  };
 
   const openQRScanner = () => {
     setScannedText("");
@@ -387,7 +365,7 @@ function RegisterHotel() {
           </div>
         )}
         <section>
-          <div className="title_1">Welcome {user}!</div>
+          <div className="title_1">Welcome to VoyageLanka!</div>
           <Card1>
             <Row>
               <Col md={6}>
@@ -576,11 +554,13 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-            //  disabled={
-            //    registerButtonDisable ||
-            //    !(isCondition1Checked && isCondition2Checked)
-            //  }
-            onClick={submitForm}
+             disabled={
+               registerButtonDisable ||
+               !(isCondition1Checked && isCondition2Checked)
+             }
+            onClick={() => {
+              submitForm();
+            }}
           >
             Complete Hotel Registration
           </Button>

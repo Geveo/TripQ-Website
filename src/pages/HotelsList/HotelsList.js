@@ -33,7 +33,7 @@ function HotelsList() {
           {hotelsList && hotelsList.length > 0 ? (
             <Table striped responsive>
               <thead>
-                <tr style={{padding: 10}}>
+                <tr style={{padding: 10, textAlign: 'center'}}>
                   <th>Hotel Name</th>
                   <th>Location</th>
                   <th>Name</th>
@@ -45,20 +45,22 @@ function HotelsList() {
                 {hotelsList &&
                   hotelsList.map((hotel) => (
                     <tr key={hotel.id}>
-                      <td>
+                      <td style={{ textAlign: 'center' }}>
                         <Link to={`/hotel/${hotel.id}`}>{hotel.name}</Link>
                       </td>
                       {hotel.location && (
-                        <td>{JSON.parse(hotel.location).AddressLine01}</td>
+                        <td style={{ textAlign: 'center' }}>{JSON.parse(hotel.location).AddressLine01}</td>
                       )}
                       {hotel.contactDetails && (
-                        <td>{JSON.parse(hotel.contactDetails).FullName}</td>
+                        <td style={{ textAlign: 'center' }}>{JSON.parse(hotel.contactDetails).FullName}</td>
                       )}
                       {hotel.contactDetails && (
-                        <td>{JSON.parse(hotel.contactDetails).Email}</td>
+                        <td style={{ textAlign: 'center' }}>{JSON.parse(hotel.contactDetails).Email}</td>
                       )}
-                      {hotel.starRate && (
-                        <td>{hotel.starRate} Stars</td>
+                      {hotel.starRate>0 ? (
+                        <td style={{ textAlign: 'center' }}>{hotel.starRate} Stars</td>
+                      ):(
+                        <td style={{ textAlign: 'center' }}> - </td>
                       )}
                     </tr>
                   ))}

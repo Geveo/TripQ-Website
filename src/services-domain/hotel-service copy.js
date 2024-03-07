@@ -367,7 +367,6 @@ export default class HotelService {
         try {
             const res = await this.contractService?.submitReadRequest(submitObject);
             if (res && res.length > 0) {
-                res = JSON.parse(res);
                 return res;
             } else {
                 console.log("No hotel images found.");

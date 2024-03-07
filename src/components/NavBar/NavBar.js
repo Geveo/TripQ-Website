@@ -125,7 +125,7 @@ function NavBar(props) {
           ) : (
             <>
               <NavbarText className="help_button">Help</NavbarText>
-              <NavbarText className="faq-text">Faq</NavbarText>
+              <NavbarText className="faq-text">FAQ</NavbarText>
             </>
           )}
 
