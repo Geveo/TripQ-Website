@@ -10,7 +10,8 @@ import { useEffect, useState } from 'react';
 import {deinit, init, getTransactions} from '../../services-common/evernode-xrpl-service'
 import {LocalStorageKeys} from "../../constants/constants";
 import {useSelector} from 'react-redux'
-import TransactionQRViewModal from "../../components/TransactionQRModal/index-view";
+import {showPayQRWindow} from "../../services-common/xumm-api-service";
+
 
 const  AccountTransactions = () => {
     
@@ -78,21 +79,13 @@ const  AccountTransactions = () => {
         return time;
     }
 
-    const [openPayModal, setOpenPayModal] = useState(false)
     const pay = async () => {
-        setOpenPayModal(true);
-    }
-
-    const onPaymentModalClose = (isPaymentCompleted) => {
-        setOpenPayModal(false);
-        console.log("The payment state : ", isPaymentCompleted);
+        const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, '6', process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
+        console.log(result)
     }
 
     return (
         <>
-        {openPayModal && <TransactionQRViewModal sourceAddress={loginState.loggedInAddress} destinationAddress={`raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`}
-                                            amount={'8'} currency={process.env.REACT_APP_CURRENCY} issuer={process.env.REACT_APP_CURRENCY_ISSUER}
-                                            isOpen={openPayModal} onClose={onPaymentModalClose}  /> }
             <Container style={{minHeight: '85vh'}}>
                 <Row>
                     <Col lg={10}>

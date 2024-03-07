@@ -49,10 +49,17 @@ const XRPLAccountEventTypes = {
     PAYMENT: 'payment'
 }
 
+const PaymentResults = {
+    COMPLETED: "completed",
+    REJECTED: "rejected",
+    ABORTED: "aborted"
+}
+
 module.exports = {
     XRPLAccountEventTypes,
     LocalStorageKeys,
     bed_types,
-    cancellation_policies
+    cancellation_policies,
+    PaymentResults
 }
 
