@@ -133,6 +133,14 @@ function NavBar(props) {
             My Reservations
           </Button>
 
+          <Button
+            outline
+            className="primaryButton smallMarginLeftRight"
+            onClick={() => navigate("/make-reservations")}
+          >
+            Make Reservations
+          </Button>
+
           {loginState.isLoggedIn ? (
           <Dropdown
             isOpen={dropdownOpen}
