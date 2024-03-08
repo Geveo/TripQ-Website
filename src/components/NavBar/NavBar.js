@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import {
   Button,
   Navbar,
@@ -11,13 +11,9 @@ import {
 } from "reactstrap";
 import { useNavigate } from "react-router-dom";
 import "./styles.scss";
-import { RiFileSettingsFill } from "react-icons/ri";
-import { FaCopy } from "react-icons/fa";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import LoginModal from "../Login/LoginModal";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutSuccessfully } from "../../features/LoginState/LoginStateSlice";
-
+import {xummAuthorize, xummLogout} from "../../services-common/xumm-api-service";
 
 const isUnderConstruction = process.env.REACT_APP_IS_UNDER_CONSTRUCTION
 ? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
@@ -29,9 +25,6 @@ const underConstructionMsg = process.env.REACT_APP_UNDER_CONSTRUCTION_MESSAGE ??
 function NavBar(props) {
   const navigate = useNavigate();
   const loginState = useSelector((state) => state.loginState);
-  const dispatch = useDispatch();
-
-  const walletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
@@ -39,7 +32,15 @@ function NavBar(props) {
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
   const isCustomer = localStorage.getItem("customer");
-  const [isCopiedAddress, setIsCopiedAddress] = useState(false);
+
+
+  const login = async () => {
+    try {
+      await xummAuthorize();
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   const openLoginModal = () => {
     setLoginOpen(true);
@@ -53,9 +54,8 @@ function NavBar(props) {
     navigate('/my-transactions');
   }
 
-  const logout = () => {
-    localStorage.removeItem('Account');
-    dispatch(logoutSuccessfully())
+  const logout = async () => {
+    await xummLogout();
     navigate('/')
   }
 
@@ -114,7 +114,7 @@ function NavBar(props) {
           ) : (
             <>
               <NavbarText className="help_button">Help</NavbarText>
-              <NavbarText className="faq-text">Faq</NavbarText>
+              <NavbarText className="faq-text">FAQ</NavbarText>
             </>
           )}
 
@@ -172,7 +172,7 @@ function NavBar(props) {
             <Button
               outline
               className="primaryButton smallMarginLeftRight"
-              onClick={() => openLoginModal()}
+              onClick={() => login()}
             >
               Login
             </Button>

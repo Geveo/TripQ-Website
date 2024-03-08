@@ -3,13 +3,13 @@ import { Input, Button } from "reactstrap";
 import styles from "./index.module.scss";
 import "../../index.scss";
 import { useSelector, useDispatch } from "react-redux";
-import { show, hide } from "../../features/visibility/visibleSlice";
+import { hide } from "../../features/visibility/visibleSlice";
 import { useNavigate } from "react-router-dom";
 import XrplService from "../../services-common/xrpl-service";
 import HotelService from "../../services-domain/hotel-service copy";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
-import LoginModal from "../Login/LoginModal";
+import {xummAuthorize} from "../../services-common/xumm-api-service";
 
 const HeaderSectionLandingPageHotelOwner = () => {
   const navigate = useNavigate();
@@ -17,45 +17,29 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const dispatch = useDispatch();
   const xrplService = XrplService.xrplInstance;
   const hotelService = HotelService.instance;
+  const loginState = useSelector(state => state.loginState)
 
   const [secret, setSecret] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [regiHotel, setRegiHotel] = useState(false);
 
-  const openLoginModal = () => {
-    setLoginOpen(true);
+  const registerHotel = async () => {
+    if(!loginState.isLoggedIn) {
+      if(await xummAuthorize()) {
+        navigate("/register-hotel");
+      }
+    } else {
+      navigate("/register-hotel");
+    }
   };
 
-  const closeLoginModal = (loginSuccessful) => {
-    setLoginOpen(false);
-    if(loginSuccessful == true){
-      if(regiHotel){
-        setRegiHotel(false);
-        navigate("/register-hotel");
-      }else{
+  const viewHotelDetails = async () => {
+    if(!loginState.isLoggedIn) {
+      if(await xummAuthorize()) {
         navigate("/hotel-list");
       }
-    }
-  };
-
-  const registerHotel = () => {
-    dispatch(hide());
-    setRegiHotel(true);
-    if(localStorage.getItem("Account")){
-      navigate("/register-hotel");
-    }else{
-      openLoginModal();
-    }
-  };
-
-  const viewHotelDetails = () => {
-    dispatch(hide());
-    if(localStorage.getItem("Account")){
+    } else {
       navigate("/hotel-list");
-    }else{
-      openLoginModal();
     }
 };
 
@@ -123,7 +107,6 @@ const HeaderSectionLandingPageHotelOwner = () => {
             >
               View Hotel Details
             </Button>
-            <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />
             <Button
               className="secondaryButton smallMarginTopBottom"
               onClick={() => registerHotel()}

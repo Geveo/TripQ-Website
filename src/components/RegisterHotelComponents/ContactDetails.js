@@ -7,7 +7,7 @@ function ContactDetails(props) {
   return (
     <div>
       <section>
-        <div className="title_2">Contact details</div>
+        <div className="title_2">Contact Details</div>
         <Card1>
           <FormGroup>
             <Label>Full Name<span style={{ color: "red" }}>*</span></Label>
