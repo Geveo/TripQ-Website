@@ -92,10 +92,10 @@ function NavBar(props) {
           <NavbarBrand href="/" style={{ marginLeft: "40px" }}>
             <img
               alt="logo"
-              src="/Assets/Images/logo.png"
+              src="/Assets/Images/TripQ.png"
               style={{
                 height: 70,
-                width: 260,
+                width: 185,
               }}
             />
           </NavbarBrand>
