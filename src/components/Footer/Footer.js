@@ -14,7 +14,7 @@ function Footer(props) {
                             navigate("/");
                             navigate(0);
                         }}>
-                            <img src="/Assets/Images/TripQ.png" alt="voyageLanka" className="logo"/>
+                            <img src="/Assets/Images/TripQ.png" alt="tripQ" className="logo"/>
                         </div>
                     </Col>
                     <Col>
