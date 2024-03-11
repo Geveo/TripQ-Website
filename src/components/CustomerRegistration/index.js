@@ -26,6 +26,7 @@ import { PaymentResults } from "../../constants/constants";
 import { ReservationDto } from "../../dto/ReservationDto";
 import { LocalStorageKeys } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
+import { useNavigate } from "react-router-dom";
 
 const CustomerRegistration = (props) => {
   const xrplService = XrplService.xrplInstance;
@@ -34,7 +35,7 @@ const CustomerRegistration = (props) => {
   const generatedSecretVisibility = useSelector(
     (state) => state.registerCustomer.generatedSecretVisibility
   );
-
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -103,7 +104,7 @@ const CustomerRegistration = (props) => {
     return;
   };
   const submitForm = async () => {
-    console.log(selectionDetails)
+    const selectionData = selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
     if (
       firstName.length > 0 &&
       lastName.length > 0 &&
@@ -113,25 +114,25 @@ const CustomerRegistration = (props) => {
         const result = await showPayQRWindow(
             loginState.loggedInAddress,
             `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-            "6",
+            "0.6",
             process.env.REACT_APP_CURRENCY,
             process.env.REACT_APP_CURRENCY_ISSUER
           );
           console.log(result);
           if(result===PaymentResults.COMPLETED){
             let reservationData = new ReservationDto({
-              HotelId : selectionDetails.HotelId,
+              HotelId : selectionData.HotelId,
               WalletAddress : localStorage.getItem(LocalStorageKeys.AccountAddress),
-              Price : "6",
-              FromDate : selectionDetails.CheckIn,
-              ToDate : selectionDetails.CheckOut,
-              NoOfNights : selectionDetails.Nights,
+              Price : "0.6",
+              FromDate : selectionData.CheckIn,
+              ToDate : selectionData.CheckOut,
+              NoOfNights : selectionData.Nights,
               FirstName : firstName,
               LastName : lastName,
               Email : email,
               Telephone : phoneNo,
-              RoomTypeId : selectionDetails.RoomTypeId,
-              NoOfRooms : selectionDetails.NoOfRooms,
+              RoomTypes : selectionData.RoomTypes,
+              NoOfRooms : selectionData.NoOfRooms,
             });
 
             hotelService.makeReservation(reservationData).then((res) => {
@@ -140,7 +141,7 @@ const CustomerRegistration = (props) => {
                 toast.success("Reserved successfully!", {
                   duration: 10000,
                 });
-                //navigate(`/hotel/${res.rowId.lastId}`);
+                navigate(`/my-reservations`);
               } else {
                 toast(
                   (element) => (
