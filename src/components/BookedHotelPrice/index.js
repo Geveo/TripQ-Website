@@ -6,8 +6,8 @@ const BookedHotelPrice = (props) => {
         <Card className={styles.bookedHotelCard}>
             <Row>
                 <Col>
-                    <h4>Price: {props.totalPrice} $</h4>
-                    <small>Currency Rates: 1XRP = 1USD</small>
+                    <h4>Price: {props.totalPrice} {process.env.REACT_APP_CURRENCY}</h4>
+                    {/* <small>Currency Rates: 1XRP = 1USD</small> */}
                 </Col>
             </Row>
         </Card>
