@@ -9,6 +9,7 @@ import XrplService from "../../services-common/xrpl-service";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { loginSuccessfully } from "../../features/LoginState/LoginStateSlice";
+import { LocalStorageKeys } from "../../constants/constants";
 
 /**
  *
@@ -48,7 +49,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   const handleLogin = () => {
     const isValidAddress = xrplService.isValidAddress(manualInput);
     if(isValidAddress){
-      localStorage.setItem("Account", manualInput);
+      localStorage.setItem(LocalStorageKeys.AccountAddress, manualInput);
       toast.success("You have successfully logged in.");
       dispatch(loginSuccessfully(manualInput));
       setManualInput("");

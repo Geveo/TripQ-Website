@@ -29,6 +29,7 @@ import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement
 import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
+import { LocalStorageKeys } from "../constants/constants";
 const { useSelector } = require("react-redux");
 
 function RegisterHotel() {
@@ -208,7 +209,7 @@ function RegisterHotel() {
             Location: JSON.stringify(locationDto),
             Facilities: JSON.stringify(HotelFacilities),
             ImageURLs: urls,
-            WalletAddress: localStorage.getItem("Account"),
+            WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
           });
           setHotelData(hotelData);
           // only if the required validations are met, form will submit
@@ -365,7 +366,7 @@ function RegisterHotel() {
           </div>
         )}
         <section>
-          <div className="title_1">Welcome to VoyageLanka!</div>
+          <div className="title_1">Welcome to TripQ!</div>
           <Card1>
             <Row>
               <Col md={6}>
@@ -526,7 +527,7 @@ function RegisterHotel() {
                   I certify that this is a legitimate accommodation business
                   with all necessary licenses and permits, which can be shown
                   upon first request.
-                  <br /> VoyageLanka reserves the right to verify and
+                  <br /> TripQ reserves the right to verify and
                   investigate any details provided in this registration.
                 </p>
               </Label>
