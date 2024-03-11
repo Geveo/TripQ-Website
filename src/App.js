@@ -34,11 +34,9 @@ function App() {
         });
 
         const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
-        const pk = localStorage.getItem(LocalStorageKeys.pkce_state);
-        const xpk = localStorage.getItem(LocalStorageKeys.XummPkceJwt);
 
 
-        if(acc && acc.length > 0 && pk && pk.length > 0 && xpk && xpk.length > 0) {
+        if(acc && acc.length > 0) {
             xummAuthorize();
             // dispatch(loginSuccessfully(acc));
         }
