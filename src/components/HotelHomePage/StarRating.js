@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const StarRating = (props) => {
   return (
-    <div style={{ display: "inline", paddingLeft: 30 }}>
+    <div style={{ display: "inline", paddingLeft:20}}>
       <div style={{ display: "inline" }}>
         {[...Array(6)].map((star, index) => {
           index += 1;
@@ -14,7 +14,7 @@ const StarRating = (props) => {
               className={`star ${
                 index <= props.ratings ? "star_button_on" : "star_button_off"
               }`}
-              style={{ color: index <= props.ratings ? "rgb(255, 215, 0)" : "" , fontSize: "30px"}}
+              style={{ color: index <= props.ratings ? "rgb(255, 215, 0)" : "" , fontSize: "20px"}}
             >
               &#9733;
             </span>

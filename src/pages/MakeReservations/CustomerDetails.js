@@ -15,6 +15,8 @@ import {
   FormFeedback,
 } from "reactstrap";
 import Card1 from "../../layout/Card";
+import { showPayQRWindow } from "../../services-common/xumm-api-service";
+import { useSelector } from "react-redux";
 
 const CustomerDetails = () => {
   const navigate = useNavigate();
@@ -23,12 +25,26 @@ const CustomerDetails = () => {
   const [email, setEmail] = useState("");
   const [country, setCountry] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+  const loginState = useSelector((state) => state.loginState);
 
-  const submitForm = () =>{
-    if(firstName.length > 0 && lastName.length > 0 && email.length > 0 && country.length > 0 && contactNumber.length > 0){
-        
+  const submitForm = async () => {
+    console.log("making payments..");
+    const result = await showPayQRWindow(
+      loginState.loggedInAddress,
+      `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+      "6",
+      process.env.REACT_APP_CURRENCY,
+      process.env.REACT_APP_CURRENCY_ISSUER
+    );
+    console.log(result);
+    if (
+      firstName.length > 0 &&
+      lastName.length > 0 &&
+      email.length > 0 &&
+      country.length > 0
+    ) {
     }
-  }
+  };
   return (
     <>
       <MainContainer>
@@ -95,23 +111,22 @@ const CustomerDetails = () => {
             </Col>
           </Row>
           <Row>
-          <Col md={6}>
-            <FormGroup>
-              <Label>
-                Phone Number<span style={{ color: "red" }}>*</span>
-              </Label>
-              <Input
+            <Col md={6}>
+              <FormGroup>
+                <Label>
+                  Phone Number<span style={{ color: "red" }}>*</span>
+                </Label>
+                <Input
                   type="text"
                   id="contact_number"
                   onChange={(e) => setContactNumber(e.target.value)}
                 />
-              <FormFeedback>
-                Phone Number should be a 10 digit number!
-              </FormFeedback>
-            </FormGroup>
-          </Col>
+                <FormFeedback>
+                  Phone Number should be a 10 digit number!
+                </FormFeedback>
+              </FormGroup>
+            </Col>
           </Row>
-          
 
           <Row>
             <Col md={6}>
@@ -137,7 +152,7 @@ const CustomerDetails = () => {
                   <Button
                     className="secondaryButton"
                     style={{ width: "180px" }}
-                    onClick={() => submitForm}
+                    onClick={() => submitForm()}
                   >
                     Continue To Payment
                   </Button>

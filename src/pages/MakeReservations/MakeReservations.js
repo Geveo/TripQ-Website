@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from "react";
-import Step1 from "./Step1";
-import MainContainer from "../../layout/MainContainer";
-import Card1 from "../../layout/Card";
-import { FaMapMarkerAlt } from "react-icons/fa";
-import StarRating from "../../components/HotelHomePage/StarRating";
 import "./styles.scss";
 import { Button } from "reactstrap";
-import { useNavigate } from "react-router-dom";
+import BookingDetails from "../../components/BookingDetails/index";
+import BookedHotelDetails from "../../components/BookedHotelDetails/index";
+import { Row, Col } from "reactstrap";
+import MainContainer from "../../layout/MainContainer";
+import CustomerRegistration from "../../components/CustomerRegistration";
+import BookedHotelPrice from "../../components/BookedHotelPrice";
+import "../../styles/layout_styles.scss";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { showPayQRWindow } from "../../services-common/xumm-api-service";
+import { useSelector, useDispatch } from "react-redux";
+import { add as selectionDetailsAdd} from "../../features/SelectionDetails/SelectionDetailsSlice";
+import {LocalStorageKeys} from "./../../constants/constants";
 
 //import Step2 from './Step2';
 //import Step3 from './Step3';
 
 const ReservationForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [step, setStep] = useState(1);
   const [reservationDetails, setReservationDetails] = useState({});
   const [searchDetails, setSearchDetails] = useState({
@@ -21,9 +29,19 @@ const ReservationForm = () => {
     StarRate: 0,
     Facilities: [],
   });
+  const [selectionStrings, setSelectionStrings] = useState({
+    RoomId: 1,
+    RoomCount: 2,
+    costPerRoom: 50,
+    roomName: "Deluxe",
+  });
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [disableConfirm, setDisableConfirm] = useState(true);
+  const loginState = useSelector((state) => state.loginState);
 
   useEffect(() => {
     let searchObj = {
+      HotelId: 1,
       Name: "Dinuda Resort",
       Address: "Sethawadiya Road, 61360 Kalpitiya, Sri Lanka",
       StarRate: 3,
@@ -31,11 +49,12 @@ const ReservationForm = () => {
       CheckIn: "Sat 20 Apr 2024",
       CheckOut: "Sat 22 Apr 2024",
       Nights: 2,
-      RoomType: "Deluxe",
+      RoomTypeId: 1,
       RoomSize: "100sqft",
       NoOfRooms: 2,
       Price: 100,
     };
+    dispatch(selectionDetailsAdd({key:localStorage.getItem(LocalStorageKeys.AccountAddress),value: searchObj}));
     setSearchDetails(searchObj);
   }, []);
 
@@ -48,100 +67,48 @@ const ReservationForm = () => {
     console.log("Reservation confirmed:", finalDetails);
   };
 
+  // const submitForm = async () => {
+  //   console.log("making payments..");
+  //   const result = await showPayQRWindow(
+  //     loginState.loggedInAddress,
+  //     `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+  //     "6",
+  //     process.env.REACT_APP_CURRENCY,
+  //     process.env.REACT_APP_CURRENCY_ISSUER
+  //   );
+  //   console.log(result);
+  // };
+
   return (
     <>
       <MainContainer>
-        <div>
-          <div className={"row"}>
-            <div className={"title_1"} style={{ width: "80%" }}>
-              {searchDetails.Name}
-              <StarRating ratings={searchDetails.StarRate} />
-            </div>
-          </div>
+        <Row>
+          <Col md={4}>
+            <BookingDetails
+              checkindate={searchDetails.CheckIn}
+              checkoutdate={searchDetails.CheckOut}
+              noOfDays={searchDetails.Nights}
+              selections={JSON.stringify(selectionStrings)}
+            />
+            <BookedHotelPrice totalPrice={searchDetails.Price} />
+          </Col>
 
-          <div className={"row left_div"} style={{ marginTop: "-0.7rem" }}>
-            <div style={{ width: "20px" }}>
-              <FaMapMarkerAlt />
-            </div>
-            <div className={"subtext pt-2 col"}>{searchDetails.Address}</div>
-          </div>
-        </div>
-        <div style={{ paddingTop: 30 }}>
-          <div className="sub-title pt-2 pb-2">Your Booking Details</div>
-          <Card1>
-            <div style={{ display: "flex", paddingBottom: 20 }}>
-              <div style={{ paddingRight: 400 }}>
-                <div className={"sub-title"}>Check-in</div>
-                <div className={"title_3"}>{searchDetails.CheckIn}</div>
-              </div>
-              <div style={{ paddingLeft: 400 }}>
-                <div className={"sub-title"}>Check-out</div>
-                <div className={"title_3"}>{searchDetails.CheckOut}</div>
-              </div>
-            </div>
-            <div>
-              <div className={"title_3"}>
-                Total length of stay : {searchDetails.Nights} nights
-              </div>
-            </div>
-          </Card1>
-        </div>
-        <div style={{ paddingTop: 30 }}>
-          <div className="sub-title pt-2 pb-2">Room Selection</div>
-          <Card1>
-            <div style={{ display: "flex", paddingBottom: 20 }}>
-              <div style={{ paddingRight: 400 }}>
-                <div className={"sub-title"}>Room type</div>
-                <div className={"title_3"}>{searchDetails.RoomType}</div>
-              </div>
-              <div style={{ paddingLeft: 400 }}>
-                <div className={"sub-title"}>No of rooms</div>
-                <div className={"title_3"}>{searchDetails.NoOfRooms}</div>
-              </div>
-            </div>
-            <div>
-              <div className={"sub-title"}>Room facilities : </div>
-            </div>
-          </Card1>
-        </div>
-        <div style={{ paddingTop: 30 }}>
-          <div className="sub-title pt-2 pb-2">Price Information</div>
-          <Card1>
-            <div style={{ paddingBottom: 20 }}>
-              <div style={{ paddingRight: 400 }}>
-                <div className={"title_3"}>
-                  Price : {searchDetails.Price} XAH
-                </div>
-                <div className={"title_3"}>
-                  Service charge : {searchDetails.Price * 0.1} XAH
-                </div>
-                <div className={"sub-title"}>
-                  Total Price :{" "}
-                  {searchDetails.Price + searchDetails.Price * 0.1} XAH
-                </div>
-              </div>
-            </div>
-          </Card1>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            paddingTop: 45,
-          }}
-        >
-          <div>
-            <Button className="secondaryButton" style={{ width: "180px" }} onClick={() => navigate("/customer-details")}>
-              Continue
-            </Button>
-          </div>
-        </div>
+          <Col md={8}>
+            <BookedHotelDetails
+              hotelName={searchDetails.Name}
+              hotelAddress={searchDetails.Address}
+              starRate={searchDetails.StarRate}
+            />
+            <CustomerRegistration
+              //createReservation={submitForm}
+              disableConfirm={disableConfirm}
+              setDisableConfirm={setDisableConfirm}
+              confirmLoading={confirmLoading}
+              setConfirmLoading={setConfirmLoading}
+            />
+          </Col>
+        </Row>
       </MainContainer>
-      <div>
-        {/* {step === 1 && <Step1 searchDetails={searchDetails} onNext={handleNext} />} */}
-        {/* {step === 2 && <Step2 selectedDates={reservationDetails.selectedDates} location={reservationDetails.location} onNext={handleNext} />}
-    {step === 3 && <Step3 reservationDetails={reservationDetails} onConfirm={handleConfirm} />} */}
-      </div>
     </>
   );
 };

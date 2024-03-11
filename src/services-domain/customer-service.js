@@ -38,5 +38,33 @@ export default class CustomerService {
       throw(error);
     }
   }
+
+  async makeReservation(data) {
+
+    const submitData =  {
+      CustomerId: data.CustomerId,
+      FromDate: data.FromDate,
+      ToDate: data.ToDate,
+      CustomerDetails: data.CustomerDetails,
+      RoomSelections: data.roomSelections  //  [  {roomId: 1, roomCount: 3, costPerRoom: 25, roomName: "" }, {roomId: 2, roomCount: 3, costPerRoom: 25} ]
+    }
+
+    const submitObj = {
+      type: constants.RequestTypes.RESERVATION,
+      subType: constants.RequestSubTypes.CREATE_RESERVATION,
+      data: data
+    }
+        let result;
+        try {
+            // {lastReservationId: 34}
+            result = await this.contractService.submitInputToContract(submitObj);
+            console.log("Result:",result);
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+
+        return result
+    }
 }
 
