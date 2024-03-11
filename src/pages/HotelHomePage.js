@@ -22,6 +22,7 @@ import SharedStateService from "../services-domain/sharedState-service";
 import { toast } from "react-hot-toast";
 import ContractService from "../services-common/contract-service";
 import { HotelDto } from "../dto/HotelDto";
+import {LocalStorageKeys} from "../constants/constants";
 
 function HotelHomePage() {
   const { id } = useParams(); // hotel id
@@ -44,7 +45,7 @@ function HotelHomePage() {
 
   useEffect(() => {
     setIsDataLoading(true);
-    const walletAddress = localStorage.getItem("Account");
+    const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
     hotelService
       .getHotelsList(walletAddress)
       .then((data) => {
@@ -61,7 +62,7 @@ function HotelHomePage() {
               Location: matchingHotel[0].location,
               Facilities: matchingHotel[0].facilities,
               ImageURLs: matchingHotel[0].imageUrls,
-              WalletAddress: localStorage.getItem("Account"),
+              WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
             });
             setIsDataLoading(false);
             setHotelName(selectedHotel.Name);

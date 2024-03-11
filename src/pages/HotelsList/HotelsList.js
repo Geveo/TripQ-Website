@@ -5,13 +5,14 @@ import HotelService from "../../services-domain/hotel-service copy";
 import Card1 from "../../layout/Card";
 import { Label } from "reactstrap";
 import toast from "react-hot-toast";
+import { LocalStorageKeys } from "../../constants/constants";
 
 function HotelsList() {
   const [hotelsList, setHotelsList] = useState(null);
   const hotelService = HotelService.instance;
 
   useEffect(() => {
-    const walletAddress = localStorage.getItem("Account");
+    const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
     hotelService
       .getHotelsList(walletAddress)
       .then((data) => {
