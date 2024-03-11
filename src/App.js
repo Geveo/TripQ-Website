@@ -18,6 +18,7 @@ import AccountTransactions from "./pages/AccountTransactions/AccountTransactions
 import {useSelector} from 'react-redux';
 import {LocalStorageKeys} from "./constants/constants";
 import {xummAuthorize} from "./services-common/xumm-api-service";
+import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";
 
 function App() {
     const loginState = useSelector((state) => state.loginState);
@@ -75,6 +76,7 @@ function App() {
                             <Route path="/my-transactions" element={<AccountTransactions />} exact />
                             <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/register-hotel" element={<RegisterHotel />} exact />
+                            <Route path="/my-reservations" element={<ViewCustomerReservations />} exact />
                         </>
                     )}
                     <Route path="*" element={<CustomerDashboard />} />

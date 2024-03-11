@@ -59,7 +59,6 @@ function NavBar(props) {
     navigate('/')
   }
 
-
   return (
     <>
       <div>
@@ -125,13 +124,16 @@ function NavBar(props) {
           >
             List Your Property
           </Button>
-          <Button
-            outline
-            className="primaryButton smallMarginLeftRight"
-            onClick={() => navigate("/reservations")}
-          >
+          {loginState.isLoggedIn ?
+              <Button
+                  outline
+                  className="primaryButton smallMarginLeftRight"
+                  onClick={() => navigate("/my-reservations")}
+              >
             My Reservations
           </Button>
+              :
+              <></>}
 
           {loginState.isLoggedIn ? (
           <Dropdown
