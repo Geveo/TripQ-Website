@@ -4,7 +4,7 @@ import HeaderSectionLandingPageHotelOwner from '../../src/components/HeaderSecti
 
 const LandingPageForHotelOwner = () => {
     return (
-        <div><HeaderSectionLandingPageHotelOwner /></div>
+        <HeaderSectionLandingPageHotelOwner />
     )
 }
 

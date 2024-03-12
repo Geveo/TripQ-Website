@@ -1,5 +1,5 @@
 .cus_navbar {
-  background-color: #2c2c76;
+  background-color: #2c2c76!important;
   min-height: 100px;
   padding-left: 50px !important;
   padding-right: 50px !important;
@@ -9,10 +9,8 @@
   top: 0;
 
   .list_button {
-    color: #ffff !important;
-    border-color: #fff;
     margin-right: 10px;
-    width: 160px;
+    min-width: 160px;
   }
 
   .signin_button {

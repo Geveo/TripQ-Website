@@ -21,6 +21,7 @@ import {xummAuthorize} from "./services-common/xumm-api-service";
 import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";
 import MakeReservations from "./pages/MakeReservations/MakeReservations";
 import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
+import MyProperties from "./pages/MyProperties/MyProperties";
 
 function App() {
     const loginState = useSelector((state) => state.loginState);
@@ -65,7 +66,7 @@ function App() {
             {isContractInitiated && (
                 <Routes>
                     <Route path="/" element={<CustomerDashboard />} />
-                    <Route path="/list-property" element={<LandingPageForHotelOwner />} exact />
+                    <Route path="/list-property" element={<MyProperties />} exact />
                     <Route path="/register-customer" element={<RegisterCustomer />} exact />
                     <Route path="/hotel/:id" element={<HotelHomePage />} exact />
                     <Route path="/reservations" element={<Reservations />} exact />
@@ -73,12 +74,12 @@ function App() {
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
-                    <Route path="/hotel-list" element={<HotelsList />} exact />
                     <Route path="/make-reservations" element={<MakeReservations />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
                     {loginState.isLoggedIn && (
                         <>
                             <Route path="/my-transactions" element={<AccountTransactions />} exact />
+                            <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/register-hotel" element={<RegisterHotel />} exact />
                         </>
