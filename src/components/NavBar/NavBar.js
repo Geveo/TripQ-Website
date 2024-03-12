@@ -83,7 +83,7 @@ function NavBar(props) {
                 My Properties
               </Button>
               <Button variant="outline-warning" style={{  marginLeft: '5px'}} className={`list_button `}
-                      onClick={() => navigate("/reservations")}
+                      onClick={() => navigate("/my-reservations")}
               >
                 My Reservations
               </Button>
