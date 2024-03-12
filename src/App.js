@@ -23,6 +23,7 @@ import MakeReservations from "./pages/MakeReservations/MakeReservations";
 import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
 import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
+import MyProperties from "./pages/MyProperties/MyProperties";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
@@ -65,7 +66,7 @@ function App() {
             {isContractInitiated && (
                 <Routes>
                     <Route path="/" element={<CustomerDashboard />} />
-                    <Route path="/list-property" element={<LandingPageForHotelOwner />} exact />
+                    <Route path="/list-property" element={<MyProperties />} exact />
                     <Route path="/register-customer" element={<RegisterCustomer />} exact />
                     <Route path="/hotel/:id" element={<HotelHomePage />} exact />
                     <Route path="/reservations" element={<Reservations />} exact />

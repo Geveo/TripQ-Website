@@ -14,14 +14,14 @@ function RoomDetails(props) {
 
     return (
         <Card1 className={"pt-4 pb-2"}>
-              {props.rooms.length == 0 &&
+              {props.rooms.length === 0 &&
                      <div>No room types added.</div>       }
 
             <div>
                 <table style={{ borderCollapse: 'collapse', width: '100%' }}>
                     <thead>
                         <tr>
-                            <th style={{ padding: '8px', textAlign: 'center' }}>Code</th>
+                            <th style={{ padding: '8px', textAlign: 'center' }}>Room Type</th>
                             <th style={{ padding: '8px', textAlign: 'center' }}>Sqft</th>
                             <th style={{ padding: '8px' , textAlign: 'center' }}>Description</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Rooms Count</th>
