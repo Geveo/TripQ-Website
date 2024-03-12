@@ -10,7 +10,6 @@ import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import { useNavigate } from "react-router-dom";
 import "./styles.scss";
-import LoginModal from "../Login/LoginModal";
 import { useSelector, useDispatch } from "react-redux";
 import {xummAuthorize, xummLogout} from "../../services-common/xumm-api-service";
 import {Nav} from "react-bootstrap";
