@@ -37,7 +37,7 @@ const ViewCustomerReservations = () => {
             <Container style={{minHeight: '85vh'}}>
                 <Row>
                     <Col lg={10}>
-                        <div className='page-header mt-4'>
+                        <div className='page-header mt-4' style={{color: 'rgb(44 44 118)', fontWeight: 700, fontSize: '50px'}}>
                             My Reservations
                         </div>
                     </Col>
