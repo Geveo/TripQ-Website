@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import { useSelector, useDispatch } from "react-redux";
-import { add as selectionDetailsAdd} from "../../features/SelectionDetails/SelectionDetailsSlice";
+import { add as selectionDetailsAdd} from "../../features/selectionDetails/selectionDetailsSlice";
 import {LocalStorageKeys} from "./../../constants/constants";
 
 //import Step2 from './Step2';

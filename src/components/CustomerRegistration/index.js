@@ -27,6 +27,8 @@ import { ReservationDto } from "../../dto/ReservationDto";
 import { LocalStorageKeys } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
+import { store } from "../../app/store";
+import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
 
 const CustomerRegistration = (props) => {
   const xrplService = XrplService.xrplInstance;
@@ -94,9 +96,9 @@ const CustomerRegistration = (props) => {
     } else {
       setEmailInvalid(false);
     }
-    
+
     if (validation(body)) {
-     // await props.createReservation(body);
+      // await props.createReservation(body);
     } else {
       props.setConfirmLoading(false);
       props.setDisableConfirm(false);
@@ -104,71 +106,76 @@ const CustomerRegistration = (props) => {
     return;
   };
   const submitForm = async () => {
-    const selectionData = selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+    const selectionData =
+      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+
     if (
       firstName.length > 0 &&
       lastName.length > 0 &&
       email.length > 0 &&
       phoneNo
     ) {
-        const result = await showPayQRWindow(
-            loginState.loggedInAddress,
-            `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-            "0.6",
-            process.env.REACT_APP_CURRENCY,
-            process.env.REACT_APP_CURRENCY_ISSUER
-          );
-          console.log(result);
-          if(result===PaymentResults.COMPLETED){
-            let reservationData = new ReservationDto({
-              HotelId : selectionData.HotelId,
-              WalletAddress : localStorage.getItem(LocalStorageKeys.AccountAddress),
-              Price : "0.6",
-              FromDate : selectionData.CheckIn,
-              ToDate : selectionData.CheckOut,
-              NoOfNights : selectionData.Nights,
-              FirstName : firstName,
-              LastName : lastName,
-              Email : email,
-              Telephone : phoneNo,
-              RoomTypes : selectionData.RoomTypes,
-              NoOfRooms : selectionData.NoOfRooms,
+      const result = await showPayQRWindow(
+        loginState.loggedInAddress,
+        `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+        "0.6",
+        process.env.REACT_APP_CURRENCY,
+        process.env.REACT_APP_CURRENCY_ISSUER
+      );
+      console.log(result);
+      if (result === PaymentResults.COMPLETED) {
+        store.dispatch(setShowScreenLoader(true));
+
+        let reservationData = new ReservationDto({
+          HotelId: selectionData.HotelId,
+          WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
+          Price: "0.6",
+          FromDate: selectionData.CheckIn,
+          ToDate: selectionData.CheckOut,
+          NoOfNights: selectionData.Nights,
+          FirstName: firstName,
+          LastName: lastName,
+          Email: email,
+          Telephone: phoneNo,
+          RoomTypes: selectionData.RoomTypes,
+          NoOfRooms: selectionData.NoOfRooms,
+        });
+
+        hotelService.makeReservation(reservationData).then((res) => {
+          store.dispatch(setShowScreenLoader(false));
+          if (res.rowId.lastId > 0) {
+            toast.success("Reserved successfully!", {
+              duration: 10000,
             });
-
-            hotelService.makeReservation(reservationData).then((res) => {
-
-              if (res.rowId.lastId > 0) {
-                toast.success("Reserved successfully!", {
-                  duration: 10000,
-                });
-                navigate(`/my-reservations`);
-              } else {
-                toast(
-                  (element) => (
-                    <ToastInnerElement
-                      message={"Registration failed!"}
-                      id={element.id}
-                    />
-                  ),
-                  {
-                    duration: Infinity,
-                  }
-                );
+            navigate(`/my-reservations`);
+          } else {
+            toast(
+              (element) => (
+                <ToastInnerElement
+                  message={"Registration failed!"}
+                  id={element.id}
+                />
+              ),
+              {
+                duration: Infinity,
               }
-            });
+            );
           }
-    }else{
-        toast(
-            (element) => (
-              <ToastInnerElement
-                message={"Check the details again!"}
-                id={element.id}
-              />
-            ),
-            {
-              duration: Infinity,
-            }
-          );
+        });
+      }
+    } else {
+      store.dispatch(setShowScreenLoader(false));
+      toast(
+        (element) => (
+          <ToastInnerElement
+            message={"Check the details again!"}
+            id={element.id}
+          />
+        ),
+        {
+          duration: Infinity,
+        }
+      );
     }
   };
   return (
@@ -246,7 +253,7 @@ const CustomerRegistration = (props) => {
               />
             </FormGroup>
           </Col>
-        </Row>        
+        </Row>
         <div
           style={{
             display: "flex",
