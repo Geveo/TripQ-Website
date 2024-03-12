@@ -21,6 +21,7 @@ import {xummAuthorize} from "./services-common/xumm-api-service";
 import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";
 import MakeReservations from "./pages/MakeReservations/MakeReservations";
 import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
+import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";
 
 function App() {
     const loginState = useSelector((state) => state.loginState);
@@ -33,11 +34,9 @@ function App() {
         });
 
         const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
-        const pk = localStorage.getItem(LocalStorageKeys.pkce_state);
-        const xpk = localStorage.getItem(LocalStorageKeys.XummPkceJwt);
 
 
-        if(acc && acc.length > 0 && pk && pk.length > 0 && xpk && xpk.length > 0) {
+        if(acc && acc.length > 0) {
             xummAuthorize();
             // dispatch(loginSuccessfully(acc));
         }
@@ -73,7 +72,6 @@ function App() {
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
-                    <Route path="/hotel-list" element={<HotelsList />} exact />
                     <Route path="/make-reservations" element={<MakeReservations />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
                     {loginState.isLoggedIn && (
@@ -81,6 +79,7 @@ function App() {
                             <Route path="/my-transactions" element={<AccountTransactions />} exact />
                             <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/register-hotel" element={<RegisterHotel />} exact />
+                            <Route path="/my-reservations" element={<ViewCustomerReservations />} exact />
                         </>
                     )}
                     <Route path="*" element={<CustomerDashboard />} />

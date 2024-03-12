@@ -60,7 +60,7 @@ function Footer(props) {
                 </Row>
                 <Row>
                     <Col className="text-center">
-                        Copyright 2023. All rights reserved.
+                        Copyright 2024. All rights reserved.
                     </Col>
                 </Row>
             </Container>
