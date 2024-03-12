@@ -10,7 +10,7 @@ export class ReservationDto {
     LastName,
     Email,
     Telephone,
-    RoomTypeId,
+    RoomTypes,
     NoOfRooms
   }) {
     this.HotelId = HotelId;
@@ -23,7 +23,7 @@ export class ReservationDto {
     this.LastName = LastName;
     this.Email = Email;
     this.Telephone = Telephone;
-    this.RoomTypeId = RoomTypeId;
+    this.RoomTypes = RoomTypes;
     this.NoOfRooms = NoOfRooms;
   }
 }
