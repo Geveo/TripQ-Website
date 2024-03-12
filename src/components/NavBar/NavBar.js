@@ -1,6 +1,5 @@
 import {useState} from "react";
 import {
-  NavbarBrand,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
@@ -59,7 +58,6 @@ function NavBar(props) {
     await xummLogout();
     navigate('/')
   }
-
 
   return (
     <>

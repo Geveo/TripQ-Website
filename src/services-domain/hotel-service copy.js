@@ -279,8 +279,8 @@ export default class HotelService {
 
     const submitObj = {
       type: constants.RequestTypes.RESERVATION,
-      subType: constants.RequestSubTypes.CREATE_RESERVATION,
-      data: submitData
+      subType: constants.RequestSubTypes.MAKE_RESERVATIONS,
+      data: data
     }
 
 

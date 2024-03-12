@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import { useSelector, useDispatch } from "react-redux";
-import { add as selectionDetailsAdd} from "../../features/SelectionDetails/SelectionDetailsSlice";
+import { add as selectionDetailsAdd} from "../../features/selectionDetails/selectionDetailsSlice";
 import {LocalStorageKeys} from "./../../constants/constants";
 
 //import Step2 from './Step2';
@@ -40,6 +40,18 @@ const ReservationForm = () => {
   const loginState = useSelector((state) => state.loginState);
 
   useEffect(() => {
+    let RoomTypes = [];
+    let RoomType1 = {
+      RoomTypeId: 1,
+      NoOfRooms: 2
+    }
+    let RoomType2 = {
+      RoomTypeId: 2,
+      NoOfRooms: 3
+    }
+    RoomTypes.push(RoomType1);
+    RoomTypes.push(RoomType2);
+
     let searchObj = {
       HotelId: 1,
       Name: "Dinuda Resort",
@@ -49,9 +61,7 @@ const ReservationForm = () => {
       CheckIn: "Sat 20 Apr 2024",
       CheckOut: "Sat 22 Apr 2024",
       Nights: 2,
-      RoomTypeId: 1,
-      RoomSize: "100sqft",
-      NoOfRooms: 2,
+      RoomTypes: JSON.stringify(RoomTypes),
       Price: 100,
     };
     dispatch(selectionDetailsAdd({key:localStorage.getItem(LocalStorageKeys.AccountAddress),value: searchObj}));

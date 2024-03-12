@@ -30,9 +30,13 @@ import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
 import { LocalStorageKeys } from "../constants/constants";
-const { useSelector } = require("react-redux");
+import { store } from "../app/store";
+import { setShowScreenLoader } from "../features/screenLoader/ScreenLoaderSlice";
+
+const { useSelector, useDispatch } = require("react-redux");
 
 function RegisterHotel() {
+  const dispatch = useDispatch();
   const hotelService = HotelService.instance;
   let emailRegex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
   let phoneNoRegex = new RegExp("^[0-9 ]*$");
@@ -170,7 +174,7 @@ function RegisterHotel() {
 
   // Form submit
   const submitForm = async () => {
-    setIsDataLoading(true);
+    store.dispatch(setShowScreenLoader(true));
     setRegisterButtonDisable(true);
 
     validationForm();
@@ -209,7 +213,9 @@ function RegisterHotel() {
             Location: JSON.stringify(locationDto),
             Facilities: JSON.stringify(HotelFacilities),
             ImageURLs: urls,
-            WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
+            WalletAddress: localStorage.getItem(
+              LocalStorageKeys.AccountAddress
+            ),
           });
           setHotelData(hotelData);
           // only if the required validations are met, form will submit
@@ -225,9 +231,9 @@ function RegisterHotel() {
             HotelFacilities.length > 0 &&
             uploadedImages.length > 2
           ) {
-            setIsDataLoading(false);
             hotelService.registerHotel(hotelData).then((res) => {
-
+              store.dispatch(setShowScreenLoader(false));
+            
               if (res.rowId.lastId > 0) {
                 toast.success("Registered successfully!", {
                   duration: 10000,
@@ -248,8 +254,8 @@ function RegisterHotel() {
               }
             });
           } else {
-            setIsDataLoading(false);
             setRegisterButtonDisable(false);
+            store.dispatch(setShowScreenLoader(false));
             toast(
               (element) => (
                 <ToastInnerElement
@@ -265,7 +271,7 @@ function RegisterHotel() {
         }
       }
     } catch (err) {
-      setIsDataLoading(false);
+      store.dispatch(setShowScreenLoader(false));
       setRegisterButtonDisable(false);
       console.log(err);
       toast(
@@ -282,89 +288,9 @@ function RegisterHotel() {
     }
   };
 
-  const openQRScanner = () => {
-    setScannedText("");
-    setShowQRScanner(true);
-  };
-
-  // async function onProceedToPayment() {
-  //   await init();
-  //   await listenToTransactionsByAddress(contractWalletAddress, {
-  //     account: ownerWalletAddress,
-  //   });
-
-  //   //setShowQRModal(true);
-  // }
-
-  // async function onCloseQRModel() {
-  //   setShowQRModal(false);
-  //   await stopListeningToTransactionsByAddress(ownerWalletAddress);
-  //   await deinit();
-  // }
-
-  // useEffect(() => {
-  //   let tmId = 0;
-  //   const checkTransactions = () => {
-  //     if (listenedTransactions.hasOwnProperty(contractWalletAddress)) {
-  //       const transactionFound = listenedTransactions[
-  //         contractWalletAddress
-  //       ].filter((transaction) => transaction.Account === ownerWalletAddress);
-
-  //       if (
-  //         transactionFound.length > 0 &&
-  //         transactionFound[transactionFound.length - 1].Account ===
-  //           scannedText &&
-  //         parseFloat(transactionFound[transactionFound.length - 1].Amount) >=
-  //           hotelRegiFee
-  //       ) {
-  //         setIsTransactionfound(true);
-  //         setShowQRModal(false);
-  //         setIsTransactionDone(true);
-
-  //         stopListeningToTransactionsByAddress(contractWalletAddress);
-  //         sendHotelRegistrationRequest();
-  //         deinit();
-  //         clearTimeout(tmId);
-  //       } else {
-  //         clearTimeout(tmId);
-  //         tmId = setTimeout(checkTransactions, 1000);
-  //       }
-  //     }
-  //   };
-
-  //   if (!isTransactionFound) {
-  //     checkTransactions();
-  //   }
-
-  //   return () => {
-  //     clearTimeout(tmId);
-  //   };
-  // }, [listenedTransactions, isTransactionFound]);
-
   return (
     <>
-      {/* {showQRModal && (
-        <TransactionQRModal
-          isOpen={showQRModal}
-          qrMessage={contractWalletAddress}
-          onClose={onCloseQRModel}
-        />
-      )} */}
       <MainContainer>
-        {isDataLoading && (
-          <div className="spinnerWrapper">
-            <Spinner
-              color="primary"
-              style={{
-                height: "3rem",
-                width: "3rem",
-              }}
-              type="grow"
-            >
-              Loading...
-            </Spinner>
-          </div>
-        )}
         <section>
           <div className="title_1">Welcome to TripQ!</div>
           <Card1>
@@ -479,34 +405,6 @@ function RegisterHotel() {
         {uploadedImages.length !== 0 && (
           <ImagePreviewSection images={uploadedImages} />
         )}
-
-        {/* <section>
-          <div className="title_2">
-            Scan Your QR Code<span style={{ color: "red" }}>*</span>
-          </div>
-          <div className="subtext">
-            Upload the QR code of your wallet address or scan it directly with
-            your camera
-          </div>
-          <Card1>
-            {showQRScanner && (
-              <QRScanner onClose onScanSuccess={handleScanSuccess} />
-            )}
-            <div style={{ textAlign: "center" }}>
-              {scannedText !== "" && (
-                <h6>Your wallet address : {scannedText}</h6>
-              )}
-            </div>
-            <div
-              style={{ textAlign: "center", marginTop: 20, marginBottom: 20 }}
-            >
-              <Button className="secondaryButton" onClick={openQRScanner}>
-                Open QR Scanner
-              </Button>
-            </div>
-          </Card1>
-        </section> */}
-
         <section>
           <h5 style={{ lineHeight: "25px" }}>
             You’re almost done.
@@ -527,8 +425,8 @@ function RegisterHotel() {
                   I certify that this is a legitimate accommodation business
                   with all necessary licenses and permits, which can be shown
                   upon first request.
-                  <br /> TripQ reserves the right to verify and
-                  investigate any details provided in this registration.
+                  <br /> TripQ reserves the right to verify and investigate any
+                  details provided in this registration.
                 </p>
               </Label>
             </FormGroup>
@@ -555,10 +453,10 @@ function RegisterHotel() {
           <Button
             className="secondaryButton"
             style={{ width: "650px" }}
-             disabled={
-               registerButtonDisable ||
-               !(isCondition1Checked && isCondition2Checked)
-             }
+            disabled={
+              registerButtonDisable ||
+              !(isCondition1Checked && isCondition2Checked)
+            }
             onClick={() => {
               submitForm();
             }}

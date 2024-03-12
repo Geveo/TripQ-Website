@@ -29,7 +29,7 @@ const RequestSubTypes = {
     DELETE_CUSTOMER: "DeleteCustomer",
     GET_CUSTOMERS: "GetCustomers",
 
-    CREATE_RESERVATION: "CreateReservation",
+    MAKE_RESERVATIONS: "MakeReservations",
     GET_RESERVATIONS: "GetReservations",
     DELETE_RESERVATION: "DeleteReservation"
 
