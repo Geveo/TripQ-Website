@@ -122,7 +122,7 @@ function NavBar(props) {
                   </Dropdown>
 
               ) : (
-                  <Button variant="outline-warning" style={{  marginLeft: '5px', width: '60px'}}
+                  <Button variant="outline-warning" style={{  marginLeft: '5px'}}
                           onClick={() => login()}
                   >
                     Login
