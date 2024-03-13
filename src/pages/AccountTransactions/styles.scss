@@ -1,16 +1,17 @@
+$main-yellow-color: rgb(251 183 37);
+$main-blue-color: rgb(44 44 118);
+
 .page-header {
     color: black;
     font-size: 2rem;
     font-weight: 500;
+}
 
-    span.account-address {
-        font-size: 1.3rem;
-        font-weight: 400;
-        color: rgb(0, 0, 0);
-        background-color: rgba(229, 225, 225, 0.763);
-        border-radius: 5px;
-    }
-
+.account-address {
+    font-size: 1.0rem;
+    color: rgb(0, 0, 0);
+    color: $main-blue-color;
+    margin-top: -7px;
 }
 
 .cell-texts {
@@ -23,4 +24,70 @@
 
 .text-green {
     color: green;
+}
+
+
+.balance-card {
+    background-color: $main-yellow-color!important;
+    //background-color: white!important;
+    color: $main-blue-color!important;
+    box-shadow: 3px 10px 19px rgb(18 18 18 / 60%);
+    border: 0px!important;
+}
+
+.card-label {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+
+.ever-balance-value {
+    font-weight: 350!important;
+    line-height: 74px;
+    display: block;
+}
+
+.font-size-10 {
+    font-size: 10px;
+}
+
+.evr-label {
+
+}
+
+
+
+@media only screen and (min-width: 992px) {
+    .ever-balance-value{
+        font-size: 58px;
+        line-height: 74px;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .ever-balance-value{
+        font-size: 45px;
+        line-height: 55px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .ever-balance-value{
+        font-size: 115px;
+        line-height: 125px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .ever-balance-value{
+        font-size: 110px;
+        line-height: 120px;
+    }
+}
+
+@media only screen and (max-width: 386px) {
+    .ever-balance-value{
+        font-size: 32px;
+        line-height: 42px;
+    }
 }

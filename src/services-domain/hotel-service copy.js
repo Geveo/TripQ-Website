@@ -291,11 +291,11 @@ export default class HotelService {
             }
         }
 
-        const submitObj = {
-            type: constants.RequestTypes.RESERVATION,
-            subType: constants.RequestSubTypes.CREATE_RESERVATION,
-            data: submitData
-        }
+    const submitObj = {
+      type: constants.RequestTypes.RESERVATION,
+      subType: constants.RequestSubTypes.MAKE_RESERVATIONS,
+      data: data
+    }
 
 
         let result;

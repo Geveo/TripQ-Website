@@ -1,19 +1,18 @@
 import {useState} from "react";
 import {
-  Button,
-  Navbar,
-  NavbarBrand,
-  NavbarText,
   Dropdown,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar';
 import { useNavigate } from "react-router-dom";
 import "./styles.scss";
-import LoginModal from "../Login/LoginModal";
 import { useSelector, useDispatch } from "react-redux";
 import {xummAuthorize, xummLogout} from "../../services-common/xumm-api-service";
+import {Nav} from "react-bootstrap";
 
 const isUnderConstruction = process.env.REACT_APP_IS_UNDER_CONSTRUCTION
 ? process.env.REACT_APP_IS_UNDER_CONSTRUCTION == 1
@@ -59,149 +58,80 @@ function NavBar(props) {
     navigate('/')
   }
 
-
   return (
     <>
       <div>
-        <Navbar className="cus_navbar" dark>
-          {isUnderConstruction ? (
-            <div
-              style={{
-                marginBottom: "20px",
-                marginLeft: "10%",
-                minHeight: "35px",
-                backgroundColor: "yellow",
-                position: "fixed",
-                width: "auto",
-                paddingRight: "10%",
-                paddingLeft: "10%",
-                paddingTop: "5px",
-                top: "-1px",
-                zIndex: "99999",
-                fontSize: "18px",
-                color: "red",
-                fontWeight: "500",
-              }}
-              classsName="under-construction-div"
-            >
-              {underConstructionMsg}
-            </div>
-          ) : (
-            <></>
-          )}
-          <NavbarBrand href="/" style={{ marginLeft: "40px" }}>
-            <img
-              alt="logo"
-              src="/Assets/Images/TripQ.png"
-              style={{
-                height: 70,
-                width: 185,
-              }}
-            />
-          </NavbarBrand>
-          {isCustomer === "true" ? (
-            <>
-              <NavbarText className="explore_txt white-text">
-                Explore
-              </NavbarText>
-              <NavbarText className="vacation_txt white-text">
-                Vacation Rental
-              </NavbarText>
-              <NavbarText className="community_txt white-text">
-                Community
-              </NavbarText>{" "}
-            </>
-          ) : (
-            <>
-              <NavbarText className="help_button">Help</NavbarText>
-              <NavbarText className="faq-text">FAQ</NavbarText>
-            </>
-          )}
+        <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary cus_navbar">
+          <Container>
+            <Navbar.Toggle aria-controls="responsive-navbar-nav" style={{backgroundColor: '#fbb725'}} />
+            <Navbar.Brand href="/">
+              <img
+                  src="/Assets/Images/TripQ.png"
+                  width="200"
+                  height="70"
+                  className="d-inline-block align-top"
+                  alt="React Bootstrap logo"
+              />
+            </Navbar.Brand>
+          </Container>
+          <Navbar.Collapse id="responsive-navbar-nav">
+            <Nav className={`ms-auto`}>
+              <Button  variant="outline-warning" className={`list_button `}
+                       onClick={() => navigate("/list-property")}
+              >
+                My Properties
+              </Button>
+              <Button variant="outline-warning" style={{  marginLeft: '5px'}} className={`list_button `}
+                      onClick={() => navigate("/my-reservations")}
+              >
+                My Reservations
+              </Button>
 
-          <Button
-            outline
-            className="primaryButton smallMarginLeftRight"
-            onClick={() => navigate("/list-property")}
-          >
-            List Your Property
-          </Button>
-          <Button
-            outline
-            className="primaryButton smallMarginLeftRight"
-            onClick={() => navigate("/reservations")}
-          >
-            My Reservations
-          </Button>
+              <Button variant="outline-warning" style={{  marginLeft: '5px'}} className={`list_button `}
+                      onClick={() => navigate("/make-reservations")}
+              >
+                Make Reservations
+              </Button>
 
-          {loginState.isLoggedIn ? (
-          <Dropdown
-            isOpen={dropdownOpen}
-            toggle={toggle}
-            direction={"down"}
-            className="primaryButton setting-button"
-          >
-            <DropdownToggle
-              className="primaryButton setting-button"
-              style={{ height: "100%" }}
-            >
-              {`${loginState.loggedInAddress.slice(0,7)}...`}
-            </DropdownToggle>
-            <DropdownMenu style={{ marginTop: " 15px" }}>
-              <DropdownItem text className="address-text">
-              {loginState.loggedInAddress}
-              </DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem onClick={() => goToMyTransactionsPage()}>
-                My transactions
-              </DropdownItem>
-              <DropdownItem onClick={() => logout()}>
-                Log out
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+              {loginState.isLoggedIn ? (
+                  <Dropdown
+                      isOpen={dropdownOpen}
+                      toggle={toggle}
+                      direction={"down"}
+                      style={{ border: 'solid 1px #fbb725',  borderRadius: '5px', backgroundColor: '#fbb725'}}
 
-          ) : (
-            <Button
-              outline
-              className="primaryButton smallMarginLeftRight"
-              onClick={() => login()}
-            >
-              Login
-            </Button>
-          )}
-          { loginOpen && <LoginModal isOpen={loginOpen} onClose={closeLoginModal} />} 
-          {/* <Dropdown
-            isOpen={dropdownOpen}
-            toggle={toggle}
-            direction={"down"}
-            className="primaryButton setting-button"
-          >
-            <DropdownToggle
-              className="primaryButton setting-button"
-              style={{ height: "100%" }}
-            >
-              <RiFileSettingsFill style={{ fontSize: "1.5rem" }} />{" "}
-            </DropdownToggle>
-            <DropdownMenu style={{ marginTop: " 15px" }}>
-              <DropdownItem text>
-                <span className="wallet_address_title">Wallet Address: </span>
-                <span className={"wallet_address"}>{walletAddress}</span>
-                <span className={"copy_button"}>
-                  <CopyToClipboard
-                    text={walletAddress}
-                    onCopy={() => setIsCopiedAddress(true)}
                   >
-                    <FaCopy size={"20px"} />
-                  </CopyToClipboard>
-                </span>
+                    <DropdownToggle
+                        className=""
+                        style={{ height: "100%", backgroundColor: '#fbb725', color: '#2c2c76', border: 'none' }}
+                    >
+                      {`${loginState.loggedInAddress.slice(0,7)}...`}
+                    </DropdownToggle>
+                    <DropdownMenu style={{ marginTop: " 15px" }}>
+                      <DropdownItem text className="address-text">
+                        {loginState.loggedInAddress}
+                      </DropdownItem>
+                      <DropdownItem divider />
+                      <DropdownItem onClick={() => goToMyTransactionsPage()}>
+                        My account
+                      </DropdownItem>
+                      <DropdownItem onClick={() => logout()}>
+                        Log out
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
 
-                {isCopiedAddress ? (
-                  <span className={"subtext"}>Copied</span>
-                ) : null}
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown> */}
+              ) : (
+                  <Button variant="outline-warning" style={{  marginLeft: '5px'}}
+                          onClick={() => login()}
+                  >
+                    Login
+                  </Button>
+              )}
+            </Nav>
+          </Navbar.Collapse>
         </Navbar>
+
       </div>
     </>
   );

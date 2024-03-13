@@ -25,14 +25,14 @@ const BookHotelRoom = (props) => {
           <p className="fontBold">{`${props.noOfDays - 1} nights, ${props.noOfDays} days`}</p>
         </Row>
         <hr />
-        <p>You selected</p>
+        {/* <p>You selected</p>
         {
           props.selections.map((sl, idx) => {
             return (
                 <p className="fontBold" key={idx}>{sl}</p>
             );
           })
-        }
+        } */}
       </Card>
     </div>
   );

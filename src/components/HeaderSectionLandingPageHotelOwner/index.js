@@ -10,6 +10,8 @@ import HotelService from "../../services-domain/hotel-service copy";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
 import {xummAuthorize} from "../../services-common/xumm-api-service";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const HeaderSectionLandingPageHotelOwner = () => {
   const navigate = useNavigate();
@@ -74,8 +76,8 @@ const HeaderSectionLandingPageHotelOwner = () => {
 
   return (
     <div className={styles.heroImage}>
-      <div>
-        <div className={styles.content}>
+      <Row>
+        <Col className={styles.content}>
           <span className={styles.heading}>Your world</span> <br />
           <hr className="noMargin" />
           <span className={styles.heading}>worth sharing!</span>
@@ -133,9 +135,9 @@ const HeaderSectionLandingPageHotelOwner = () => {
               </Button>
             </div>
           ) : null}
-        </div>
+        </Col>
         <div className={styles.backgroundShape}></div>
-      </div>
+      </Row>
     </div>
   );
 };

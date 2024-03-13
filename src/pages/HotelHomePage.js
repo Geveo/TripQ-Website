@@ -14,7 +14,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Spinner,
 } from "reactstrap";
 import RoomTypesGrid from "../components/HotelHomePage/RoomTypesGrid";
 import HotelService from "../services-domain/hotel-service copy";
@@ -22,13 +21,16 @@ import SharedStateService from "../services-domain/sharedState-service";
 import { toast } from "react-hot-toast";
 import ContractService from "../services-common/contract-service";
 import { HotelDto } from "../dto/HotelDto";
+import {LocalStorageKeys} from "../constants/constants";
+import{store} from "./../app/store";
+import { setShowScreenLoader} from "../features/screenLoader/ScreenLoaderSlice";
+const { useDispatch } = require("react-redux");
 
 function HotelHomePage() {
+  const dispatch = useDispatch();
   const { id } = useParams(); // hotel id
   const sharedInstance = SharedStateService.instance;
   const hotelService = HotelService.instance;
-
-  const [isDataLoading, setIsDataLoading] = useState(true);
 
   const [selectedHotel, setSelectedHotel] = useState({
     Id: "",
@@ -43,8 +45,8 @@ function HotelHomePage() {
   });
 
   useEffect(() => {
-    setIsDataLoading(true);
-    const walletAddress = localStorage.getItem("Account");
+    store.dispatch(setShowScreenLoader(true));
+    const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
     hotelService
       .getHotelsList(walletAddress)
       .then((data) => {
@@ -61,8 +63,9 @@ function HotelHomePage() {
               Location: matchingHotel[0].location,
               Facilities: matchingHotel[0].facilities,
               ImageURLs: matchingHotel[0].imageUrls,
-              WalletAddress: localStorage.getItem("Account"),
+              WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
             });
+            store.dispatch(setShowScreenLoader(false));
             getRoomTypes();
             setIsDataLoading(false);
             setHotelName(selectedHotel.Name);
@@ -93,72 +96,20 @@ function HotelHomePage() {
                 toast.error("Error in fetching hotel images.");
               });
           } else {
-            setIsDataLoading(false);
+            store.dispatch(setShowScreenLoader(false));
           }
         }
       })
       .catch((err) => {
-        setIsDataLoading(false);
+        store.dispatch(setShowScreenLoader(false));
         console.log(err.thrownError);
         toast.error("Error in fetching hotels list.");
       });
   }, []);
 
-  // // Load hotel details
-  // async function getHotelDetails() {
-  //   setIsDataLoading(true);
-  //   if (id && id > 0) {
-  //     try {
-  //       //IMPLEMENT BACK END
-  //       const res = await hotelService.getMyHotel(id);
-  //       if (!res) {
-  //         toast(
-  //           (element) => (
-  //             <ToastInnerElement message={"Error occured !"} id={element.id} />
-  //           ),
-  //           {
-  //             duration: Infinity,
-  //           }
-  //         );
-  //       }
-
-  //       setHotelName("res.Name");
-  //       setDescription(res.Description ?? null);
-  //       setAddress1(res.AddressLine1 ?? null);
-  //       setAddress2(res.AddressLine2 ?? null);
-  //       setCity(res.City);
-  //       setImages(res.Images);
-  //       setSelectedFacilityIds(res.Facilities);
-
-  //       setIsDataLoading(false);
-  //     } catch (error) {
-  //       setIsDataLoading(false);
-  //       toast(
-  //         (element) => (
-  //           <ToastInnerElement
-  //             message={`Error occured: ${error} `}
-  //             id={element.id}
-  //           />
-  //         ),
-  //         {
-  //           duration: Infinity,
-  //         }
-  //       );
-  //     }
-  //   }
-  //   setIsDataLoading(false);
-  // }
-
   async function innnit() {
     await ContractService.instance.init();
   }
-
-  // // Init function
-  // useEffect(() => {
-  //   innnit();
-  // //  getHotelDetails();
-  //   getRoomTypes();
-  // }, []);
 
   const [images, setImages] = useState([]);
   const [hotelName, setHotelName] = useState(null);
@@ -208,9 +159,6 @@ function HotelHomePage() {
   };
 
   const onSubmitRoom = async (room_data) => {
-    // If there is a roomdata,  send a request to submit the room for creation.
-    // on successfull return id, call the fetch room query method
-
     room_data.HotelId = parseInt(id, 10);
     try {
       const res = await HotelService.instance.createRoom(room_data);
@@ -303,20 +251,6 @@ function HotelHomePage() {
       )}
 
       <MainContainer>
-        {isDataLoading ? (
-          <div className="spinnerWrapper">
-            <Spinner
-              color="primary"
-              style={{
-                height: "3rem",
-                width: "3rem",
-              }}
-              type="grow"
-            >
-              Loading...
-            </Spinner>
-          </div>
-        ) : (
           <>
             <section>
               <div className={"row"}>
@@ -469,7 +403,6 @@ function HotelHomePage() {
               </button>
             </section>
           </>
-        )}
       </MainContainer>
     </>
   );

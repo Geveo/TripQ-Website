@@ -15,7 +15,7 @@ function RoomTypesGrid(props) {
 
     return (
         <Card1 className={"pt-4 pb-2"}>
-              {props.rooms.length == 0 &&
+              {props.rooms.length === 0 &&
                      <div>No room types added.</div>       }
 
             <div>

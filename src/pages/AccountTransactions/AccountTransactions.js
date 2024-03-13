@@ -7,20 +7,38 @@ import Button from 'react-bootstrap/Button';
 
 import './styles.scss';
 import { useEffect, useState } from 'react';
-import {deinit, init, getTransactions} from '../../services-common/evernode-xrpl-service'
+import {
+    deinit,
+    init,
+    getTransactions,
+    getTrustlines, getAccountInfo
+} from '../../services-common/evernode-xrpl-service'
 import {LocalStorageKeys} from "../../constants/constants";
 import {useSelector} from 'react-redux'
 import {showPayQRWindow} from "../../services-common/xumm-api-service";
+import Card from "react-bootstrap/Card";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { faArrowUp, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch } from "react-redux";
+import {setShowScreenLoader} from '../../features/screenLoader/ScreenLoaderSlice'
 
 
 const  AccountTransactions = () => {
-    
+    const dispatch = useDispatch();
     const [accountAddress, setAccountAddress] = useState(null);
     const [transactions, setTransactions] = useState([]);
+    const [totalEVR, setTotalEVR] = useState('0');
+    const [totalXAHDrops, setTotalXAHDrops] = useState('0')
+
+    const [issuer, setIssuer ] = useState(process.env.REACT_APP_CURRENCY_ISSUER);
+    const currency = process.env.REACT_APP_CURRENCY;
+
 
     const loginState = useSelector(state => state.loginState)
 
     useEffect(() => {
+        dispatch(setShowScreenLoader(true));
         const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
         if(acc && acc.length > 0) {
             setAccountAddress(acc);
@@ -32,15 +50,31 @@ const  AccountTransactions = () => {
 
     const loadTransactions =  () => {
         if(accountAddress) {
+            dispatch(setShowScreenLoader(true));
             init().then(res => {
+                getTrustlines(accountAddress, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER).then(res => {
+                    if(res && res.length > 0) {
+                        const evrBalance = res.filter(ob => ob.account === process.env.REACT_APP_CURRENCY_ISSUER)[0].balance;
+                        setTotalEVR(evrBalance);
+                    }
+                } ).catch(e => {throw e});
+
+                getAccountInfo(accountAddress).then(res => {
+                    if(res && res.Balance && res.Balance.length > 0)
+                        setTotalXAHDrops(res.Balance);
+                }).catch(e => {throw e});
+
                 getTransactions(accountAddress).then(res => {
                     const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
                     setTransactions(sortedtrx);
                     deinit().catch(e => {throw e});
+                    dispatch(setShowScreenLoader(false))
                 }).catch(e => {throw e})
             }).catch(error => {
                 console.log(error)
-            })
+            });
+
+
         }
     }
 
@@ -89,25 +123,53 @@ const  AccountTransactions = () => {
             <Container style={{minHeight: '85vh'}}>
                 <Row>
                     <Col lg={10}>
-                        <div className='page-header mt-4'>
-                            My Transactions: <span className='account-address'>&nbsp;{accountAddress}&nbsp;</span>
+                        <div className='page-header mt-4'   style={{color: 'rgb(44 44 118)', fontWeight: 700, fontSize: '50px'}}>
+                            MY ACCOUNT
                         </div>
+                        <div  className='account-address'>{accountAddress}</div>
                     </Col>
                     <Col lg={2}>
-                        <div className='page-header mt-4'>
+                        <div className='page-header mt-5'>
                             <Button variant="warning" onClick={loadTransactions}
-                                    style={{color: 'white', fontWeight: 700}}>Refresh</Button>
-                        </div>
-                        <div className='page-header mt-4'>
-                            <Button variant="warning" onClick={() => pay()}
-                                    style={{color: 'white', fontWeight: 700}}>Pay</Button>
+                                    style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Refresh <FontAwesomeIcon icon={faArrowsRotate} /></Button>
                         </div>
                     </Col>
                 </Row>
 
-                <Row className='mt-3'>
+                <Row className={`mt-5`}>
+                    <Col lg={1}></Col>
+                    <Col lg={4}>
+                        <Card className={`text-center p-5 balance-card`} style={{position: 'relative'}}>
+                            <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> EVR balance</div>
+                            <Card.Body>
+                                <div className={`ever-balance-value`}>
+                                    {Number(parseFloat(totalEVR).toFixed(2))}
+                                </div>
+                                {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col lg={2}></Col>
+                    <Col lg={4}>
+                        <Card className={`text-center p-5 balance-card`} style={{position: 'relative'}}>
+                            <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> XAH balance</div>
+                            <Card.Body>
+                                <div className={`ever-balance-value`}>
+                                    {Number((parseFloat(totalXAHDrops)/1000000).toFixed(2))}
+                                </div>
+                                {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col lg={1}></Col>
+                </Row>
+
+                <Row className='mt-5'>
+                    <Col><h2 style={{ color: 'rgb(44 44 118)'}}>Transactions</h2></Col>
+                </Row>
+                <Row className='mt-1'>
                     <Col>
-                        <Table>
+                        <Table striped={true} bordered={true}>
                             <tbody>
                             {transactions.map((trx, index) => {
                                     if(trx.validated && trx.tx.TransactionType === 'Payment') {
@@ -117,12 +179,12 @@ const  AccountTransactions = () => {
                                             <tr key={index}>
                                                 <td>
                                                     <h5 className='mb-0'>
-                                                        {tx.Account === accountAddress ? <Badge bg="danger">SENT</Badge> : <Badge bg="success">RECEIVED</Badge>}
+                                                        {tx.Account === accountAddress ? <Badge bg="danger">SENT <FontAwesomeIcon icon={faArrowUp} style={{ transform: 'rotate(45deg)'}} /> </Badge> : <Badge bg="success">RECEIVED  <FontAwesomeIcon icon={faArrowUp} style={{ transform: 'rotate(225deg)'}} /></Badge>}
                                                     </h5>
                                                 </td>
-                                                <td><div className='cell-texts'>{formatAndGetDate(tx.date)}</div></td>
-                                                <td><div className='cell-texts'>{formatAndGetTime(tx.date)}</div></td>
-                                                <td><div className='cell-texts'>{ tx.Account === accountAddress ? tx.Destination : tx.Account  }</div></td>
+                                                <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{formatAndGetDate(tx.date)}</div></td>
+                                                <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{formatAndGetTime(tx.date)}</div></td>
+                                                <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{ tx.Account === accountAddress ? tx.Destination : tx.Account  }</div></td>
                                                 <td><div className={`cell-texts ${tx.Account === accountAddress ? 'text-red' : 'text-green'} `}>{formatAmount(tx.Amount)}</div></td>
                                             </tr>
                                         )

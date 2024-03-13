@@ -1,241 +1,278 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Col,
-    Form,
-    Row,
-    FormGroup,
-    Label,
-    Button,
-    Input,
-    FormFeedback,
+  Col,
+  Form,
+  Row,
+  FormGroup,
+  Label,
+  Button,
+  Input,
+  FormFeedback,
 } from "reactstrap";
 import Card1 from "../../layout/Card";
-import {useSelector, useDispatch} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
-    show,
-    hide,
+  show,
+  hide,
 } from "../../features/registerCustomer/registerCustomerSlice";
 import XrplService from "../../services-common/xrpl-service";
-import PhoneInput from 'react-phone-input-2'
-import 'react-phone-input-2/lib/style.css'
-import "./styles.scss"
-import LoadingButton from "../LoadingButton/LoadingButton";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import "./styles.scss";
+import { showPayQRWindow } from "../../services-common/xumm-api-service";
+import { toast } from "react-hot-toast";
+import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
+import { PaymentResults } from "../../constants/constants";
+import { ReservationDto } from "../../dto/ReservationDto";
+import { LocalStorageKeys } from "../../constants/constants";
+import HotelService from "./../../services-domain/hotel-service copy";
+import { useNavigate } from "react-router-dom";
+import { store } from "../../app/store";
+import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
 
 const CustomerRegistration = (props) => {
-    const xrplService = XrplService.xrplInstance;
+  const xrplService = XrplService.xrplInstance;
+  const hotelService = HotelService.instance;
 
-    const generatedSecretVisibility = useSelector(
-        (state) => state.registerCustomer.generatedSecretVisibility
-    );
+  const generatedSecretVisibility = useSelector(
+    (state) => state.registerCustomer.generatedSecretVisibility
+  );
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [firstNameInvalid, setFirstNameInvalid] = useState(false);
+  const [lastNameInvalid, setLastNameInvalid] = useState(false);
+  const [emailInvalid, setEmailInvalid] = useState(false);
+  const loginState = useSelector((state) => state.loginState);
 
-    const [fullName, setFullName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phoneNo, setPhoneNo] = useState("");
-    const [secret, setSecret] = useState("");
-    const [walletAddress, setWalletAddress] = useState("");
-    const [payNow, setPayNow] = useState(false);
-    const [payAtDoor, setPayAtDoor] = useState(false);
-    const [fullNameInvalid, setFullNameInvalid] = useState(false);
-    const [emailInvalid, setEmailInvalid] = useState(false);
-    const [secretInvalid, setSecretInvalid] = useState(false);
-    const [walletAddressInvalid, setWalletAddressInvalid] = useState(false);
+  const selectionDetails = useSelector((state) => state.selectionDetails);
 
+  // const [disableAll, setdisableAll] = useState(true);
 
-    // const [disableAll, setdisableAll] = useState(true);
+  const dispatch = useDispatch();
 
-    const dispatch = useDispatch();
+  // disable confirm button logic
+  useEffect(() => {
+    if (firstName && lastName && email && phoneNo) {
+      props.setDisableConfirm(false);
+    } else {
+      props.setDisableConfirm(true);
+    }
+  }, [firstName, lastName, email, phoneNo]);
 
-    // disable confirm button logic
-    useEffect(() => {
-        if (fullName && email && phoneNo && walletAddress && ((payNow && secret) || payAtDoor)) {
-            props.setDisableConfirm(false)
-        } else {
-            props.setDisableConfirm(true)
-        }
+  const validation = (body) => {
+    // only when validate, body will pass
+    if (firstName.length !== 0 && lastName.length !== 0 && email.length !== 0) {
+      console.log("body", body);
+      return true;
+    }
+    return false;
+  };
 
-    }, [fullName, email, phoneNo, walletAddress, payNow, secret, payAtDoor])
-    
-    const validation = (body) => {
-        // only when validate, body will pass
-        if (
-            fullName.length !== 0 &&
-            email.length !== 0 && walletAddress.length !== 0 && (walletAddress.length > 0 && XrplService.xrplInstance.isValidAddress(walletAddress)) &&
-            ((payNow && secret.length !== 0 && xrplService.isValidSecret(secret)) || payAtDoor)
-        ) {
-            console.log("body", body);
-            return true;
-        }
-
-        return false;
+  const registerCustomer = async (e) => {
+    e.preventDefault();
+    // setdisableAll(true);
+    const body = {
+      firstName,
+      lastName,
+      email,
+      phoneNo,
     };
 
-    const registerCustomer = async (e) => {
-        e.preventDefault();
-        // setdisableAll(true);
-        const body = {fullName, email, phoneNo, secret, payNow, walletAddress};
+    if (firstName.length === 0) {
+      setFirstNameInvalid(true);
+    } else {
+      setFirstNameInvalid(false);
+    }
+    if (lastName.length === 0) {
+      setLastNameInvalid(true);
+    } else {
+      setLastNameInvalid(false);
+    }
+    if (email.length === 0) {
+      setEmailInvalid(true);
+    } else {
+      setEmailInvalid(false);
+    }
 
-        if (fullName.length === 0) {
-            setFullNameInvalid(true);
-        } else {
-            setFullNameInvalid(false);
-        }
-        if (email.length === 0) {
-            setEmailInvalid(true);
-        } else {
-            setEmailInvalid(false);
-        }
-        if (walletAddress.length === 0 || (walletAddress.length > 0 && !XrplService.xrplInstance.isValidAddress(walletAddress)) )
-            setWalletAddressInvalid(true);
-        else
-            setWalletAddressInvalid(false);
+    if (validation(body)) {
+      // await props.createReservation(body);
+    } else {
+      props.setConfirmLoading(false);
+      props.setDisableConfirm(false);
+    }
+    return;
+  };
+  const submitForm = async () => {
+    const selectionData =
+      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
-        if (secret.length === 0) {
-            setSecretInvalid(true);
-        } else {
-            setSecretInvalid(false);
-        }
-        if (validation(body)) {
-            await props.createReservation(body)
-        } else {
-            props.setConfirmLoading(false);
-            props.setDisableConfirm(false);
-        }
-        return;
-    };
+    if (
+      firstName.length > 0 &&
+      lastName.length > 0 &&
+      email.length > 0 &&
+      phoneNo
+    ) {
+      const result = await showPayQRWindow(
+        loginState.loggedInAddress,
+        `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+        "0.6",
+        process.env.REACT_APP_CURRENCY,
+        process.env.REACT_APP_CURRENCY_ISSUER
+      );
+      console.log(result);
+      if (result === PaymentResults.COMPLETED) {
+        store.dispatch(setShowScreenLoader(true));
 
-    const payNowHandler = (e) => {
-        setPayAtDoor(false);
-        setPayNow(e.target.checked);
-    };
-    const payAtDoorHandler = (e) => {
-        setPayNow(false);
-        setSecret("");
-        setPayAtDoor(e.target.checked);
-    };
-    return (
-        <Card1>
-            <Form onSubmit={registerCustomer}>
-                <Row>
-                    <Col md={6}>
-                        <FormGroup>
-                            <Label for="fullName">Full Name</Label>
-                            <Input
-                                id="fullName"
-                                name="fullName"
-                                type="text"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                invalid={fullNameInvalid}
-                            />
-                            <FormFeedback invalid={fullNameInvalid.toString()}>
-                                Name can not be empty
-                            </FormFeedback>
-                        </FormGroup>
-                    </Col>
-                    <Col md={6}>
-                        <FormGroup>
-                            <Label for="email">E-Mail</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                invalid={emailInvalid}
-                            />
-                            <FormFeedback invalid={emailInvalid.toString()}>
-                                E-Mail can not be empty
-                            </FormFeedback>
-                        </FormGroup>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col md={6}>
-                        <FormGroup>
-                            <Label for="phoneNo">Phone Number</Label>
-                            <PhoneInput
-                                country="lk"
-                                placeholder="Enter phone number"
-                                value={phoneNo}
-                                onChange={setPhoneNo}
-                                international={true}
-                                withCountryCallingCode={true}/>
-                        </FormGroup>
-                    </Col>
-                    <Col md={6}>
-                        <FormGroup>
-                            <Label for="phoneNo">Wallet Address</Label>
-                            <Input
-                                id="walletAddress"
-                                name="walletAddress"
-                                type="text"
-                                value={walletAddress}
-                                onChange={(e) => setWalletAddress(e.target.value)}
-                                invalid={walletAddressInvalid}
-                            />
-                            <FormFeedback invalid={walletAddressInvalid.toString()}>
-                                Wallet address is invalid.
-                            </FormFeedback>
-                        </FormGroup>
-                    </Col>
-                </Row>
-                <div>
-                    <FormGroup tag="fieldset">
-                        <FormGroup check>
-                            <Input
-                                name="radio1"
-                                type="radio"
-                                onChange={(e) => payNowHandler(e)}
-                                onClick={() => dispatch(show())}
-                                value={payNow}
-                            />
-                            <Label check>Pay Now</Label>
-                        </FormGroup>
-                        <FormGroup check>
-                            <Input
-                                name="radio1"
-                                type="radio"
-                                onChange={(e) => payAtDoorHandler(e)}
-                                onClick={() => dispatch(hide())}
-                                value={payAtDoor}
-                            />
-                            <Label check>Pay At Door</Label>
-                        </FormGroup>
-                    </FormGroup>
-                </div>
-                {generatedSecretVisibility ? (
-                    <Row>
-                        <Col md={6}>
-                            <FormGroup>
-                                <Label for="secret">Generated Secret</Label>
-                                <Input
-                                    id="secret"
-                                    name="secret"
-                                    type="text"
-                                    value={secret}
-                                    onChange={(e) => setSecret(e.target.value)}
-                                    invalid={secretInvalid}
-                                />
-                                <FormFeedback invalid={secretInvalid.toString()}>
-                                    Secret can not be empty
-                                </FormFeedback>
-                            </FormGroup>
-                        </Col>
-                    </Row>
-                ) : null}
+        let reservationData = new ReservationDto({
+          HotelId: selectionData.HotelId,
+          WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
+          Price: "0.6",
+          FromDate: selectionData.CheckIn,
+          ToDate: selectionData.CheckOut,
+          NoOfNights: selectionData.Nights,
+          FirstName: firstName,
+          LastName: lastName,
+          Email: email,
+          Telephone: phoneNo,
+          RoomTypes: selectionData.RoomTypes,
+          NoOfRooms: selectionData.NoOfRooms,
+        });
 
-                <div>
-                    <LoadingButton
-                        className="confirm_booking_button smallMarginTopBottom"
-                        loading={props.confirmLoading}
-                        disabled={props.disableConfirm}
-                    >
-                        {props.confirmLoading ? "Confirming" : "Confirm Booking"}
-                    </LoadingButton>
-                </div>
-            </Form>
-        </Card1>
-    );
+        hotelService.makeReservation(reservationData).then((res) => {
+          store.dispatch(setShowScreenLoader(false));
+          if (res.rowId.lastId > 0) {
+            toast.success("Reserved successfully!", {
+              duration: 10000,
+            });
+            navigate(`/my-reservations`);
+          } else {
+            toast(
+              (element) => (
+                <ToastInnerElement
+                  message={"Registration failed!"}
+                  id={element.id}
+                />
+              ),
+              {
+                duration: Infinity,
+              }
+            );
+          }
+        });
+      }
+    } else {
+      store.dispatch(setShowScreenLoader(false));
+      toast(
+        (element) => (
+          <ToastInnerElement
+            message={"Check the details again!"}
+            id={element.id}
+          />
+        ),
+        {
+          duration: Infinity,
+        }
+      );
+    }
+  };
+  return (
+    <Card1>
+      <Form onSubmit={registerCustomer}>
+        <Row>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="firstName">
+                First Name<span style={{ color: "red" }}>*</span>
+              </Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                invalid={firstNameInvalid}
+              />
+              <FormFeedback invalid={firstNameInvalid.toString()}>
+                First name can not be empty
+              </FormFeedback>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="lastName">
+                Last Name<span style={{ color: "red" }}>*</span>
+              </Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                invalid={lastNameInvalid}
+              />
+              <FormFeedback invalid={lastNameInvalid.toString()}>
+                Last name can not be empty
+              </FormFeedback>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="email">
+                E-Mail<span style={{ color: "red" }}>*</span>
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                invalid={emailInvalid}
+              />
+              <FormFeedback invalid={emailInvalid.toString()}>
+                E-Mail can not be empty
+              </FormFeedback>
+            </FormGroup>
+          </Col>
+          <Col md={6}>
+            <FormGroup>
+              <Label for="phoneNo">
+                Phone Number<span style={{ color: "red" }}>*</span>
+              </Label>
+              <PhoneInput
+                country="lk"
+                placeholder="Enter phone number"
+                value={phoneNo}
+                onChange={setPhoneNo}
+                international={true}
+                withCountryCallingCode={true}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 25,
+          }}
+        >
+          <Button
+            className="secondaryButton"
+            style={{ width: "180px" }}
+            onClick={() => submitForm()}
+          >
+            Continue To Payment
+          </Button>
+        </div>
+      </Form>
+    </Card1>
+  );
 };
 
 export default CustomerRegistration;

@@ -14,7 +14,7 @@ function Footer(props) {
                             navigate("/");
                             navigate(0);
                         }}>
-                            <img src="/Assets/Images/TripQ.png" alt="voyageLanka" className="logo"/>
+                            <img src="/Assets/Images/TripQ.png" alt="tripQ" className="logo"/>
                         </div>
                     </Col>
                     <Col>
@@ -60,7 +60,7 @@ function Footer(props) {
                 </Row>
                 <Row>
                     <Col className="text-center">
-                        Copyright 2023. All rights reserved.
+                        Copyright 2024. All rights reserved.
                     </Col>
                 </Row>
             </Container>

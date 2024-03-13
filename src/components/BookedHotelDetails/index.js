@@ -3,6 +3,7 @@ import { Row, Col, Card, Badge } from "reactstrap";
 import styles from "./index.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro"; // <-- import styles to be used
+import StarRating from "../../components/HotelHomePage/StarRating";
 
 const BookedHotelDetails = (props) => {
   return (
@@ -15,10 +16,7 @@ const BookedHotelDetails = (props) => {
           <h3 className="fontBold">{props.hotelName}</h3>
           <p>{props.hotelAddress}</p>
           <Badge color="warning">4.5 Ratings</Badge>
-          <FontAwesomeIcon icon={solid("star")} />
-          <FontAwesomeIcon icon={solid("star")} />
-          <FontAwesomeIcon icon={solid("star")} />
-          <FontAwesomeIcon icon={solid("star")} />
+          <StarRating ratings={props.starRate} />
 
           <div className={styles.facilities}>
             <FontAwesomeIcon
