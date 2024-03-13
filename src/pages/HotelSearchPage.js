@@ -56,11 +56,11 @@ function HotelSearchPage(props) {
             City: city,
             CheckInDate: checkInDate,
             CheckOutDate: checkOutDate,
-            PeopleCount: numOfPeople
+            GuestCount: numOfPeople
         }
 
         try {
-            const res = await hotelService.getRoomHotelList(obj);
+            const res = await hotelService.SearchHotelsWithRooms(obj);
             if (res && res.length > 0) {
                 const newHotellist = res.map(hh => {
                     return {

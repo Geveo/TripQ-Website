@@ -67,11 +67,10 @@ export default class HotelService {
         let result;
         try {
             result = await this.contractService.submitInputToContract(submitObject);
-            console.log("result",result);
 
             SharedStateService.instance.currentHotelId = result.rowId.lastId;
             //accepting the NFT offer...
-           // result = await this.#acceptHotelRegistrationOffer(result);
+            // result = await this.#acceptHotelRegistrationOffer(result);
         } catch (error) {
             console.log(error);
             throw error;
@@ -89,12 +88,11 @@ export default class HotelService {
         let result;
         try {
             result = await this.contractService.submitInputToContract(submitObject);
-            console.log("res ",result);
         } catch (error) {
             console.log(error);
             throw error;
         }
-        
+
         return result
     }
 
@@ -164,7 +162,7 @@ export default class HotelService {
      * @param {Object} filterObj
      * @returns An array of objects || []
      */
-    async getRoomHotelList(filterObj) {
+    async SearchHotelsWithRooms(filterObj) {
         const submitObject = {
             type: constants.RequestTypes.HOTEL,
             subType: constants.RequestSubTypes.SEARCH_HOTELS_WITH_ROOM,
@@ -174,15 +172,15 @@ export default class HotelService {
         try {
             console.log(submitObject)
             const res = await this.contractService.submitReadRequest(submitObject);
-            if (res && res.searchResult && res.searchResult.length > 0) {
-                console.log(res.searchResult)
-                return res.searchResult;
+            if (res && res.success && res.success.length > 0) {
+                console.log(res.success)
+                return res.success;
             } else {
                 return [];
             }
         } catch (error) {
             console.log(error);
-            throw(error);
+            throw (error);
         }
     }
 
@@ -195,41 +193,58 @@ export default class HotelService {
         const submitObject = {
             type: constants.RequestTypes.ROOM,
             subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
-            data: {HotelId: hotelId}
+            data: { HotelId: hotelId }
         };
         console.log(submitObject);
-    let result;
-    try {
-      result = await this.contractService.submitReadRequest(submitObject);
-    } catch (error) {
-      console.log(error);
-      throw error;
+        let result;
+        try {
+            result = await this.contractService.submitReadRequest(submitObject);
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        return result;
     }
-    return result;
-  }
 
-  async getSingleHotelWithRooms(hotelId, fromDateStr, toDateStr, roomCount) {
-    const submitObject = {
-      type: constants.RequestTypes.HOTEL,
-      subType: constants.RequestSubTypes.GET_SINGLE_HOTEL_WITH_ROOMS,
-      filters: {
-        HotelId: hotelId,
-        CheckInDate: fromDateStr,
-        CheckOutDate: toDateStr,
-        RoomCount: roomCount
-      }
-    };
-
-    let result;
-    try {
-      result = await this.contractService.submitReadRequest(submitObject);
-    } catch (error) {
-      console.log(error);
-      throw error;
+    async getRoomTypeById(RTypeId) {
+        const submitObject = {
+            type: constants.RequestTypes.ROOM,
+            subType: constants.RequestSubTypes.GET_ROOMTYPE_BY_ID,
+            data: { RTypeId: RTypeId }
+        };
+        console.log(submitObject);
+        let result;
+        try {
+            result = await this.contractService.submitReadRequest(submitObject);
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        return result;
     }
-    return result.searchResult;
 
-  }
+    async getSingleHotelWithRooms(hotelId, fromDateStr, toDateStr, roomCount) {
+        const submitObject = {
+            type: constants.RequestTypes.HOTEL,
+            subType: constants.RequestSubTypes.GET_SINGLE_HOTEL_WITH_ROOMS,
+            filters: {
+                HotelId: hotelId,
+                CheckInDate: fromDateStr,
+                CheckOutDate: toDateStr,
+                RoomCount: roomCount
+            }
+        };
+
+        let result;
+        try {
+            result = await this.contractService.submitReadRequest(submitObject);
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        return result.searchResult;
+
+    }
 
     /**
      *
@@ -240,7 +255,7 @@ export default class HotelService {
         const submitObject = {
             type: constants.RequestTypes.ROOM,
             subType: constants.RequestSubTypes.DELETE_ROOM,
-            data: {RoomId: roomId}
+            data: { RoomId: roomId }
         };
 
         let result;
@@ -259,23 +274,22 @@ export default class HotelService {
      * @param {object} data |
      * @returns A object { roomId: 2}
      */
- 
 
-  async makeReservation(data) {
+    async makeReservation(data) {
 
-    const submitData =  {
-      CustomerId: data.CustomerId,
-      FromDate: data.FromDate,
-      ToDate: data.ToDate,
-      CustomerDetails: data.CustomerDetails,
-      RoomSelections: data.roomSelections  //  [  {roomId: 1, roomCount: 3, costPerRoom: 25, roomName: "" }, {roomId: 2, roomCount: 3, costPerRoom: 25} ]
-    }
-    if(data.payNow){
-      const res = await this.#xrplService.makePayment(data.secret, data.totalFee.toString(), contractWalletAddress);
-      if(res.meta.TransactionResult == "tesSUCCESS") {
-        submitData.TransactionId = res.hash;
-      }
-    }
+        const submitData = {
+            CustomerId: data.CustomerId,
+            FromDate: data.FromDate,
+            ToDate: data.ToDate,
+            CustomerDetails: data.CustomerDetails,
+            RoomSelections: data.roomSelections  //  [  {roomId: 1, roomCount: 3, costPerRoom: 25, roomName: "" }, {roomId: 2, roomCount: 3, costPerRoom: 25} ]
+        }
+        if (data.payNow) {
+            const res = await this.#xrplService.makePayment(data.secret, data.totalFee.toString(), contractWalletAddress);
+            if (res.meta.TransactionResult == "tesSUCCESS") {
+                submitData.TransactionId = res.hash;
+            }
+        }
 
     const submitObj = {
       type: constants.RequestTypes.RESERVATION,
@@ -286,7 +300,6 @@ export default class HotelService {
 
         let result;
         try {
-            // {lastReservationId: 34}
             result = await this.contractService.submitInputToContract(submitObj);
         } catch (e) {
             console.log(e);
@@ -322,7 +335,7 @@ export default class HotelService {
             }
         } catch (error) {
             console.log(error);
-            throw(error);
+            throw (error);
         }
     }
 
@@ -352,11 +365,11 @@ export default class HotelService {
         }
     }
 
-     /**
-     *
-     * @returns hotel images || null
-     */
-     async getHotelImagesById(id) {
+    /**
+    *
+    * @returns hotel images || null
+    */
+    async getHotelImagesById(id) {
         const submitObject = {
             type: constants.RequestTypes.HOTEL,
             subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,

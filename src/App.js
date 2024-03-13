@@ -24,6 +24,7 @@ import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
 import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import MyProperties from "./pages/MyProperties/MyProperties";
+import RoomTypeDetails from "./components/HotelHomePage/RoomTypeDetails/RoomTypeDetails";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
@@ -73,6 +74,7 @@ function App() {
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
+                    <Route path="/roomType/:id" element={<RoomTypeDetails/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
                     <Route path="/make-reservations" element={<MakeReservations />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
