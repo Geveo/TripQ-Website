@@ -55,11 +55,16 @@ const PaymentResults = {
     ABORTED: "aborted"
 }
 
+const DestinationTags = {
+    RESERVATION_PAYMENT: 1002
+}
+
 module.exports = {
     XRPLAccountEventTypes,
     LocalStorageKeys,
     bed_types,
     cancellation_policies,
-    PaymentResults
+    PaymentResults,
+    DestinationTags
 }
 

@@ -17,6 +17,7 @@ import {
 import Card1 from "../../layout/Card";
 import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import { useSelector } from "react-redux";
+import {DestinationTags} from "../../constants/constants";
 
 const CustomerDetails = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const CustomerDetails = () => {
       loginState.loggedInAddress,
       `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
       "6",
+      DestinationTags.RESERVATION_PAYMENT,
       process.env.REACT_APP_CURRENCY,
       process.env.REACT_APP_CURRENCY_ISSUER
     );
