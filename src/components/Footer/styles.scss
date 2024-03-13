@@ -1,0 +1,35 @@
+.footer {
+    padding-top: 2rem;
+    background-color: #2C2C76;
+    padding-bottom: 1rem;
+
+    .row {
+        color: white;
+
+        .image-container {
+            width: 150px;
+            height: 40px;
+
+            margin-left: -15px;
+            .logo {
+                width: 84%;
+                height: 122%;
+                background-size: cover;
+            }
+        }
+
+        .image-container:hover {
+            cursor: pointer;
+        }
+
+        .customer_support {
+            margin-top: 1.5rem;
+        }
+
+        h4 {
+            margin-bottom: 0px !important;
+        }
+
+    }
+
+}
