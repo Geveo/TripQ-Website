@@ -4,16 +4,18 @@ import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 
 import './styles.scss';
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import {
     deinit,
     init,
     getTransactions,
     getTrustlines, getAccountInfo
 } from '../../services-common/evernode-xrpl-service'
-import {LocalStorageKeys} from "../../constants/constants";
+import {DestinationTags, LocalStorageKeys} from "../../constants/constants";
 import {useSelector} from 'react-redux'
 import {showPayQRWindow} from "../../services-common/xumm-api-service";
 import Card from "react-bootstrap/Card";
@@ -28,6 +30,7 @@ const  AccountTransactions = () => {
     const dispatch = useDispatch();
     const [accountAddress, setAccountAddress] = useState(null);
     const [transactions, setTransactions] = useState([]);
+    const [transactionForTable, setTransactionsForTable] = useState([]);
     const [totalEVR, setTotalEVR] = useState('0');
     const [totalXAHDrops, setTotalXAHDrops] = useState('0')
 
@@ -35,10 +38,20 @@ const  AccountTransactions = () => {
     const currency = process.env.REACT_APP_CURRENCY;
 
 
-    const loginState = useSelector(state => state.loginState)
+    const loginState = useSelector(state => state.loginState);
+
+
+    const [checked, setChecked] = useState(false);
+    const [radioValue, setRadioValue] = useState('1');
+
+    const radios = [
+        { name: 'All TRX', value: '1' },
+        { name: 'TripQ TRX', value: '2' },
+    ];
+
 
     useEffect(() => {
-        dispatch(setShowScreenLoader(true));
+        dispatch(setShowScreenLoader(true))
         const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
         if(acc && acc.length > 0) {
             setAccountAddress(acc);
@@ -46,11 +59,13 @@ const  AccountTransactions = () => {
 
         if(accountAddress)
             loadTransactions();
+        else {
+            dispatch(setShowScreenLoader(false))
+        }
     }, [accountAddress]);
 
     const loadTransactions =  () => {
         if(accountAddress) {
-            dispatch(setShowScreenLoader(true));
             init().then(res => {
                 getTrustlines(accountAddress, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER).then(res => {
                     if(res && res.length > 0) {
@@ -67,14 +82,30 @@ const  AccountTransactions = () => {
                 getTransactions(accountAddress).then(res => {
                     const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
                     setTransactions(sortedtrx);
-                    deinit().catch(e => {throw e});
+
+                    if(radioValue === '2') {
+                        setTransactionsForTable(res.filter(t => t.tx.DestinationTag && t.tx.DestinationTag === DestinationTags.RESERVATION_PAYMENT).sort((a, b) => b.tx.date - a.tx.date));
+                    } else {
+                        setTransactionsForTable(sortedtrx);
+                    }
+
                     dispatch(setShowScreenLoader(false))
+                    deinit().catch(e => {throw e});
                 }).catch(e => {throw e})
             }).catch(error => {
                 console.log(error)
             });
 
 
+        }
+    }
+
+    const toggleTransactions = (value) => {
+        setRadioValue(value);
+        if(value === '2') {
+            setTransactionsForTable(transactions.filter(t => t.tx.DestinationTag && t.tx.DestinationTag === DestinationTags.RESERVATION_PAYMENT).sort((a, b) => b.tx.date - a.tx.date));
+        } else {
+            setTransactionsForTable([...transactions]);
         }
     }
 
@@ -114,7 +145,7 @@ const  AccountTransactions = () => {
     }
 
     const pay = async () => {
-        const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, '6', process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
+        const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, '6', DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
         console.log(result)
     }
 
@@ -134,6 +165,12 @@ const  AccountTransactions = () => {
                                     style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Refresh <FontAwesomeIcon icon={faArrowsRotate} /></Button>
                         </div>
                     </Col>
+                    {/*<Col lg={2}>*/}
+                    {/*    <div className='page-header mt-5'>*/}
+                    {/*        <Button variant="warning" onClick={pay}*/}
+                    {/*                style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Pay <FontAwesomeIcon icon={faArrowsRotate} /></Button>*/}
+                    {/*    </div>*/}
+                    {/*</Col>*/}
                 </Row>
 
                 <Row className={`mt-5`}>
@@ -164,14 +201,34 @@ const  AccountTransactions = () => {
                     <Col lg={1}></Col>
                 </Row>
 
-                <Row className='mt-5'>
+                <Row className='mt-5 mb-2'>
                     <Col><h2 style={{ color: 'rgb(44 44 118)'}}>Transactions</h2></Col>
+                </Row>
+                <Row className={`mb-3`}>
+                    <Col>
+                        <ButtonGroup>
+                            {radios.map((radio, idx) => (
+                                <ToggleButton
+                                    key={idx}
+                                    id={`radio-${idx}`}
+                                    type="radio"
+                                    variant={'outline-warning'}
+                                    name="radio"
+                                    value={radio.value}
+                                    checked={radioValue === radio.value}
+                                    onChange={(e) => { toggleTransactions(e.currentTarget.value);}}
+                                >
+                                    {radio.name}
+                                </ToggleButton>
+                            ))}
+                        </ButtonGroup>
+                    </Col>
                 </Row>
                 <Row className='mt-1'>
                     <Col>
                         <Table striped={true} bordered={true}>
                             <tbody>
-                            {transactions.map((trx, index) => {
+                            {transactionForTable.map((trx, index) => {
                                     if(trx.validated && trx.tx.TransactionType === 'Payment') {
                                         const tx = trx.tx;
                                     

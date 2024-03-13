@@ -78,7 +78,7 @@ export async function createPayloadAndSubmit(sourceAccount, destinationAccount, 
  *   "pushed": true
  * }
  */
-export async function createPayload(sourceAccount, destinationAccount, amount, currency = null, issuer = null) {
+export async function createPayload(sourceAccount, destinationAccount, amount, destinationTag = 1000, currency = null, issuer = null) {
     let amountField = String(amount * 1000000);
     if(currency && issuer) {
         amountField = {
@@ -93,6 +93,7 @@ export async function createPayload(sourceAccount, destinationAccount, amount, c
         Destination: destinationAccount,
         Account: sourceAccount,
         Amount: amountField,
+        DestinationTag: destinationTag
     })
 }
 
@@ -105,12 +106,13 @@ export async function subscribe(createdPayload) {
  * @param sourceAddress
  * @param destinationAddress
  * @param amount
+ * @param destinationTag Number | greater than 1000 to represent the reason
  * @param currency
  * @param issuer
  * @returns {Promise<constants.PaymentResults>}
  */
-export async function showPayQRWindow(sourceAddress, destinationAddress, amount, currency, issuer) {
-    const payload = await createPayload(sourceAddress, destinationAddress, amount, currency, issuer);
+export async function showPayQRWindow(sourceAddress, destinationAddress, amount, destinationTag, currency, issuer) {
+    const payload = await createPayload(sourceAddress, destinationAddress, amount, destinationTag, currency, issuer);
     const subscription = await subscribe(payload);
 
     const newWindow = window.open(payload.next.no_push_msg_received, 'Xaman Pay','height=750,width=600, right=300, resizable=no, left=300,top=100');
