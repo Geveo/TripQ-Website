@@ -18,6 +18,7 @@ import AccountTransactions from "./pages/AccountTransactions/AccountTransactions
 import {useSelector} from 'react-redux';
 import {LocalStorageKeys} from "./constants/constants";
 import {xummAuthorize} from "./services-common/xumm-api-service";
+import RoomTypeDetails from "./components/HotelHomePage/RoomTypeDetails/RoomTypeDetails";
 
 function App() {
     const loginState = useSelector((state) => state.loginState);
@@ -69,6 +70,7 @@ function App() {
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
                     <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
+                    <Route path="/roomType/:id" element={<RoomTypeDetails/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
                     {loginState.isLoggedIn && (
                         <>

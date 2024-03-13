@@ -16,7 +16,7 @@ import {
   ModalHeader,
   Spinner,
 } from "reactstrap";
-import RoomDetails from "../components/HotelHomePage/RoomDetails";
+import RoomTypesGrid from "../components/HotelHomePage/RoomTypesGrid";
 import HotelService from "../services-domain/hotel-service copy";
 import SharedStateService from "../services-domain/sharedState-service";
 import { toast } from "react-hot-toast";
@@ -63,6 +63,7 @@ function HotelHomePage() {
               ImageURLs: matchingHotel[0].imageUrls,
               WalletAddress: localStorage.getItem("Account"),
             });
+            getRoomTypes();
             setIsDataLoading(false);
             setHotelName(selectedHotel.Name);
             const location = JSON.parse(selectedHotel.Location);
@@ -233,7 +234,6 @@ function HotelHomePage() {
       const res = await HotelService.instance.getHotelRoomTypes(
         parseInt(id, 10)
       );
-      console.log(" resRooms:", res);
       if (res && res.length > 0) {
         setRooms(res);
       }
@@ -245,12 +245,6 @@ function HotelHomePage() {
     const res = await HotelService.instance.deleteMyRoom(deleteRoomDetails.Id);
     console.log(res);
 
-    // await getRooms();
-    // setRooms(prevState => {
-    //     return prevState.filter(cur_room => {
-    //         return cur_room.Id !== deleteRoomDetails.Id;
-    //     })
-    // })
 
     setDeleteRoomDetails(null);
     setDeletingRoom(false);
@@ -276,7 +270,7 @@ function HotelHomePage() {
 
   return (
     <>
-      <Modal
+    <div className=" z-index: 1;" ><Modal
         isOpen={creatingRoom}
         toggle={onCloseCreateRoomModal}
         size="lg"
@@ -284,8 +278,9 @@ function HotelHomePage() {
         className={""}
         style={{ maxWidth: "850px", width: "100%" }}
       >
-        <CreateRoomModal onSubmitRoom={onSubmitRoom} />
-      </Modal>
+        <CreateRoomModal onSubmitRoom={onSubmitRoom} onClose={onCloseCreateRoomModal} />
+      </Modal></div>
+      
 
       {deletingRoom && (
         <Modal isOpen={deletingRoom} toggle={onCloseDeleteRoomModal}>
@@ -384,7 +379,7 @@ function HotelHomePage() {
               </div>
             </section>
             <section ref={infoSection} id="info_section" className={"pt-2"}>
-              <div>
+             <div>
                 {images.map((image, index) => (
                   <img
                     key={index}
@@ -459,7 +454,7 @@ function HotelHomePage() {
               <div className="title_2 pt-2 pb-2">Room Types</div>
               <div className={"subtext"}>Details about your rooms.</div>
               {rooms.length !== 0 && (
-                <RoomDetails
+                <RoomTypesGrid
                   rooms={rooms}
                   onOpenDeleteRoomModal={onOpenDeleteRoomModal}
                 />
