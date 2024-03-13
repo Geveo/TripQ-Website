@@ -22,7 +22,7 @@ on:
 # Environment variables available to all jobs and steps in this workflow
 env:
   APP_LOCATION: "./" # location of your client code
-  API_LOCATION: "api" # location of your api source code - optional
+  API_LOCATION: "" # location of your api source code - optional
   APP_ARTIFACT_LOCATION: "build" # location of client code build output
   AZURE_STATIC_WEB_APPS_API_TOKEN: "fe3dd64248bf040503292ef2e57a7f6c5c402bfdcd7835d83967084de86069b15-6fc35b95-7dcf-454a-abd9-1fd3d8f8509a000136005" # secret containing deployment token for your static web app
 
@@ -53,6 +53,7 @@ jobs:
           app_location: ${{ env.APP_LOCATION }}
           api_location: ${{ env.API_LOCATION }}
           app_artifact_location: ${{ env.APP_ARTIFACT_LOCATION }}
+          app_build_command: 'npm run build:prod'
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
