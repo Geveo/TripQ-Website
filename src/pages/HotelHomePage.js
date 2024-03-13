@@ -31,6 +31,7 @@ function HotelHomePage() {
   const { id } = useParams(); // hotel id
   const sharedInstance = SharedStateService.instance;
   const hotelService = HotelService.instance;
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   const [selectedHotel, setSelectedHotel] = useState({
     Id: "",
@@ -176,7 +177,7 @@ function HotelHomePage() {
     }
   };
 
-  // Load roomType details
+  // Load RoomType details
   async function getRoomTypes() {
     if (parseInt(id, 10) && parseInt(id, 10) > 0) {
       const res = await HotelService.instance.getHotelRoomTypes(
