@@ -71,9 +71,7 @@ function App() {
                     <Route path="/reservations" element={<Reservations />} exact />
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
-                    <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
-                    <Route path="/make-reservations" element={<MakeReservations />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
                     {loginState.isLoggedIn && (
                         <>
@@ -81,6 +79,8 @@ function App() {
                             <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/register-hotel" element={<RegisterHotel />} exact />
                             <Route path="/my-reservations" element={<ViewCustomerReservations />} exact />
+                            <Route path="/availability/:id" element={<AvailabilityPage/>} exact />
+                            <Route path="/make-reservations" element={<MakeReservations />} exact />
                         </>
                     )}
                     <Route path="*" element={<CustomerDashboard />} />

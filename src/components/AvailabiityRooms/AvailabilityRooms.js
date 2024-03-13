@@ -12,18 +12,15 @@ function AvailabilityRooms(props) {
     const [roomDetails, setRoomDetails] = useState(props.roomData);
 
 
-    const getRoomCount = (roomIndex) => {
-        if (roomIndex in props.selectedRooms) {
-            return props.selectedRooms[roomIndex].count;
-        }
-        return 0;
-    }
+    // const getRoomCount = (roomIndex) => {
+    //     if (roomIndex in props.selectedRooms) {
+    //         return props.selectedRooms[roomIndex].count;
+    //     }
+    //     return 0;
+    // }
 
     const getFacilities = (facilitiesIds) => {
         return roomFacilitiesData;
-        return roomFacilitiesData.filter(facility => {
-            return facilitiesIds.includes(facility.Id);
-        })
     }
 
     return (
@@ -32,7 +29,6 @@ function AvailabilityRooms(props) {
                 <thead>
                 <tr>
                     <th>Room type</th>
-                    <th>Sleeps</th>
                     <th>Price for 1 day (per room)</th>
                     <th>Select rooms</th>
                 </tr>
@@ -48,10 +44,6 @@ function AvailabilityRooms(props) {
                                     {room.RoomName} <span className={"available_rooms"}>({room.NumOfRooms} rooms available)</span>
                                 </div>
 
-                                <div className={"room-count"}>
-                                    {room.BedType} Beds
-                                </div>
-
                                 <div className={"facilities"}>
                                     {getFacilities(room.RoomFacilities).map(facility => {
                                         return (
@@ -64,7 +56,7 @@ function AvailabilityRooms(props) {
                                 </div>
 
                             </td>
-                            <td className={"td-sleeps"}>
+                            {/* <td className={"td-sleeps"}>
                                 {
                                     Array(room.NumOfSleeps).fill(true).map((_, i) => {
                                             return (
@@ -74,9 +66,9 @@ function AvailabilityRooms(props) {
                                     )
                                 }
 
-                            </td>
+                            </td> */}
                             <td className={"td-price"}>
-                                <div className={"price-text"}>$ {parseFloat(room.PricePerNight).toFixed(2)}</div>
+                                <div className={"price-text"}> {parseFloat(room.PricePerNight).toFixed(2)}EVR</div>
                                 <div className={"price-subtext"}>Includes taxes and charges</div>
                             </td>
                             <td className={"td-room-count"}>
@@ -90,7 +82,7 @@ function AvailabilityRooms(props) {
                                         paddingLeft: "1px"
                                     }}/>
                                 </button>
-                                <span className={"title_3_sub bedroom_text"}>{getRoomCount(room.Id)}</span>
+                                {/* <span className={"title_3_sub bedroom_text"}>{getRoomCount(room.Id)}</span> */}
 
                                 <button className={"decrement_button"}
                                         onClick={ props.onChangeSelectedRooms.bind(this, room, true)}>
