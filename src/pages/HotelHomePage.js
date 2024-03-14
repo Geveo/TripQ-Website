@@ -315,7 +315,7 @@ function HotelHomePage() {
             </section>
             <section ref={infoSection} id="info_section" className={"pt-2"}>
              <div>
-                {images.map((image, index) => (
+                {images && images.map((image, index) => (
                   <img
                     key={index}
                     style={{ margin: 10, width: 350, height: 250 }}
