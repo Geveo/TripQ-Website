@@ -19,7 +19,7 @@ root.render(
       <div style={{ marginTop: "100px" }}>
         <App />
       </div>
-      <div style={{ marginTop: "400px" }}>
+      <div style={{ marginTop: "110px" }}>
         <Footer />
       </div>
       <Toaster

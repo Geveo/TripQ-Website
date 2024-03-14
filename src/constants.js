@@ -9,7 +9,7 @@ const RequestSubTypes = {
     REGISTER_HOTEL: "RegisterHotel",
     REQUEST_TOKEN_OFFER: "RequestTokenOffer",
     REGISTRATION_CONFIRMATION: "RegistrationConfirmation",
-    GET_HOTELS: "GetHotels",
+    GET_HOTEL_BY_ID: "GetHotelById",
     DEREG_HOTEL: "DeregHotel",
     RATE_HOTEL: "RateHotel",
     IS_REGISTERED_HOTEL: "IsRegisteredHotel",
@@ -20,6 +20,7 @@ const RequestSubTypes = {
 
     GET_ROOMS: "GetRooms",
     GET_ROOMS_BY_HOTELID: "GetRoomTypes",
+    GET_ROOMTYPE_BY_ID: "GetRoomTypeById",
     CREATE_ROOMTYPE: "CreateRoomType",
     EDIT_ROOM: "EditRoom",
     DELETE_ROOM: "DeleteRoom",

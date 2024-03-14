@@ -3,7 +3,7 @@ import visibleReducer from "../features/visibility/visibleSlice";
 import registerCustomerReducer from "../features/registerCustomer/registerCustomerSlice";
 import transactionListenerReducer from "./../features/transactionListener/transactionListenerSlice";
 import loginStateReducer from "./../features/LoginState/LoginStateSlice";
-import selectionDetailsReducer from "../features/selectionDetails/selectionDetailsSlice";
+import selectionDetailsReducer from "../features/SelectionDetails/SelectionDetailsSlice";
 import ScreenLoaderReducer from "../features/screenLoader/ScreenLoaderSlice";
 
 export const store = configureStore({

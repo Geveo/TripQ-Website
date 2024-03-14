@@ -23,6 +23,8 @@ import MakeReservations from "./pages/MakeReservations/MakeReservations";
 import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
 import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
+import MyProperties from "./pages/MyProperties/MyProperties";
+import RoomTypeDetails from "./components/HotelHomePage/RoomTypeDetails/RoomTypeDetails";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
@@ -65,12 +67,13 @@ function App() {
             {isContractInitiated && (
                 <Routes>
                     <Route path="/" element={<CustomerDashboard />} />
-                    <Route path="/list-property" element={<LandingPageForHotelOwner />} exact />
+                    <Route path="/list-property" element={<MyProperties />} exact />
                     <Route path="/register-customer" element={<RegisterCustomer />} exact />
                     <Route path="/hotel/:id" element={<HotelHomePage />} exact />
                     <Route path="/reservations" element={<Reservations />} exact />
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />
+                    <Route path="/roomType/:id" element={<RoomTypeDetails/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
                     {loginState.isLoggedIn && (

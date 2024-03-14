@@ -1,9 +1,10 @@
 import Card1 from "../../layout/Card";
 import React, { useEffect, useState } from "react";
-//import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "reactstrap";
 import RoomFacilities from "./RoomFacilities";
-//import { v4 as uuid } from 'uuid';
-//import { bed_types } from "../../constants/constants";
+import {Spinner} from "reactstrap";
+
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function CreateRoomModal(props) {
     const { onSubmitRoom } = props;
@@ -16,6 +17,7 @@ function CreateRoomModal(props) {
     const [sqft, setSqft] = useState(0);
     const [pricePerDay, setPricePerDay] = useState(0.0);
     const [roomCreateDisabled, setRoomCreateDisabled] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [checkedFacilities, setCheckedFacilities] = useState([]);
 
@@ -88,6 +90,7 @@ function CreateRoomModal(props) {
 
     const onSubmitRoomModal = () => {
         try {
+            setIsLoading(true);
             const data = {
                 "HotelId": 0,
                 "Code": roomName,
@@ -101,6 +104,9 @@ function CreateRoomModal(props) {
                 "Facilities": checkedFacilities.map(fc => ({ RFacilityId: fc.Id, ...fc }))
             };
             onSubmitRoom(data);
+            setIsLoading(false);
+            setRoomCreateDisabled(true)
+              console.log(data);
         }
         catch (error) {
             console.log(error);
@@ -122,8 +128,6 @@ function CreateRoomModal(props) {
     }*/
 
 
-
-
     //disable create room button logic
     useEffect(() => {
         if (roomName && description && numOfRooms && numOfSingleBeds && numOfDoubleBeds && pricePerDay && numOfTripleBeds && checkedFacilities.length > 0) {
@@ -135,12 +139,28 @@ function CreateRoomModal(props) {
     }, [roomName, description, numOfRooms, numOfSingleBeds, numOfDoubleBeds, pricePerDay, numOfTripleBeds, checkedFacilities])
 
     return (
-        <div className={"room_modal pt-0 mt-0"}>
-            <Card1 width={"850px"} className={"mt-0"}>
-
-                <div className={"title_2"}>
-                    Create Room Type
+        <div>
+             {isLoading ? (
+                <div className="spinnerWrapper">
+                    <Spinner
+                        color="primary"
+                        style={{
+                            height: '3rem',
+                            width: '3rem'
+                        }}
+                        type="grow"
+                    >
+                        Loading...
+                    </Spinner>
                 </div>
+            ) : (
+        <div className={"room_modal pt-5 mt-8"}>
+            <Card1 width={"850px"} className={"mt-7 pt-15"}> 
+               <div className="row">
+                <div className={"title_2 col-11"} > Create Room Type</div>
+                <div className={"col-1 "} style={{flex: 1, display: 'flex', alignItems: 'center'}}><FontAwesomeIcon size="2x" icon={faTimes} className="fa fa-window-close " onClick={props.onClose} /></div>   
+               </div>
+               
 
                 <div className="title_3_sub mt-3">Room Type Name</div>
                 <input type="text" className="form-control input_full" id="room_name"
@@ -180,7 +200,35 @@ function CreateRoomModal(props) {
                     onChange={onChangeNumOfTripleBeds} />
 
 
-                {/*  <div className={"row left_div"}>
+               
+
+
+                <div className="title_3 mt-4">Base price per day</div>
+                <div className={"subtext"} style={{ lineHeight: "20px" }}>
+                </div>
+
+                <div className="title_3_sub mt-3">Price per day (Evers)</div>
+                <input type="text" className="form-control input_half" id="price_per_day"
+                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "50%" }} value={pricePerDay}
+                    onChange={onChangePricePerDay} />
+                <RoomFacilities onChange={onChangeFacility} />
+
+                <div className={"row center_div pt-0"}>
+                    <button className={"create_room_button"} style={{ width: "500px" }} onClick={onSubmitRoomModal} disabled={roomCreateDisabled}>
+                        Create Room
+                    </button>
+                </div>
+
+
+            </Card1>
+        </div> )}
+        </div>
+    );
+}
+
+export default CreateRoomModal
+
+ {/*  <div className={"row left_div"}>
                     <div className={"col"} style={{ width: "100%" }}>
                         <div className="title_3_sub mt-3">Bed Type</div>
                         <Dropdown isOpen={bedTypeDropDownOpen} toggle={toggleBedTypeDropDown}
@@ -215,30 +263,3 @@ function CreateRoomModal(props) {
                             onChange={onChangeNumOfBeds} />
                     </div>
                 </div>*/}
-
-
-
-                <div className="title_3 mt-4">Base price per day</div>
-                <div className={"subtext"} style={{ lineHeight: "20px" }}>
-                    Tell us only about the existing beds in a room (don't include extra beds).
-                </div>
-
-                <div className="title_3_sub mt-3">Price per day ($)</div>
-                <input type="text" className="form-control input_half" id="price_per_day"
-                    style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "50%" }} value={pricePerDay}
-                    onChange={onChangePricePerDay} />
-                <RoomFacilities onChange={onChangeFacility} />
-
-                <div className={"row center_div pt-3"}>
-                    <button className={"create_room_button"} style={{ width: "500px" }} onClick={onSubmitRoomModal} disabled={roomCreateDisabled}>
-                        Create Room
-                    </button>
-                </div>
-
-
-            </Card1>
-        </div>
-    );
-}
-
-export default CreateRoomModal

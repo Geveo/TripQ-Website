@@ -2,124 +2,92 @@ import MainContainer from "../layout/MainContainer";
 import "../components/HotelHomePage/StarRating";
 import StarRating from "../components/HotelHomePage/StarRating";
 import { FaMapMarkerAlt, FaWallet } from "react-icons/fa";
-import HotelImages from "../components/HotelHomePage/HotelImages";
-import FacilitiesReadOnly from "../components/HotelHomePage/FacilitiesReadOnly";
 import React, { useRef, useState, useEffect } from "react";
-import {
-  createSearchParams,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import AvailabilitySearchBar from "../components/Availability/AvailabilitySearchBar";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AvailabilityRooms from "../components/AvailabiityRooms/AvailabilityRooms";
 import DateFunctions from "../helpers/DateFunctions";
 import HotelService from "../services-domain/hotel-service copy";
-import RoomService from "../services-domain/room-service";
-import { toast } from "react-hot-toast";
-import { Spinner } from "reactstrap";
+import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
+import { LocalStorageKeys } from "../constants/constants";
+import { useDispatch } from "react-redux";
 
-//http://localhost:3000/availability/1?fromDate=2023-03-17&toDate=2023-03-20
 function AvailabilityPage() {
   const hotelService = HotelService.instance;
-  const roomService = RoomService.instance;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const { id } = useParams();
+
   let checkInDate = queryParams.get("checkInDate");
   let checkOutDate = queryParams.get("checkOutDate");
-  let roomCount = Number(queryParams.get("rooms"));
 
-  const [images, setImages] = useState([
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-    {
-      Url: "https://reactnativecode.com/wp-content/uploads/2018/02/Default_Image_Thumbnail.png",
-    },
-  ]);
-
-  const [hotelName, setHotelName] = useState("Heritance Kandalama");
+  const [images, setImages] = useState([]);
   const [address1, setAddress1] = useState("P.O Box 11");
   const [address2, setAddress2] = useState("Heritance Kandalama");
   const [city, setCity] = useState("Sigiriya");
-  const [hotelWalletAddress, setHotelWalletAddress] = useState("");
-  const [description, setDescription] = useState();
-  const [selectedFacilityIds, setSelectedFacilityIds] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
-  const [roomData, setRoomData] = useState([]);
+  const [hotelData, setHotelData] = useState([]);
 
   const [checkInCheckOutDates, setCheckInCheckOutDates] = useState({
     checkIn: checkInDate,
     checkOut: checkOutDate,
   });
 
-  const [selectedRooms, setSelectedRooms] = useState({});
+  const [selectedRooms, setSelectedRooms] = useState([]);
 
   const [reserveBtnDisabled, setReserveBtnDisabled] = useState(true);
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    hotelService.getHotelRoomTypes(id).then((resObj) => {
-      console.log(resObj)
-      setRoomTypes(resObj);
-    });
+    // Get hotel details
+    hotelService.getHotelById(id).then((data) => {
+      if (data) {
+        let hotelData = {
+          Id: data.hotelDetails[0].Id,
+          Name: data.hotelDetails[0].Name,
+          StarRating: data.hotelDetails[0].StarRatings,
+          Location: data.hotelDetails[0].Location,
+          ImageURLs: data.hotelImages,
+        };
 
-  }, []);
+        setHotelData(hotelData);
 
-  async function getMyHotelRoomDetails() {
-    try {
-      setIsLoading(true);
-      const resObj = await hotelService.getHotelRoomTypes(id);
-      if (resObj) {
-        // // set images
-        // if (resObj.ImageUrls && resObj.ImageUrls.length > 0) {
-        //     setImages(resObj.ImageUrls.map(im => ({Url: im.Url})));
-        // }
-        setHotelName(resObj.Name);
-        setAddress1(resObj.AddressLine1 ?? "");
-        setAddress2(resObj.AddressLine2 ?? "");
-        setCity(resObj.City);
-        setHotelWalletAddress(resObj.HotelWalletAddress);
-        setDescription(resObj.Description);
-        setSelectedFacilityIds(resObj.facilityIds?.map((f) => f.HFacilityId));
-
-        setRoomData(
-          resObj.RoomDetails.map((rm) => {
-            return {
-              Id: Number(rm.Id),
-              RoomName: rm.Name,
-              Description: rm.Description,
-              NumOfRooms: rm.avaialableRoomCount,
-              PricePerNight: rm.CostPerNight,
-              BedType: rm.BedType,
-              NumOfSleeps: rm.NoOfBeds,
-              RoomFacilities: rm.facilityIds?.map((f) => f.RFacilityId),
-            };
-          })
-        );
-
-        setIsLoading(false);
+        setAddress1(JSON.parse(data.hotelDetails[0].Location).AddressLine01);
+        setAddress2(JSON.parse(data.hotelDetails[0].Location).AddressLine02);
+        setCity(JSON.parse(data.hotelDetails[0].Location).City);
+        setImages(data.hotelImages);
       }
-    } catch (err) {
-      setIsLoading(false);
-      toast.error(err);
-    }
-  }
+    });
+    // Get room details
+    hotelService
+      .getHotelRoomTypes(id)
+      .then(async (res) => {
+        let newRoomTypes = [];
+        for (const roomType of res) {
+          const resObj = await hotelService.getRoomTypeById(roomType.Id);
+
+          let facilitiesIds = [];
+
+          for (const facility of resObj.Facilities) {
+            facilitiesIds.push(facility.id);
+          }
+          newRoomTypes.push({
+            Id: roomType.Id,
+            RoomName: roomType.Code,
+            Price: roomType.Price,
+            RoomsCount: roomType.RoomsCount,
+            Facilities: facilitiesIds,
+            SelectedRooms: 0,
+          });
+        }
+        setRoomTypes(newRoomTypes);
+      })
+      .catch((error) => {
+        console.error("Error fetching room types:", error);
+      });
+  }, [id]);
 
   const onChangeSelectedRooms = (room, isAdding) => {
     setSelectedRooms((prevState) => {
@@ -219,6 +187,32 @@ function AvailabilityPage() {
   };
 
   const onReserve = () => {
+    let roomsCount = 0;
+    const selectedRoomsArray = Object.values(selectedRooms);
+
+    let selectedObj = {
+      HotelId: id,
+      Name: hotelData.Name,
+      Address: getFullAddress(),
+      StarRate: hotelData.StarRatings,
+      Images: hotelData.ImageURLs,
+      CheckIn: "Sat 20 Apr 2024",
+      CheckOut: "Sat 22 Apr 2024",
+      Nights: 2,
+      RoomTypes: selectedRoomsArray,
+    };
+
+    dispatch(
+      selectionDetailsAdd({
+        key: localStorage.getItem(LocalStorageKeys.AccountAddress),
+        value: selectedObj,
+      })
+    );
+
+    localStorage.setItem(
+      LocalStorageKeys.HotelSelectionDetails,
+      JSON.stringify(selectedObj)
+    );
     let selectedRoomList = [];
     for (const [roomId, values] of Object.entries(selectedRooms)) {
       console.log(roomId, values);
@@ -247,8 +241,8 @@ function AvailabilityPage() {
         <section>
           <div className={"row"}>
             <div className={"title_1"} style={{ width: "80%" }}>
-              {hotelName}
-              <StarRating ratings={2} />
+              {hotelData.Name}
+              <StarRating ratings={hotelData.StarRating} />
             </div>
           </div>
 
@@ -300,21 +294,17 @@ function AvailabilityPage() {
         </section>
         <section ref={infoSection} id="info_section" className={"pt-2"}>
           <div>
-            {images.map((image, index) => (
-              <img
-                key={index}
-                style={{ margin: 10, width: 350, height: 250 }}
-                src={image.ImageURL}
-                alt={`Displayed Image ${index}`}
-              />
-            ))}
+            {images.length > 0 &&
+              images.map((image, index) => (
+                <img
+                  key={index}
+                  style={{ margin: 10, width: 350, height: 250 }}
+                  src={image.ImageURL}
+                  alt={`Displayed Image ${index}`}
+                />
+              ))}
           </div>
         </section>
-        {/* <FacilitiesReadOnly
-          facilitiesSection={facilitiesSection}
-          selectedFacilityIds={selectedFacilityIds}
-        /> */}
-
         <section id={"house_rules_section"} ref={houseRulesSection}>
           <div className="title_2 pt-2 pb-2">House Rules</div>
 
@@ -353,13 +343,15 @@ function AvailabilityPage() {
             guest. In extreme cases, criminal charges will be pursued.
           </div>
         </section>
-        <AvailabilityRooms
-          roomData={roomData}
-          onReserve={onReserve}
-          selectedRooms={selectedRooms}
-          //reserveBtnDisabled={reserveBtnDisabled}
-          onChangeSelectedRooms={onChangeSelectedRooms}
-        />
+        {roomTypes.length > 0 && (
+          <AvailabilityRooms
+            roomData={roomTypes}
+            onReserve={onReserve}
+            selectedRooms={selectedRooms}
+            reserveBtnDisabled={reserveBtnDisabled}
+            onChangeSelectedRooms={onChangeSelectedRooms}
+          />
+        )}
       </>
     </MainContainer>
   );

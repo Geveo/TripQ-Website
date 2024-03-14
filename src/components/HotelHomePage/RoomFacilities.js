@@ -9,16 +9,13 @@ function RoomFacilities(props) {
         rowsData.push(rowItems);
     }
 
-
     return (
         <section>
             <div className="title_3">Room Facilities</div>
 
             {rowsData.map(row => {
-                return <CheckBoxRow facilities={row} key={row[0].Id} onChange={props.onChange}/>
+                return <CheckBoxRow facilities={row} key={row[0].Id} onChange={props.onChange} />
             })}
-
-
         </section>
 
     );

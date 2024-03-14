@@ -128,3 +128,18 @@ export async function getTransactions(accountAddress) {
         throw error;
     }
 }
+
+export async function getAccountInfo(accountAddress) {
+
+    const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
+    clients.push(client)
+
+    try {
+        console.log("Getting account objects of ", accountAddress);
+        const accInfo = await client.getInfo();
+        return accInfo;
+
+    } catch (error) {
+        throw error;
+    }
+}

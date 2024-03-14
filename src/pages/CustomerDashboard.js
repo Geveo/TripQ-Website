@@ -73,7 +73,7 @@ function CustomerDashboard() {
         if (peopleCount < 1) {
             toast(
                 (element) => (
-                    <ToastInnerElement message={"Invalid people count."} id={element.id}/>
+                    <ToastInnerElement message={"Invalid guest count."} id={element.id}/>
                 ),
                 {
                     duration: Infinity,
@@ -123,7 +123,7 @@ function CustomerDashboard() {
                 />
               </Col>
               <Col>
-                <Label>No. of rooms</Label>
+                <Label>No. of Guests</Label>
                 <InputGroup>
                   <Input
                     placeholder="0"
