@@ -168,20 +168,15 @@ export default class HotelService {
             subType: constants.RequestSubTypes.SEARCH_HOTELS_WITH_ROOM,
             filters: filterObj
         }
-
+        let result;
         try {
             console.log(submitObject)
-            const res = await this.contractService.submitReadRequest(submitObject);
-            if (res && res.success && res.success.length > 0) {
-                console.log(res.success)
-                return res.success;
-            } else {
-                return [];
-            }
+            result = await this.contractService.submitReadRequest(submitObject);
         } catch (error) {
             console.log(error);
             throw (error);
         }
+        return result;
     }
 
     /**

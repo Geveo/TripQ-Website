@@ -30,14 +30,14 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
                             <FaMapMarkerAlt color={"#908F8F"}/>
                         </div>
                         <div className={"subtext col"} style={{paddingTop: "4px"}}>
-                            {hotel.City}
+                            {hotel.Location}
                         </div>
                     </div>
 
-                    {/* <div className={"pt-3"}>
+                    <div className={"pt-3"}>
                         <StarRating ratings={3} reviews={726}/>
-                    </div> */}
-
+                    </div> 
+ {/*
                     <div className={"pt-3 subtext row_right"} style={{}}>
                         {hotel.noOfDays - 1} night, {numOfPeople} Rooms
                     </div>
@@ -52,7 +52,7 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
                         <button className={"view_availability_button"} style={{width: "200px"}} onClick={() => onViewAvailableClicked(hotel.Id)} >
                             View availability
                         </button>
-                    </div>
+                    </div>*/}
                 </div>
 
 
