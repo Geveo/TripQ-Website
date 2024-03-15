@@ -69,7 +69,7 @@ function App() {
                     <Route path="/" element={<CustomerDashboard />} />
                     <Route path="/list-property" element={<MyProperties />} exact />
                     <Route path="/register-customer" element={<RegisterCustomer />} exact />
-                    <Route path="/hotel/:id" element={<HotelHomePage />} exact />
+                    <Route path="/hotel/:idString" element={<HotelHomePage />} exact />
                     <Route path="/reservations" element={<Reservations />} exact />
                     <Route path="/search-hotel" element={<HotelSearchPage exact />} />
                     <Route path="/confirm-booking" element={<ConfirmBooking exact />} />

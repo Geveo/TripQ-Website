@@ -178,27 +178,27 @@ export default class HotelService {
     }
   }
 
-  /**
-   *
-   * @param {number} hotelId | Hotel Id
-   * @returns | An array of rooms || []
-   */
-  async getHotelRoomTypes(hotelId) {
-    const submitObject = {
-      type: constants.RequestTypes.ROOM,
-      subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
-      data: { HotelId: hotelId },
-    };
-    console.log(submitObject);
-    let result;
-    try {
-      result = await this.contractService.submitReadRequest(submitObject);
-    } catch (error) {
-      console.log(error);
-      throw error;
+    /**
+     *
+     * @param {number} hotelId | Hotel Id
+     * @returns | An array of rooms || []
+     */
+    async getHotelRoomTypes(hotelId) {
+        const submitObject = {
+            type: constants.RequestTypes.ROOM,
+            subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
+            data: { HotelId: hotelId }
+        };
+
+        let result;
+        try {
+            result = await this.contractService.submitReadRequest(submitObject);
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+        return result;
     }
-    return result;
-  }
 
   async getRoomTypeById(RTypeId) {
     const submitObject = {
@@ -361,29 +361,29 @@ export default class HotelService {
     }
   }
 
-  /**
-   *
-   * @returns hotel images || null
-   */
-  async getHotelImagesById(id) {
-    const submitObject = {
-      type: constants.RequestTypes.HOTEL,
-      subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,
-      filters: {
-        Id: id,
-      },
-    };
-    try {
-      const res = await this.contractService?.submitReadRequest(submitObject);
-      if (res && res.length > 0) {
-        return res;
-      } else {
-        console.log("No hotel images found.");
-        return null;
-      }
-    } catch (error) {
-      console.log(error);
-      throw error;
+    /**
+    *
+    * @returns hotel images || null
+    */
+    async getHotelImagesById(id) {
+        const submitObject = {
+            type: constants.RequestTypes.HOTEL,
+            subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,
+            filters: {
+                Id: id
+            }
+        }
+        try {
+            const res = await this.contractService?.submitReadRequest(submitObject);
+            if (res && res.length > 0) {
+                return res;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.log(error);
+            throw (error);
+        }
     }
-  }
 }
+
