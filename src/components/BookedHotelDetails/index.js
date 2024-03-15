@@ -1,23 +1,28 @@
-import React from "react";
 import { Row, Col, Card, Badge } from "reactstrap";
 import styles from "./index.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro"; // <-- import styles to be used
 import StarRating from "../../components/HotelHomePage/StarRating";
+import React from "react";
 
 const BookedHotelDetails = (props) => {
   return (
     <Card className={styles.bookedHotelCard}>
       <Row>
-        <Col md={4}>
-          <div className={styles.hotelImg}></div>
-        </Col>
+        {props.image && props.image.length > 0 && (
+          <Col md={4}>
+            <img
+              style={{ margin: 0, width: 250, height: 150 }}
+              src={props.image[0].ImageURL}
+              alt={`Displayed Image`}
+            />
+          </Col>
+        )}
         <Col md={8}>
           <h3 className="fontBold">{props.hotelName}</h3>
           <p>{props.hotelAddress}</p>
           <Badge color="warning">4.5 Ratings</Badge>
           <StarRating ratings={props.starRate} />
-
           <div className={styles.facilities}>
             <FontAwesomeIcon
               icon={solid("square-parking")}

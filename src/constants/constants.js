@@ -42,7 +42,8 @@ const LocalStorageKeys ={
     PrivateKey: "private-key",
     AccountAddress: "account-address",
     XummPkceJwt: 'XummPkceJwt',
-    pkce_state: 'pkce_state'
+    pkce_state: 'pkce_state',
+    HotelSelectionDetails: 'hotel-selection-details'
 }
 
 const XRPLAccountEventTypes = {

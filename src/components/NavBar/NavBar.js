@@ -87,11 +87,13 @@ function NavBar(props) {
                 My Reservations
               </Button>
 
-              <Button variant="outline-warning" style={{  marginLeft: '5px'}} className={`list_button `}
-                      onClick={() => navigate("/make-reservations")}
-              >
-                Make Reservations
-              </Button>
+          <Button
+            outline
+            className="primaryButton smallMarginLeftRight"
+            onClick={() => navigate(`/availability/${5}`)}
+          >
+            Make Reservations
+          </Button>
 
               {loginState.isLoggedIn ? (
                   <Dropdown
