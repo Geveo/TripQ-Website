@@ -195,7 +195,7 @@ export default class HotelService {
             subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
             data: { HotelId: hotelId }
         };
-        console.log(submitObject);
+
         let result;
         try {
             result = await this.contractService.submitReadRequest(submitObject);
@@ -379,11 +379,11 @@ export default class HotelService {
         }
         try {
             const res = await this.contractService?.submitReadRequest(submitObject);
+            console.log(res)
             if (res && res.length > 0) {
                 return res;
             } else {
-                console.log("No hotel images found.");
-                return null;
+                return [];
             }
         } catch (error) {
             console.log(error);
