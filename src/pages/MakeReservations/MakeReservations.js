@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
-import { Button } from "reactstrap";
 import BookingDetails from "../../components/BookingDetails/index";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
 import { Row, Col } from "reactstrap";
@@ -9,16 +8,12 @@ import CustomerRegistration from "../../components/CustomerRegistration";
 import BookedHotelPrice from "../../components/BookedHotelPrice";
 import "../../styles/layout_styles.scss";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
-import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import { useSelector, useDispatch } from "react-redux";
-import { add as selectionDetailsAdd} from "../../features/SelectionDetails/SelectionDetailsSlice";
-import {LocalStorageKeys} from "../../constants/constants";
-
-//import Step2 from './Step2';
-//import Step3 from './Step3';
+import { LocalStorageKeys } from "../../constants/constants";
 
 const ReservationForm = () => {
+  const selectionDetails = useSelector((state) => state.selectionDetails);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [step, setStep] = useState(1);
@@ -37,35 +32,32 @@ const ReservationForm = () => {
   });
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
+  const [totalPrice, setTotalPrice] = useState(0);
   const loginState = useSelector((state) => state.loginState);
 
   useEffect(() => {
-    let RoomTypes = [];
-    let RoomType1 = {
-      RoomTypeId: 1,
-      NoOfRooms: 2
-    }
-    let RoomType2 = {
-      RoomTypeId: 2,
-      NoOfRooms: 3
-    }
-    RoomTypes.push(RoomType1);
-    RoomTypes.push(RoomType2);
+    let selectedDetails =
+      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
-    let searchObj = {
-      HotelId: 1,
-      Name: "Dinuda Resort",
-      Address: "Sethawadiya Road, 61360 Kalpitiya, Sri Lanka",
-      StarRate: 3,
-      Facilities: [2, 4, 5],
-      CheckIn: "Sat 20 Apr 2024",
-      CheckOut: "Sat 22 Apr 2024",
-      Nights: 2,
-      RoomTypes: JSON.stringify(RoomTypes),
-      Price: 100,
-    };
-    dispatch(selectionDetailsAdd({key:localStorage.getItem(LocalStorageKeys.AccountAddress),value: searchObj}));
-    setSearchDetails(searchObj);
+    if (!selectedDetails) {
+      selectedDetails = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
+      );
+    }
+    if (
+      selectedDetails &&
+      selectedDetails.RoomTypes &&
+      selectedDetails.RoomTypes.length > 0
+    ) {
+      let totalPrice = 0;
+      selectedDetails.RoomTypes.forEach((element) => {
+        totalPrice += parseFloat(element.roomData.Price);
+      });
+
+      setTotalPrice(totalPrice);
+    }
+
+    setSearchDetails(selectedDetails);
   }, []);
 
   const handleNext = (data) => {
@@ -76,18 +68,6 @@ const ReservationForm = () => {
   const handleConfirm = (finalDetails) => {
     console.log("Reservation confirmed:", finalDetails);
   };
-
-  // const submitForm = async () => {
-  //   console.log("making payments..");
-  //   const result = await showPayQRWindow(
-  //     loginState.loggedInAddress,
-  //     `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-  //     "6",
-  //     process.env.REACT_APP_CURRENCY,
-  //     process.env.REACT_APP_CURRENCY_ISSUER
-  //   );
-  //   console.log(result);
-  // };
 
   return (
     <>
@@ -100,7 +80,7 @@ const ReservationForm = () => {
               noOfDays={searchDetails.Nights}
               selections={JSON.stringify(selectionStrings)}
             />
-            <BookedHotelPrice totalPrice={searchDetails.Price} />
+            <BookedHotelPrice totalPrice={totalPrice} />
           </Col>
 
           <Col md={8}>
@@ -108,6 +88,7 @@ const ReservationForm = () => {
               hotelName={searchDetails.Name}
               hotelAddress={searchDetails.Address}
               starRate={searchDetails.StarRate}
+              image={searchDetails.Images}
             />
             <CustomerRegistration
               //createReservation={submitForm}

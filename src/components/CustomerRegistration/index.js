@@ -11,10 +11,6 @@ import {
 } from "reactstrap";
 import Card1 from "../../layout/Card";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  show,
-  hide,
-} from "../../features/registerCustomer/registerCustomerSlice";
 import XrplService from "../../services-common/xrpl-service";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -49,13 +45,12 @@ const CustomerRegistration = (props) => {
 
   const selectionDetails = useSelector((state) => state.selectionDetails);
 
-  // const [disableAll, setdisableAll] = useState(true);
-
   const dispatch = useDispatch();
 
   // disable confirm button logic
   useEffect(() => {
     if (firstName && lastName && email && phoneNo) {
+
       props.setDisableConfirm(false);
     } else {
       props.setDisableConfirm(true);
@@ -109,6 +104,13 @@ const CustomerRegistration = (props) => {
     const selectionData =
       selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
+    if (!selectionData) {
+      selectionData = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
+      );
+      console.log(selectionData);
+    }
+
     if (
       firstName.length > 0 &&
       lastName.length > 0 &&
@@ -142,11 +144,13 @@ const CustomerRegistration = (props) => {
         });
 
         hotelService.makeReservation(reservationData).then((res) => {
+          console.log(res)
           store.dispatch(setShowScreenLoader(false));
           if (res.rowId.lastId > 0) {
             toast.success("Reserved successfully!", {
               duration: 10000,
             });
+            localStorage.removeItem(LocalStorageKeys.HotelSelectionDetails);
             navigate(`/my-reservations`);
           } else {
             toast(
@@ -266,6 +270,7 @@ const CustomerRegistration = (props) => {
             className="secondaryButton"
             style={{ width: "180px" }}
             onClick={() => submitForm()}
+            disabled={props.disableConfirm}
           >
             Continue To Payment
           </Button>
