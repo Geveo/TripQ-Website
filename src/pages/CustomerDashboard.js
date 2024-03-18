@@ -128,6 +128,7 @@ function CustomerDashboard() {
                   <Input
                     placeholder="0"
                     type="number"
+                    min="1" 
                     onChange={(e) => setPeopleCount(e.target.value)}
                   />
                 </InputGroup>
