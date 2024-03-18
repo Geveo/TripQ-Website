@@ -21,8 +21,10 @@ const BookHotelRoom = (props) => {
             <small className={styles.checkinoutTime}>After noon</small>
             <br />
           </Col>
-          <p style={{ marginTop:'20px'}}>Total length of stay:</p>
-          <p className="fontBold">{`${props.noOfDays - 1} nights, ${props.noOfDays} days`}</p>
+          <p style={{ marginTop: "20px" }}>Total length of stay:</p>
+          <p className="fontBold">{`${props.noOfDays} nights, ${
+            props.noOfDays + 1
+          } days`}</p>
         </Row>
         <hr />
         {/* <p>You selected</p>

@@ -9,7 +9,7 @@ import DateFunctions from "../helpers/DateFunctions";
 import HotelService from "../services-domain/hotel-service copy";
 import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
 import { LocalStorageKeys } from "../constants/constants";
-import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux"
 
 function AvailabilityPage() {
   const hotelService = HotelService.instance;
@@ -42,52 +42,71 @@ function AvailabilityPage() {
 
   useEffect(() => {
     // Get hotel details
-    hotelService.getHotelById(id).then((data) => {
-      if (data) {
-        let hotelData = {
-          Id: data.hotelDetails[0].Id,
-          Name: data.hotelDetails[0].Name,
-          StarRating: data.hotelDetails[0].StarRatings,
-          Location: data.hotelDetails[0].Location,
-          ImageURLs: data.hotelImages,
-        };
-
-        setHotelData(hotelData);
-
-        setAddress1(JSON.parse(data.hotelDetails[0].Location).AddressLine01);
-        setAddress2(JSON.parse(data.hotelDetails[0].Location).AddressLine02);
-        setCity(JSON.parse(data.hotelDetails[0].Location).City);
-        setImages(data.hotelImages);
-      }
-    });
-    // Get room details
     hotelService
-      .getHotelRoomTypes(id)
-      .then(async (res) => {
-        let newRoomTypes = [];
-        for (const roomType of res) {
-          const resObj = await hotelService.getRoomTypeById(roomType.Id);
+      .getHotelById(id)
+      .then((data) => {
+        if (data) {
+          let hotelData = {
+            Id: data.hotelDetails[0].Id,
+            Name: data.hotelDetails[0].Name,
+            StarRating: data.hotelDetails[0].StarRatings,
+            Location: data.hotelDetails[0].Location,
+            ImageURLs: data.hotelImages,
+          };
 
-          let facilitiesIds = [];
+          setHotelData(hotelData);
 
-          for (const facility of resObj.Facilities) {
-            facilitiesIds.push(facility.id);
-          }
-          newRoomTypes.push({
-            Id: roomType.Id,
-            RoomName: roomType.Code,
-            Price: roomType.Price,
-            RoomsCount: roomType.RoomsCount,
-            Facilities: facilitiesIds,
-            SelectedRooms: 0,
-          });
+          setAddress1(JSON.parse(data.hotelDetails[0].Location).AddressLine01);
+          setAddress2(JSON.parse(data.hotelDetails[0].Location).AddressLine02);
+          setCity(JSON.parse(data.hotelDetails[0].Location).City);
+          setImages(data.hotelImages);
         }
-        setRoomTypes(newRoomTypes);
+
+        // Get available room count
+        hotelService
+          .getAvailableRoomCount(id, "2024-03-11", "2024-03-14")
+          .then((res) => {
+            let availableRoomCount = res;
+            // Get room details
+            hotelService
+              .getHotelRoomTypes(id)
+              .then(async (res) => {
+                let newRoomTypes = [];
+                let id = 0;
+                for (const roomType of res) {
+                  const resObj = await hotelService.getRoomTypeById(
+                    roomType.Id
+                  );
+
+                  let facilitiesIds = [];
+
+                  for (const facility of resObj.Facilities) {
+                    facilitiesIds.push(facility.id);
+                  }
+                  newRoomTypes.push({
+                    Id: roomType.Id,
+                    RoomName: roomType.Code,
+                    Price: roomType.Price,
+                    RoomsCount: availableRoomCount[id].RoomsCount,
+                    Facilities: facilitiesIds,
+                    SelectedRooms: 0,
+                  });
+                  id++;
+                }
+                setRoomTypes(newRoomTypes);
+              })
+              .catch((error) => {
+                console.error("Error fetching room types:", error);
+              });
+          })
+          .catch((error) => {
+            console.error("Error fetching available rooms count:", error);
+          });
       })
       .catch((error) => {
-        console.error("Error fetching room types:", error);
+        console.error("Error fetching hotel details:", error);
       });
-  }, [id]);
+  }, []);
 
   const onChangeSelectedRooms = (room, isAdding) => {
     setSelectedRooms((prevState) => {
@@ -99,8 +118,8 @@ function AvailabilityPage() {
         ? newState[room.Id].count + 1
         : newState[room.Id].count - 1;
       if (newState[room.Id].count < 0) newState[room.Id].count = 0;
-      else if (newState[room.Id].count > room.NumOfRooms)
-        newState[room.Id].count = room.NumOfRooms;
+      else if (newState[room.Id].count > room.RoomsCount)
+        newState[room.Id].count = room.RoomsCount;
 
       // For disabling the reserve button
       let countTotal = 0;
@@ -189,6 +208,14 @@ function AvailabilityPage() {
   const onReserve = () => {
     let roomsCount = 0;
     const selectedRoomsArray = Object.values(selectedRooms);
+    const checkInDate = new Date("2024-03-11");
+    const checkOutDate = new Date("2024-03-13");
+
+    // Calculate the difference in milliseconds
+    const differenceInMilliseconds = checkOutDate - checkInDate;
+
+    // Convert milliseconds to days
+    const differenceInDays = differenceInMilliseconds / (1000 * 3600 * 24);
 
     let selectedObj = {
       HotelId: id,
@@ -196,9 +223,9 @@ function AvailabilityPage() {
       Address: getFullAddress(),
       StarRate: hotelData.StarRatings,
       Images: hotelData.ImageURLs,
-      CheckIn: "Sat 20 Apr 2024",
-      CheckOut: "Sat 22 Apr 2024",
-      Nights: 2,
+      CheckIn: "2024-03-11",
+      CheckOut: "2024-03-13",
+      Nights: differenceInDays,
       RoomTypes: selectedRoomsArray,
     };
 
