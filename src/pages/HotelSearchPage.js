@@ -9,6 +9,7 @@ import { bed_types } from "../constants/constants";
 import HotelList from "../components/HotelSearchPage/HotelList";
 import HotelService from "../services-domain/hotel-service copy";
 import {Alert, Spinner} from 'reactstrap'
+import toast from "react-hot-toast";
 
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
@@ -45,10 +46,11 @@ function HotelSearchPage(props) {
     const [hotelResultList, setHotelResultList] = useState(null);
     const [hotelResultListCopy, setHotelResultListCopy] = useState(null);
 
-    async function getRoomHotelList(city, checkInDate, checkOutDate, numOfPeople) {
+    async function searchHotelsWithRooms(city, checkInDate, checkOutDate, numOfPeople) {
         setIsDataLoading(true);
-        if (!(city && checkInDate && checkOutDate && numOfPeople)) {
+        if (!(city && checkInDate && checkOutDate && numOfPeople && numOfPeople > 0)) {
             setIsDataLoading(false);
+            toast.error("Invalid search criteria!")
             return;
         }
         const obj = {
@@ -127,7 +129,7 @@ function HotelSearchPage(props) {
         setRoomFacilities(roomFacilityAvailability);
         setBedTypes(bedTypeAvailability);
         setSearchCity(city);
-        getRoomHotelList(city, checkInDate, checkOutDate, numOfPeople);
+        searchHotelsWithRooms(city, checkInDate, checkOutDate, numOfPeople);
     }, []);
 
     const onClickSearch = async () => {
@@ -149,7 +151,7 @@ function HotelSearchPage(props) {
 
         if (searchCity !== city) {
             setCity(searchCity);
-            await getRoomHotelList(searchCity, checkInDate, checkOutDate, numOfPeople);
+            await searchHotelsWithRooms(searchCity, checkInDate, checkOutDate, numOfPeople);
         }
 
         if (searchText && searchText.length > 0) {
@@ -184,33 +186,10 @@ function HotelSearchPage(props) {
         setRoomFacilities(room_facilities);
     }
 
-    const onChangeConvenience = (Id) => {
-        let temp_data = [...conveniences];
-        let index = temp_data.findIndex(cur_facility => Id === cur_facility.Id)
-        temp_data[index].status = !temp_data[index].status;
-
-        setConveniences(temp_data);
-    }
-
-    const onChangeBedType = (Id) => {
-        let temp_data = [...bedTypes];
-        let index = temp_data.findIndex(bed_type => Id === bed_type.Id)
-        temp_data[index].status = !temp_data[index].status;
-
-        setBedTypes(temp_data);
-    }
-
-
-    const onChangeRoomFacility = (Id) => {
-        let temp_data = [...roomFacilities];
-        let index = temp_data.findIndex(cur_facility => Id === cur_facility.Id)
-        temp_data[index].status = !temp_data[index].status;
-
-        setRoomFacilities(temp_data);
-    }
+   
 
     function onViewAvailableClicked(hotelId) {
-        navigate(`/availability/${hotelId}?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}&rooms=${numOfPeople}`);
+        navigate(`/availability/${hotelId}/${checkInDate}/${checkOutDate}`);
     }
 
     function onCitySearchChanged(newCity) {
@@ -250,20 +229,9 @@ function HotelSearchPage(props) {
             </Alert>) : 
 
                 <div className={"row_fit"} style={{ width: "100%" }}>
-                    <div style={{ paddingRight: "30px", paddingBottom: "20px" }}>
-                        <Filters city={city} budget={budget} setBudget={setBudget}
-                            distance={distance} setDistance={setDistance}
-                            conveniences={conveniences} onChangeConvenience={onChangeConvenience}
-                            cancellationPolicy={cancellationPolicy} setCancellationPolicy={setCancellationPolicy}
-                            bedTypes={bedTypes} onChangeBedType={onChangeBedType}
-                            roomFacilities={roomFacilities} onChangeRoomFacility={onChangeRoomFacility}
-                            resetFilters={resetFilters} isDisable={isFilerDisable}
-                        />
-                    </div>
 
                     <div className={"col"}>
                         {(hotelResultListCopy && hotelResultListCopy.length > 0) ? <HotelList data={hotelResultListCopy} numOfPeople={numOfPeople} onViewAvailableClicked={onViewAvailableClicked} /> : ''}
-                        {/* <HotelList data={hotelResultList} numOfPeople={numOfPeople}/> */}
                     </div>
 
 
