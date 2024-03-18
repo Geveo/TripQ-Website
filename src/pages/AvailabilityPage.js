@@ -64,7 +64,7 @@ function AvailabilityPage() {
 
         // Get available room count
         hotelService
-          .getAvailableRoomCount(id, "2024-03-11", "2024-03-14")
+          .getAvailableRoomCount(id, checkInDate, checkOutDate)
           .then((res) => {
             let availableRoomCount = res;
             // Get room details

@@ -58,8 +58,8 @@ function HotelsList() {
                       <td style={{ textAlign: 'center' }}>
                         <Link to={`/hotel/${hotel.id}`}>{hotel.name}</Link>
                       </td>
-                     {/* Cann  uncomment when removing seeded data at the back end scripts
-                      * {hotel.location && (
+                
+                       {hotel.location && (
                         <td style={{ textAlign: 'center' }}>{JSON.parse(hotel.location).AddressLine01}</td>
                       )}
                       {hotel.contactDetails && (
@@ -72,7 +72,7 @@ function HotelsList() {
                         <td style={{ textAlign: 'center' }}>{hotel.starRate} Stars</td>
                       ):(
                         <td style={{ textAlign: 'center' }}> - </td>
-                      )} */} 
+                      )}  
                     </tr>
                   ))}
               </tbody>
