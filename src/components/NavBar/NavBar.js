@@ -90,7 +90,7 @@ function NavBar(props) {
           <Button
             outline
             className="primaryButton smallMarginLeftRight"
-            onClick={() => navigate(`/availability/${5}`)}
+            onClick={() => navigate(`/availability/${9}`)}
           >
             Make Reservations
           </Button>

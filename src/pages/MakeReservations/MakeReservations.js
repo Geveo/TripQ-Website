@@ -51,7 +51,7 @@ const ReservationForm = () => {
     ) {
       let totalPrice = 0;
       selectedDetails.RoomTypes.forEach((element) => {
-        totalPrice += parseFloat(element.roomData.Price);
+        totalPrice += (parseFloat(element.roomData.Price)*(element.count));
       });
 
       setTotalPrice(totalPrice);
