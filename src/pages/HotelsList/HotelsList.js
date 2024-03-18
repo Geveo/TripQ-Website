@@ -6,6 +6,7 @@ import Card1 from "../../layout/Card";
 import { Label } from "reactstrap";
 import toast from "react-hot-toast";
 import { LocalStorageKeys } from "../../constants/constants";
+import { Row, Col } from "reactstrap";
 
 function HotelsList() {
   const [hotelsList, setHotelsList] = useState(null);
@@ -31,7 +32,15 @@ function HotelsList() {
     <>
       <Container style={{paddingTop: 10}} fluid className="hotels-list bg-white rounded">
         <Card1>
+        <Row>
+          <Col lg={10}>
+              <div className='page-header mt-4' style={{color: 'rgb(44 44 118)', fontWeight: 600, fontSize: '40px', paddingBottom: '50px'}}>
+                  My Properties
+              </div>
+          </Col>
+      </Row>
           {hotelsList && hotelsList.length > 0 ? (
+          
             <Table striped responsive>
               <thead>
                 <tr style={{padding: 10, textAlign: 'center'}}>
