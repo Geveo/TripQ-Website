@@ -48,6 +48,7 @@ function HotelHomePage() {
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
+    getRoomTypes();
     const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
     hotelService.getHotelsList(walletAddress).then((data) => {
         if (data && data.length > 0) {
@@ -64,6 +65,7 @@ function HotelHomePage() {
               ImageURLs: matchingHotel[0].imageUrls,
               WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
             });
+            store.dispatch(setShowScreenLoader(false));
             setIsDataLoading(false);
             setHotelName(selectedHotel.Name);
             const location = JSON.parse(selectedHotel.Location);

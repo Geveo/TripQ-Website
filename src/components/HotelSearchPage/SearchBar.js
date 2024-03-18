@@ -56,7 +56,7 @@ function SearchBar(props) {
 
                 <div className={"mb-3"} style={{width: "auto"}}>
                     <Dropdown group style={{border: "1px solid #908F8F", height: "40px"}}>
-                        <span className={"title_4 people_text"}>{props.numOfPeople} Rooms</span>
+                        <span className={"title_4 people_text"}>{props.numOfPeople} Guests</span>
 
                         <DropdownToggle caret
                                         style={{

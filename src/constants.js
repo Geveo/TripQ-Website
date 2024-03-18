@@ -13,7 +13,7 @@ const RequestSubTypes = {
     DEREG_HOTEL: "DeregHotel",
     RATE_HOTEL: "RateHotel",
     IS_REGISTERED_HOTEL: "IsRegisteredHotel",
-    SEARCH_HOTELS_WITH_ROOM: "SearchHotelsWithRoom",
+    SEARCH_HOTELS_WITH_ROOM: "SearchHotelsWithRooms",
     GET_SINGLE_HOTEL_WITH_ROOMS: "GetSingleHotelWithRooms",
     GET_HOTELS_BY_WALLET_ADDRESS: "GetHotelsListByWalletAddress",
     GET_HOTEL_IMAGES_BY_ID: "GetHotelImagesById",

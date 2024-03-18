@@ -51,37 +51,42 @@ function HotelSearchPage(props) {
             setIsDataLoading(false);
             return;
         }
-
         const obj = {
             City: city,
-            CheckInDate: checkInDate,
-            CheckOutDate: checkOutDate,
+            CheckInDate:  new Date(checkInDate).toISOString().split('T')[0],
+            CheckOutDate: new Date(checkOutDate).toISOString().split('T')[0],
             GuestCount: numOfPeople
         }
 
         try {
-            const res = await hotelService.SearchHotelsWithRooms(obj);
-            if (res && res.length > 0) {
-                const newHotellist = res.map(hh => {
-                    return {
-                        Id: hh.Id,
-                        Name: hh.Name,
-                        City: hh.city,
-                        roomDetails: hh.roomDetails,
-                        imageUrl: hh.ImageUrl,
-                        noOfDays: hh.noOfDays
-                    };
-                });
+            hotelService.SearchHotelsWithRooms(obj)
+            .then((res) => {
+                console.log("res:", res)
+                if (res && res.length > 0) {
+                    const newHotellist = res.map(hh => {
+                        return {
+                            Id: hh.Id,
+                            Name: hh.Name,
+                            City: hh.city,
+                            roomDetails: hh.roomDetails,
+                            imageUrl: hh.ImageUrl,
+                            noOfDays: hh.noOfDays
+                        };
+                    });
+    
+                    setCity(city);
+                    setHotelResultList(newHotellist);
+                    setHotelResultListCopy(newHotellist);
+    
+                    setIsDataLoading(false)
+                } else {
+                    setIsDataLoading(false);
+                    setHotelResultListCopy([])
+                }
+            });
+           
 
-                setCity(city);
-                setHotelResultList(newHotellist);
-                setHotelResultListCopy(newHotellist);
-
-                setIsDataLoading(false)
-            } else {
-                setIsDataLoading(false);
-                setHotelResultListCopy([])
-            }
+           
         } catch (error) {
             setIsDataLoading(false)
             console.log(error);
@@ -151,8 +156,6 @@ function HotelSearchPage(props) {
             setHotelResultListCopy(hotelResultList);
             setHotelResultListCopy(hotelResultListCopy.filter(hh => hh.Name.includes(searchText)));
         }
-
-
     }
 
     const resetFilters = () => {
