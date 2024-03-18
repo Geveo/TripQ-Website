@@ -47,12 +47,13 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
                     <div className={"pt-1 subtext row_right"}>
                         include taxes and charges
                     </div>
+                    */}
 
                     <div className={"pt-3 row_right"} style={{}}>
                         <button className={"view_availability_button"} style={{width: "200px"}} onClick={() => onViewAvailableClicked(hotel.Id)} >
-                            View availability
+                            View Availability
                         </button>
-                    </div>*/}
+                    </div>
                 </div>
 
 

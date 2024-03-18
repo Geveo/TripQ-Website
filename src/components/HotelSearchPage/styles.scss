@@ -70,7 +70,8 @@
 .clear_button {
   border: 1px solid #A9A6A6;
   border-radius: 5px;
-  background: transparent;
+  background: #2C2C76;
+  color: #D9D9D9;
   width: 100%;
   height: 38px;
   padding-left: 20px;
@@ -78,7 +79,7 @@
 }
 
 .clear_button:hover {
-  background: #cecccc;
+  background-color: #0c0c79;
 }
 
 .clear_button:active {
