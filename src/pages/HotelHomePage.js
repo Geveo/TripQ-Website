@@ -28,7 +28,8 @@ const { useDispatch } = require("react-redux");
 
 function HotelHomePage() {
   const dispatch = useDispatch();
-  const { id } = useParams(); // hotel id
+  const { idString } = useParams(); // hotel id
+  const id = parseInt(isNaN(idString) ? "0" : idString, 10);
   const sharedInstance = SharedStateService.instance;
   const hotelService = HotelService.instance;
   const [isDataLoading, setIsDataLoading] = useState(false);
@@ -47,13 +48,11 @@ function HotelHomePage() {
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
+    getRoomTypes();
     const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
-    hotelService
-      .getHotelsList(walletAddress)
-      .then((data) => {
+    hotelService.getHotelsList(walletAddress).then((data) => {
         if (data && data.length > 0) {
-          const matchingHotel = data.filter((element) => element.id == id);
-
+          const matchingHotel = data.filter(element => element.id === id);
           if (matchingHotel.length > 0) {
             let selectedHotel = new HotelDto({
               Id: matchingHotel[0].id,
@@ -67,7 +66,6 @@ function HotelHomePage() {
               WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
             });
             store.dispatch(setShowScreenLoader(false));
-            getRoomTypes();
             setIsDataLoading(false);
             setHotelName(selectedHotel.Name);
             const location = JSON.parse(selectedHotel.Location);
@@ -86,16 +84,14 @@ function HotelHomePage() {
             });
             setSelectedFacilityIds(selectedFacilitiesIDs);
 
-            // Get hotel images
-            hotelService
-              .getHotelImagesById(id)
-              .then((data) => {
-                setImages(data);
-              })
-              .catch((err) => {
-                console.log(err.thrownError);
-                toast.error("Error in fetching hotel images.");
-              });
+            getRoomTypes(id).then(rms => {
+              setRooms(rms);
+            }).catch(e => {
+              console.log(e)
+            }).finally(() =>  {
+              store.dispatch(setShowScreenLoader(false));
+            });
+
           } else {
             store.dispatch(setShowScreenLoader(false));
           }
@@ -106,7 +102,17 @@ function HotelHomePage() {
         console.log(err.thrownError);
         toast.error("Error in fetching hotels list.");
       });
-  }, []);
+
+    // Get hotel images
+    hotelService.getHotelImagesById(id).then((data) => {
+      if(data && data.length > 0)
+        setImages(data);
+    }).catch((err) => {
+      console.log(err);
+      toast.error("Error in fetching hotel images.");
+    });
+
+  }, [id]);
 
   async function innnit() {
     await ContractService.instance.init();
@@ -160,9 +166,9 @@ function HotelHomePage() {
   };
 
   const onSubmitRoom = async (room_data) => {
-    room_data.HotelId = parseInt(id, 10);
+    room_data.HotelId = id;
     try {
-      const res = await HotelService.instance.createRoom(room_data);
+      const res = await hotelService.createRoom(room_data);
       if (res > 0) {
         toast.success("Room type created successfully!", {
           duration: 10000,
@@ -173,20 +179,20 @@ function HotelHomePage() {
       throw error;
     } finally {
       setCreatingRoom(false);
-      await getRoomTypes();
+      const res = await getRoomTypes(id);
+      setRooms(res);
     }
   };
 
   // Load RoomType details
-  async function getRoomTypes() {
-    if (parseInt(id, 10) && parseInt(id, 10) > 0) {
-      const res = await HotelService.instance.getHotelRoomTypes(
-        parseInt(id, 10)
-      );
-      if (res && res.length > 0) {
-        setRooms(res);
-      }
+  async function getRoomTypes(hotelId) {
+    const res = await hotelService.getHotelRoomTypes(hotelId);
+    if(res && res.length > 0) {
+      return res;
+    } else {
+      return []
     }
+
   }
 
   const onDeleteRoom = async () => {
@@ -315,7 +321,7 @@ function HotelHomePage() {
             </section>
             <section ref={infoSection} id="info_section" className={"pt-2"}>
              <div>
-                {images.map((image, index) => (
+                {images && images.map((image, index) => (
                   <img
                     key={index}
                     style={{ margin: 10, width: 350, height: 250 }}
@@ -388,7 +394,7 @@ function HotelHomePage() {
             <section id={"room_layout_section"} ref={roomLayoutSection}>
               <div className="title_2 pt-2 pb-2">Room Types</div>
               <div className={"subtext"}>Details about your rooms.</div>
-              {rooms.length !== 0 && (
+              {rooms.length > 0 && (
                 <RoomTypesGrid
                   rooms={rooms}
                   onOpenDeleteRoomModal={onOpenDeleteRoomModal}
