@@ -20,7 +20,7 @@ import { toast } from "react-hot-toast";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import { PaymentResults } from "../../constants/constants";
 import { ReservationDto } from "../../dto/ReservationDto";
-import { LocalStorageKeys } from "../../constants/constants";
+import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
 import { store } from "../../app/store";
@@ -100,7 +100,7 @@ const CustomerRegistration = (props) => {
     return;
   };
   const submitForm = async () => {
-    const selectionData =
+    let selectionData =
       selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
     if (!selectionData) {
@@ -115,13 +115,14 @@ const CustomerRegistration = (props) => {
       email.length > 0 &&
       phoneNo
     ) {
-      const result = await showPayQRWindow(
-        loginState.loggedInAddress,
-        `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-        props.totalPrice,
-        process.env.REACT_APP_CURRENCY,
-        process.env.REACT_APP_CURRENCY_ISSUER
-      );
+      const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, props.totalPrice.toString(), DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
+      // const result = await showPayQRWindow(
+      //   loginState.loggedInAddress,
+      //   `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+      //   props.totalPrice.toString(),
+      //   process.env.REACT_APP_CURRENCY,
+      //   process.env.REACT_APP_CURRENCY_ISSUER
+      // );
       console.log(result);
      if (result === PaymentResults.COMPLETED) {
         store.dispatch(setShowScreenLoader(true));
