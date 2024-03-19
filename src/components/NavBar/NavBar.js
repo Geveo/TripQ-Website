@@ -104,13 +104,13 @@ function NavBar(props) {
                 My Reservations
               </Button>
 
-              <Button
+              {/* <Button
                 outline
                 className="primaryButton smallMarginLeftRight"
                 onClick={() => navigate(`/availability/${9}/${'2024-04-21'}/${'2024-04-23'}/${3}`)}
               >
                 Make Reservations
-              </Button>
+              </Button> */}
 
               {loginState.isLoggedIn ? (
                 <Dropdown

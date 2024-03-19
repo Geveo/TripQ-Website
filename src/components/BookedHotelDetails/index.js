@@ -10,15 +10,17 @@ const BookedHotelDetails = (props) => {
     <Card className={styles.bookedHotelCard}>
       <Row>
         {props.image && props.image.length > 0 && (
-          <Col md={4}>
-            <img
-              style={{ margin: 0, width: 250, height: 150 }}
-              src={props.image[0].ImageURL}
-              alt={`Displayed Image`}
-            />
+          <Col md={5}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img
+                style={{ margin: "0 auto", width: 250, height: 150 }}
+                src={props.image[0].ImageURL}
+                alt={`Displayed Image`}
+              />
+            </div>
           </Col>
         )}
-        <Col md={8}>
+        <Col md={7}>
           <h3 className="fontBold">{props.hotelName}</h3>
           <p>{props.hotelAddress}</p>
           <Badge color="warning">4.5 Ratings</Badge>

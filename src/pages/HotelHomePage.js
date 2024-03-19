@@ -42,8 +42,9 @@ function HotelHomePage() {
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
-    getRoomTypes();
+    //getRoomTypes();
     const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
+
     hotelService
       .getHotelsList(walletAddress)
       .then((data) => {
@@ -85,27 +86,24 @@ function HotelHomePage() {
             getRoomTypes(id)
               .then((rms) => {
                 setRooms(rms);
+
+                // Get hotel images
+                hotelService
+                  .getHotelImagesById(id)
+                  .then((data) => {
+                    if (data && data.length > 0) setImages(data);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    toast.error("Error in fetching hotel images.");
+                  });
               })
               .catch((e) => {
                 console.log(e);
-              })
-              .finally(() => {
-                store.dispatch(setShowScreenLoader(false));
               });
-          } else {
-            store.dispatch(setShowScreenLoader(false));
           }
         }
-        // Get hotel images
-        hotelService
-          .getHotelImagesById(id)
-          .then((data) => {
-            if (data && data.length > 0) setImages(data);
-          })
-          .catch((err) => {
-            console.log(err);
-            toast.error("Error in fetching hotel images.");
-          });
+        store.dispatch(setShowScreenLoader(false));
       })
       .catch((err) => {
         store.dispatch(setShowScreenLoader(false));

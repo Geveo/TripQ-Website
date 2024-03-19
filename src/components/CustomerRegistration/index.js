@@ -60,7 +60,6 @@ const CustomerRegistration = (props) => {
   const validation = (body) => {
     // only when validate, body will pass
     if (firstName.length !== 0 && lastName.length !== 0 && email.length !== 0) {
-      console.log("body", body);
       return true;
     }
     return false;
@@ -108,7 +107,6 @@ const CustomerRegistration = (props) => {
       selectionData = JSON.parse(
         localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
       );
-      console.log(selectionData);
     }
 
     if (
@@ -120,18 +118,18 @@ const CustomerRegistration = (props) => {
       const result = await showPayQRWindow(
         loginState.loggedInAddress,
         `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-        "0.6",
+        props.totalPrice,
         process.env.REACT_APP_CURRENCY,
         process.env.REACT_APP_CURRENCY_ISSUER
       );
       console.log(result);
-      if (result === PaymentResults.COMPLETED) {
+     if (result === PaymentResults.COMPLETED) {
         store.dispatch(setShowScreenLoader(true));
 
         let reservationData = new ReservationDto({
           HotelId: selectionData.HotelId,
           WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
-          Price: "0.6",
+          Price: props.totalPrice,
           FromDate: selectionData.CheckIn,
           ToDate: selectionData.CheckOut,
           NoOfNights: selectionData.Nights,
@@ -144,7 +142,6 @@ const CustomerRegistration = (props) => {
         });
 
         hotelService.makeReservation(reservationData).then((res) => {
-          console.log(res)
           store.dispatch(setShowScreenLoader(false));
           if (res.rowId.lastId > 0) {
             toast.success("Reserved successfully!", {
@@ -258,7 +255,27 @@ const CustomerRegistration = (props) => {
             </FormGroup>
           </Col>
         </Row>
-        <div
+        <Row>
+          <Col md={6}>
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 25,
+          }}
+        >
+          <Button
+            className="secondaryButton"
+            style={{ width: "180px" }}
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </Button>
+        </div>
+          </Col>
+          <Col md={6}>
+          <div
           style={{
             display: "flex",
             justifyContent: "center",
@@ -275,6 +292,9 @@ const CustomerRegistration = (props) => {
             Continue To Payment
           </Button>
         </div>
+          </Col>
+        </Row>
+    
       </Form>
     </Card1>
   );
