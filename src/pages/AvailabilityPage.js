@@ -9,7 +9,9 @@ import DateFunctions from "../helpers/DateFunctions";
 import HotelService from "../services-domain/hotel-service copy";
 import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
 import { LocalStorageKeys } from "../constants/constants";
-import { useDispatch } from "react-redux"
+import { useDispatch } from "react-redux";
+import { format } from 'date-fns';
+
 
 function AvailabilityPage() {
   const hotelService = HotelService.instance;
@@ -19,8 +21,14 @@ function AvailabilityPage() {
   const queryParams = new URLSearchParams(location.search);
   const { id } = useParams();
 
-  let checkInDate = queryParams.get("checkInDate");
-  let checkOutDate = queryParams.get("checkOutDate");
+  const { checkInDate } = useParams();
+  const { checkOutDate } = useParams();
+  
+const checkIn = new Date(checkInDate);
+const checkOut = new Date(checkOutDate);
+
+const checkInFormatted = format(checkIn, 'yyyy-MM-dd');
+const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
 
   const [images, setImages] = useState([]);
   const [address1, setAddress1] = useState("P.O Box 11");
@@ -28,11 +36,6 @@ function AvailabilityPage() {
   const [city, setCity] = useState("Sigiriya");
   const [roomTypes, setRoomTypes] = useState([]);
   const [hotelData, setHotelData] = useState([]);
-
-  const [checkInCheckOutDates, setCheckInCheckOutDates] = useState({
-    checkIn: checkInDate,
-    checkOut: checkOutDate,
-  });
 
   const [selectedRooms, setSelectedRooms] = useState([]);
 
@@ -106,7 +109,7 @@ function AvailabilityPage() {
       .catch((error) => {
         console.error("Error fetching hotel details:", error);
       });
-  }, []);
+  }, [id]);
 
   const onChangeSelectedRooms = (room, isAdding) => {
     setSelectedRooms((prevState) => {
@@ -180,7 +183,7 @@ function AvailabilityPage() {
       new Date(checkOut)
     );
 
-    setCheckInCheckOutDates({ checkIn: checkInDate, checkOut: checkOutDate });
+    //setCheckInCheckOutDates({ checkIn: checkInDate, checkOut: checkOutDate });
   };
 
   const getFullAddress = () => {
@@ -191,28 +194,16 @@ function AvailabilityPage() {
     return address;
   };
 
-  const getTotalPrice = () => {
-    let pricePerNight = 0;
-    for (const [roomId, values] of Object.entries(selectedRooms)) {
-      pricePerNight += parseFloat(values.roomData.PricePerNight) * values.count;
-    }
 
-    let num_of_days = DateFunctions.getDaysCountInBetween(
-      checkInCheckOutDates.checkIn,
-      checkInCheckOutDates.checkOut
-    );
-    console.log(pricePerNight * num_of_days);
-    return pricePerNight * num_of_days;
-  };
 
   const onReserve = () => {
     let roomsCount = 0;
     const selectedRoomsArray = Object.values(selectedRooms);
-    const checkInDate = new Date("2024-03-11");
-    const checkOutDate = new Date("2024-03-13");
+    const checkIn = new Date(checkInFormatted);
+    const checkOut = new Date(checkOutFormatted);
 
     // Calculate the difference in milliseconds
-    const differenceInMilliseconds = checkOutDate - checkInDate;
+    const differenceInMilliseconds = checkOut - checkIn;
 
     // Convert milliseconds to days
     const differenceInDays = differenceInMilliseconds / (1000 * 3600 * 24);
@@ -221,10 +212,10 @@ function AvailabilityPage() {
       HotelId: id,
       Name: hotelData.Name,
       Address: getFullAddress(),
-      StarRate: hotelData.StarRatings,
+      StarRate: hotelData.StarRating,
       Images: hotelData.ImageURLs,
-      CheckIn: "2024-03-11",
-      CheckOut: "2024-03-13",
+      CheckIn: checkInFormatted,
+      CheckOut: checkOutFormatted,
       Nights: differenceInDays,
       RoomTypes: selectedRoomsArray,
     };
