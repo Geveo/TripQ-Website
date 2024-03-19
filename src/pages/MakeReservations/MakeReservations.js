@@ -91,7 +91,7 @@ const ReservationForm = () => {
               image={searchDetails.Images}
             />
             <CustomerRegistration
-              //createReservation={submitForm}
+              totalPrice={totalPrice}
               disableConfirm={disableConfirm}
               setDisableConfirm={setDisableConfirm}
               confirmLoading={confirmLoading}

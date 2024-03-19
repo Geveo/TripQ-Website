@@ -343,7 +343,7 @@ export default class HotelService {
     };
     try {
       const res = await this.contractService?.submitReadRequest(submitObject);
-      if (res && res.length > 0) {
+      if (res) {
         return res;
       } else {
         console.log("No hotel found.");
