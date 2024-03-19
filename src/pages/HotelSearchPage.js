@@ -10,6 +10,8 @@ import HotelList from "../components/HotelSearchPage/HotelList";
 import HotelService from "../services-domain/hotel-service copy";
 import {Alert, Spinner} from 'reactstrap'
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import {xummAuthorize} from "../services-common/xumm-api-service";
 
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
@@ -17,6 +19,7 @@ function HotelSearchPage(props) {
     const navigate = useNavigate();
     const location = useLocation();
     const hotelService = HotelService.instance;
+    const loginState = useSelector(state => state.loginState)
 
     const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -188,8 +191,15 @@ function HotelSearchPage(props) {
 
    
 
-    function onViewAvailableClicked(hotelId) {
-        navigate(`/availability/${hotelId}/${checkInDate}/${checkOutDate}`);
+    async function onViewAvailableClicked(hotelId) {
+        if(!loginState.isLoggedIn) {
+            if(await xummAuthorize()) {
+                navigate(`/availability/${hotelId}/${checkInDate}/${checkOutDate}`);
+            }
+          } else {
+            navigate(`/availability/${hotelId}/${checkInDate}/${checkOutDate}`);
+          }
+        
     }
 
     function onCitySearchChanged(newCity) {

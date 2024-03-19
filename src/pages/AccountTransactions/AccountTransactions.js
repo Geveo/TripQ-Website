@@ -31,7 +31,7 @@ const  AccountTransactions = () => {
     const [accountAddress, setAccountAddress] = useState(null);
     const [transactions, setTransactions] = useState([]);
     const [transactionForTable, setTransactionsForTable] = useState([]);
-    const [totalEVR, setTotalEVR] = useState('0');
+    const [totalEVR, setTotalEVR] = useState('0.00');
     const [totalXAHDrops, setTotalXAHDrops] = useState('0')
 
     const [issuer, setIssuer ] = useState(process.env.REACT_APP_CURRENCY_ISSUER);
@@ -69,7 +69,9 @@ const  AccountTransactions = () => {
             init().then(res => {
                 getTrustlines(accountAddress, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER).then(res => {
                     if(res && res.length > 0) {
-                        const evrBalance = res.filter(ob => ob.account === process.env.REACT_APP_CURRENCY_ISSUER)[0].balance;
+                        const balanceValue = res.find(ob => ob.account === process.env.REACT_APP_CURRENCY_ISSUER)?.balance;
+                        const evrBalance = balanceValue ? parseFloat(balanceValue).toFixed(2) : 0.00;                        
+                       
                         setTotalEVR(evrBalance);
                     }
                 } ).catch(e => {throw e});
@@ -180,7 +182,7 @@ const  AccountTransactions = () => {
                             <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> EVR balance</div>
                             <Card.Body>
                                 <div className={`ever-balance-value`}>
-                                    {Number(parseFloat(totalEVR).toFixed(2))}
+                                    {totalEVR}
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
                             </Card.Body>
@@ -192,7 +194,7 @@ const  AccountTransactions = () => {
                             <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> XAH balance</div>
                             <Card.Body>
                                 <div className={`ever-balance-value`}>
-                                    {Number((parseFloat(totalXAHDrops)/1000000).toFixed(2))}
+                                    {(parseFloat(totalXAHDrops)/1000000).toFixed(2)}
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
                             </Card.Body>
