@@ -56,8 +56,8 @@ function OfferCard(props) {
               name="rating"
             />
           </div>
-          <div className="original_price">{props.offer.originalPrice}$</div>
-          <div className="discounted_price">{props.offer.discountedPrice}$</div>
+          <div className="original_price">{props.offer.originalPrice}{process.env.REACT_APP_CURRENCY}</div>
+          <div className="discounted_price">{props.offer.discountedPrice}{process.env.REACT_APP_CURRENCY}</div>
           <Button className="secondaryButton dealButton">View Deal</Button>
         </div>
       </div>

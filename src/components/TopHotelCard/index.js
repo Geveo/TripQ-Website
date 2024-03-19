@@ -29,7 +29,7 @@ function TopHotelCard(props) {
           </CardSubtitle>
           <p className={`m-0 ${style.price}`}>
             {" "}
-            from ${props.hotel.price} per night{" "}
+            from {props.hotel.price}{process.env.REACT_APP_CURRENCY} per night{" "}
           </p>
           <div className={` ${style.stars}`}>
             <StarRatings
