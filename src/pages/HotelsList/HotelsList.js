@@ -59,7 +59,7 @@ function HotelsList() {
                         <Link to={`/hotel/${hotel.id}`}>{hotel.name}</Link>
                       </td>
                 
-                       {hotel.location && (
+                {hotel.location && (
                         <td style={{ textAlign: 'center' }}>{JSON.parse(hotel.location).AddressLine01}</td>
                       )}
                       {hotel.contactDetails && (

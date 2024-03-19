@@ -69,13 +69,13 @@ function HotelSearchPage(props) {
                         return {
                             Id: hh.Id,
                             Name: hh.Name,
-                            City: hh.city,
-                            roomDetails: hh.roomDetails,
-                            imageUrl: hh.ImageUrl,
-                            noOfDays: hh.noOfDays
+                            City: hh.Location,
+                            ImageURL: hh.ImageURL,
+                            StarRatings: hh.StarRatings, 
+                            ContactDetails: hh.ContactDetails,
+                            Description: hh.Description
                         };
                     });
-    
                     setCity(city);
                     setHotelResultList(newHotellist);
                     setHotelResultListCopy(newHotellist);
