@@ -115,7 +115,7 @@ const CustomerRegistration = (props) => {
       email.length > 0 &&
       phoneNo
     ) {
-      const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, '6', DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
+      const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, props.totalPrice.toString(), DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
       // const result = await showPayQRWindow(
       //   loginState.loggedInAddress,
       //   `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
