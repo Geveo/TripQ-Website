@@ -70,6 +70,7 @@ const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
           .getAvailableRoomCount(id, checkInDate, checkOutDate)
           .then((res) => {
             let availableRoomCount = res;
+            console.log("availableRoomCount",availableRoomCount)
             // Get room details
             hotelService
               .getHotelRoomTypes(id)
@@ -90,13 +91,18 @@ const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
                     Id: roomType.Id,
                     RoomName: roomType.Code,
                     Price: roomType.Price,
-                    RoomsCount: availableRoomCount[id].RoomsCount,
+                    RoomsCount: availableRoomCount.find(item => item.Id == roomType.Id).RoomsCount,
+                    SingleBedCount: availableRoomCount.find(item => item.Id == roomType.Id).SingleBedCount,
+			              DoubleBedCount: availableRoomCount.find(item => item.Id == roomType.Id).DoubleBedCount,
+			              TripleBedCount: availableRoomCount.find(item => item.Id == roomType.Id).TripleBedCount,
+			              TotalSleeps: availableRoomCount.find(item => item.Id == roomType.Id).TotalSleeps,
                     Facilities: facilitiesIds,
                     SelectedRooms: 0,
                   });
                   id++;
                 }
                 setRoomTypes(newRoomTypes);
+                console.log("newRoomTypes",newRoomTypes)
               })
               .catch((error) => {
                 console.error("Error fetching room types:", error);
