@@ -1,29 +1,30 @@
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Badge from 'react-bootstrap/Badge';
-import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Badge from "react-bootstrap/Badge";
+import Table from "react-bootstrap/Table";
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import ToggleButton from "react-bootstrap/ToggleButton";
 
-import './styles.scss';
-import {useEffect, useState} from 'react';
+import "./styles.scss";
+import { useEffect, useState } from "react";
 import {
-    deinit,
-    init,
-    getTransactions,
-    getTrustlines, getAccountInfo
-} from '../../services-common/evernode-xrpl-service'
-import {DestinationTags, LocalStorageKeys} from "../../constants/constants";
-import {useSelector} from 'react-redux'
-import {showPayQRWindow} from "../../services-common/xumm-api-service";
+  deinit,
+  init,
+  getTransactions,
+  getTrustlines,
+  getAccountInfo,
+} from "../../services-common/evernode-xrpl-service";
+import { DestinationTags, LocalStorageKeys } from "../../constants/constants";
+import { useSelector } from "react-redux";
+import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import Card from "react-bootstrap/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { faArrowUp, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
+import { faArrowUp, faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
-import {setShowScreenLoader} from '../../features/screenLoader/ScreenLoaderSlice'
+import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
 import CoinRankingService from "../../services-common/coinranking-service";
 
 
@@ -37,35 +38,31 @@ const  AccountTransactions = () => {
     const [totalEVRinUSD, setTotalEVRinUSD] = useState(0);
     const [totalXAHinUSD, setTotalXAHinUSD] = useState(0);
 
-    const [issuer, setIssuer ] = useState(process.env.REACT_APP_CURRENCY_ISSUER);
-    const currency = process.env.REACT_APP_CURRENCY;
+  const [issuer, setIssuer] = useState(process.env.REACT_APP_CURRENCY_ISSUER);
+  const currency = process.env.REACT_APP_CURRENCY;
 
+  const loginState = useSelector((state) => state.loginState);
 
-    const loginState = useSelector(state => state.loginState);
+  const [checked, setChecked] = useState(false);
+  const [radioValue, setRadioValue] = useState("1");
 
+  const radios = [
+    { name: "All TRX", value: "1" },
+    { name: "TripQ TRX", value: "2" },
+  ];
 
-    const [checked, setChecked] = useState(false);
-    const [radioValue, setRadioValue] = useState('1');
+  useEffect(() => {
+    dispatch(setShowScreenLoader(true));
+    const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
+    if (acc && acc.length > 0) {
+      setAccountAddress(acc);
+    }
 
-    const radios = [
-        { name: 'All TRX', value: '1' },
-        { name: 'TripQ TRX', value: '2' },
-    ];
-
-
-    useEffect(() => {
-        dispatch(setShowScreenLoader(true))
-        const acc = localStorage.getItem(LocalStorageKeys.AccountAddress);
-        if(acc && acc.length > 0) {
-            setAccountAddress(acc);
-        }
-
-        if(accountAddress)
-            loadTransactions();
-        else {
-            dispatch(setShowScreenLoader(false))
-        }
-    }, [accountAddress]);
+    if (accountAddress) loadTransactions();
+    else {
+      dispatch(setShowScreenLoader(false));
+    }
+  }, [accountAddress]);
 
     const loadTransactions =  () => {
         if(accountAddress) {
@@ -93,45 +90,77 @@ const  AccountTransactions = () => {
 
                 }).catch(e => {throw e});
 
-                getTransactions(accountAddress).then(res => {
-                    const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
-                    setTransactions(sortedtrx);
+          getTransactions(accountAddress)
+            .then((res) => {
+              const sortedtrx = [...res].sort((a, b) => b.tx.date - a.tx.date);
+              setTransactions(sortedtrx);
 
-                    if(radioValue === '2') {
-                        setTransactionsForTable(res.filter(t => t.tx.DestinationTag && t.tx.DestinationTag === DestinationTags.RESERVATION_PAYMENT).sort((a, b) => b.tx.date - a.tx.date));
-                    } else {
-                        setTransactionsForTable(sortedtrx);
-                    }
+              if (radioValue === "2") {
+                setTransactionsForTable(
+                  res
+                    .filter(
+                      (t) =>
+                        t.tx.DestinationTag &&
+                        t.tx.DestinationTag ===
+                          DestinationTags.RESERVATION_PAYMENT
+                    )
+                    .sort((a, b) => b.tx.date - a.tx.date)
+                );
+              } else {
+                setTransactionsForTable(sortedtrx);
+              }
 
-                    dispatch(setShowScreenLoader(false))
-                    deinit().catch(e => {throw e});
-                }).catch(e => {throw e})
-            }).catch(error => {
-                console.log(error)
+              dispatch(setShowScreenLoader(false));
+              deinit().catch((e) => {
+                throw e;
+              });
+            })
+            .catch((e) => {
+              throw e;
             });
-
-
-        }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
+  };
 
-    const toggleTransactions = (value) => {
-        setRadioValue(value);
-        if(value === '2') {
-            setTransactionsForTable(transactions.filter(t => t.tx.DestinationTag && t.tx.DestinationTag === DestinationTags.RESERVATION_PAYMENT).sort((a, b) => b.tx.date - a.tx.date));
-        } else {
-            setTransactionsForTable([...transactions]);
-        }
+  const toggleTransactions = (value) => {
+    setRadioValue(value);
+    if (value === "2") {
+      setTransactionsForTable(
+        transactions
+          .filter(
+            (t) =>
+              t.tx.DestinationTag &&
+              t.tx.DestinationTag === DestinationTags.RESERVATION_PAYMENT
+          )
+          .sort((a, b) => b.tx.date - a.tx.date)
+      );
+    } else {
+      setTransactionsForTable([...transactions]);
     }
+  };
 
-
-    const formatAmount = (amount) => {
-        if(typeof amount === 'string') {
-            return `${amount/1000000} XAH`
-        } else {
-            return `${amount.value} ${amount.currency}`
-        }
+  const formatAmount = (amount) => {
+    if (typeof amount === "string") {
+      const value=parseFloat(amount / 1000000).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return `${value} XAH`;
+    } else {
+      const value=parseFloat(amount.value).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return `${value} ${amount.currency}`;
     }
+  };
 
+  const formatAndGetDate = (timestamp) => {
+    const millisecondsSinceUnixEpoch = (timestamp + 946684800) * 1000;
+    const dateObject = new Date(millisecondsSinceUnixEpoch);
     const formatAmountTooltip = async (amount) => {
         if(typeof amount === 'string') {
             return `${ await CoinRankingService.getXAH2USDT(amount/1000000)} LKR `
@@ -144,56 +173,75 @@ const  AccountTransactions = () => {
         const millisecondsSinceUnixEpoch = (timestamp + 946684800) * 1000;
         const dateObject = new Date(millisecondsSinceUnixEpoch);
 
-        const year = dateObject.getFullYear();
-        const month = dateObject.getMonth() + 1;
-        const day = dateObject.getDate();
+    const year = dateObject.getFullYear();
+    const month = dateObject.getMonth() + 1;
+    const day = dateObject.getDate();
 
-        return `${year}-${month}-${day}`;
-    }
+    return `${year}-${month}-${day}`;
+  };
 
-    const formatAndGetTime = (timestamp) => {
-        const millisecondsSinceUnixEpoch = (timestamp + 946684800) * 1000;
-        const dateObject = new Date(millisecondsSinceUnixEpoch);
+  const formatAndGetTime = (timestamp) => {
+    const millisecondsSinceUnixEpoch = (timestamp + 946684800) * 1000;
+    const dateObject = new Date(millisecondsSinceUnixEpoch);
 
-        const hours = dateObject.getHours();
-        const minutes = dateObject.getMinutes();
-        const seconds = dateObject.getSeconds();
+    const hours = dateObject.getHours();
+    const minutes = dateObject.getMinutes();
+    const seconds = dateObject.getSeconds();
 
-        const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
-        const time = dateObject.toLocaleTimeString('en-US', timeOptions);
+    const timeOptions = { hour: "numeric", minute: "2-digit", hour12: true };
+    const time = dateObject.toLocaleTimeString("en-US", timeOptions);
 
-        // return `${hours}:${minutes}:${seconds}`;
-        return time;
-    }
+    // return `${hours}:${minutes}:${seconds}`;
+    return time;
+  };
 
-    const pay = async () => {
-        const result = await showPayQRWindow(loginState.loggedInAddress, `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`, '6', DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
-        console.log(result)
-    }
+  const pay = async () => {
+    const result = await showPayQRWindow(
+      loginState.loggedInAddress,
+      `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
+      "6",
+      DestinationTags.RESERVATION_PAYMENT,
+      process.env.REACT_APP_CURRENCY,
+      process.env.REACT_APP_CURRENCY_ISSUER
+    );
+    console.log(result);
+  };
 
-    return (
-        <>
-            <Container style={{minHeight: '85vh'}}>
-                <Row>
-                    <Col lg={10}>
-                        <div className='page-header mt-4'   style={{color: 'rgb(44 44 118)', fontWeight: 700, fontSize: '50px'}}>
-                            MY ACCOUNT
-                        </div>
-                        <div  className='account-address'>{accountAddress}</div>
-                    </Col>
-                    <Col lg={2}>
-                        <div className='page-header mt-5'>
-                            <Button variant="warning" onClick={loadTransactions}
-                                    style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Refresh <FontAwesomeIcon icon={faArrowsRotate} /></Button>
-                        </div>
-                    </Col>
-                    {/*<Col lg={2}>*/}
-                    {/*    <div className='page-header mt-5'>*/}
-                    {/*        <Button variant="warning" onClick={pay}*/}
-                    {/*                style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Pay <FontAwesomeIcon icon={faArrowsRotate} /></Button>*/}
-                    {/*    </div>*/}
-                    {/*</Col>*/}
-                </Row>
+  return (
+    <>
+      <Container style={{ minHeight: "85vh" }}>
+        <Row>
+          <Col lg={10}>
+            <div
+              className="page-header mt-4"
+              style={{
+                color: "rgb(44 44 118)",
+                fontWeight: 700,
+                fontSize: "50px",
+              }}
+            >
+              My Account
+            </div>
+            <div className="account-address">{accountAddress}</div>
+          </Col>
+          <Col lg={2}>
+            <div className="page-header mt-5">
+              <Button
+                variant="warning"
+                onClick={loadTransactions}
+                style={{ color: "rgb(44 44 118)", fontWeight: 700 }}
+              >
+                Refresh <FontAwesomeIcon icon={faArrowsRotate} />
+              </Button>
+            </div>
+          </Col>
+          {/*<Col lg={2}>*/}
+          {/*    <div className='page-header mt-5'>*/}
+          {/*        <Button variant="warning" onClick={pay}*/}
+          {/*                style={{color: 'rgb(44 44 118)', fontWeight: 700}}>Pay <FontAwesomeIcon icon={faArrowsRotate} /></Button>*/}
+          {/*    </div>*/}
+          {/*</Col>*/}
+        </Row>
 
                 <Row className={`mt-5`}>
                     {/*<Col lg={1}></Col>*/}

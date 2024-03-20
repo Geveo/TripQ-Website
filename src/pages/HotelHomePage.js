@@ -356,37 +356,19 @@ function HotelHomePage() {
               className={"subtext"}
               style={{ lineHeight: "25px", textAlign: "justify" }}
             >
-              You are liable for any damage howsoever caused (whether by
-              deliberate, negligent, or reckless act) to the room(s), hotel's
-              premises or property caused by you or any person in your party,
-              whether or not staying at the hotel during your stay. Crest Wave
-              Boutique Hotel reserves the right to retain your credit card
-              and/or debit card details, or forfeit your security deposit of
-              MYR50.00 as presented at registration and charge or debit the
-              credit/debit card such amounts as it shall, at its sole
-              discretion, deem necessary to compensate or make good the cost or
-              expenses incurred or suffered by Crest Wave Boutique Hotel as a
-              result of the aforesaid. Should this damage come to light after
-              the guest has departed, we reserve the right, and you hereby
-              authorize us, to charge your credit or debit card for any damage
-              incurred to your room or the Hotel property during your stay,
-              including and without limitation for all property damage, missing
-              or damaged items, smoking fee, cleaning fee, guest compensation,
-              etc. We will make every effort to rectify any damage internally
-              prior to contracting specialist to make the repairs, and therefore
-              will make every effort to keep any costs that the guest would
-              incur to a minimum.
+              To ensure a pleasant and safe stay for all guests, please abide by
+              the following rules:
               <br />
               <br />
-              Damage to rooms, fixtures, furnishing and equipment including the
-              removal of electronic equipment, towels, artwork, etc. will be
-              charged at 150% of full and new replacement value plus any
-              shipping and handling charges. Any damage to hotel property,
-              whether accidental or wilful, is the responsibility of the
-              registered guest for each particular room. Any costs associated
-              with repairs and/or replacement will be charged to the credit card
-              of the registered guest. In extreme cases, criminal charges will
-              be pursued.
+              check-in and check-out times, presentation of valid
+              identification, prompt settlement of charges, adherence to our
+              smoke-free policy, respect for noise levels and privacy,
+              prohibition of pets (except service animals), accountability for
+              damages, vigilance in safety and security, personal responsibility
+              for lost items, and courteous conduct towards others. Any
+              disruptive behavior may result in immediate eviction without
+              refund. Thank you for choosing TripQ for your accommodation needs;
+              we're here to make your stay enjoyable and comfortable.
             </div>
           </section>
 
