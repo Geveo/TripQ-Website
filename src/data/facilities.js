@@ -57,6 +57,19 @@ const facilitiesData = [
         Name: "Parking",
         Description: "Description"
     }
+    ,
+    {
+        Id: 11,
+        Name: "Air Port Shuttle",
+        Description: "Description"
+    }
+    ,
+    {
+        Id: 12,
+        Name: "Bar",
+        Description: "Description"
+    }
+    
 ]
 
 export default facilitiesData;

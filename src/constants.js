@@ -18,6 +18,7 @@ const RequestSubTypes = {
     GET_HOTELS_BY_WALLET_ADDRESS: "GetHotelsListByWalletAddress",
     GET_HOTEL_IMAGES_BY_ID: "GetHotelImagesById",
     GET_AVAILABLE_ROOM_COUNT: "GetAvailableRoomCount",
+    GET_RECENT_HOTEL: "GetRecentHotels",
 
     GET_ROOMS: "GetRooms",
     GET_ROOMS_BY_HOTELID: "GetRoomTypes",

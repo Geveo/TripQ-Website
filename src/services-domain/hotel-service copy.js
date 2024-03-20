@@ -149,6 +149,28 @@ export default class HotelService {
     }
   }
 
+  async getRecentHotels() {
+    const submitObject = {
+      type: constants.RequestTypes.HOTEL,
+      subType: constants.RequestSubTypes.GET_RECENT_HOTEL,
+      filters: {},
+    };
+    try {
+      const res = await this.contractService?.submitReadRequest(submitObject);
+      console.log("res.",res );
+      if (res) {
+        return res;
+      } else {
+        console.log("No hotel found.");
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+
   /**
    *
    * @param {Object} filterObj
