@@ -171,7 +171,7 @@ function CustomerDashboard() {
         </div>
         <section>
           <div className="top_rated_hotels">
-            <h1 className="best_offers">Explore New Hotels!</h1>
+            <h2 className="best_offers">Explore New Hotels!</h2>
             <div className="hotel_items_flexbox">
               {recentHotels.slice(0, 8).map((recentHotel, index) => (
                 <div className="hotel_card" key={index}>
