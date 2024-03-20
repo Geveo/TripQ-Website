@@ -91,7 +91,6 @@ const CustomerRegistration = (props) => {
     }
 
     if (validation(body)) {
-      // await props.createReservation(body);
     } else {
       props.setConfirmLoading(false);
       props.setDisableConfirm(false);
@@ -99,8 +98,7 @@ const CustomerRegistration = (props) => {
     return;
   };
   const submitForm = async () => {
-   
-    let selectionData =
+      let selectionData =
       selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
     if (!selectionData) {
