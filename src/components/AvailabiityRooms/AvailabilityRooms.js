@@ -46,6 +46,13 @@ function AvailabilityRooms(props) {
                       ({room.RoomsCount} rooms available)
                     </span>
                   </div>
+                  <div>
+                    <div className={"sleeps"}>Total Sleeps - {room.TotalSleeps}
+                      <span className={"beds"}>(Single Beds - {room.SingleBedCount}  Double Beds - {room.DoubleBedCount}  Triple Beds - {room.TripleBedCount})
+                      </span>
+                    </div>
+                  </div>
+
                   <div className={"facilities"}>
                     {getFacilities(room.Facilities).map((facility) => {
                       return (

@@ -34,10 +34,10 @@ const ViewCustomerReservations = () => {
 
     return (
         <>
-            <Container style={{minHeight: '85vh'}}>
+            <Container style={{minHeight: '35vh'}}>
                 <Row>
                     <Col lg={10}>
-                        <div className='page-header mt-4' style={{color: 'rgb(44 44 118)', fontWeight: 600, fontSize: '40px'}}>
+                        <div className='page-header mt-4' style={{color: 'rgb(44 44 118)', fontWeight: 700, fontSize: '50px', marginBottom: '20px'}}>
                             My Reservations
                         </div>
                     </Col>
@@ -53,13 +53,13 @@ const ViewCustomerReservations = () => {
                                     <th>To</th>
                                     <th>No. of nights</th>
                                     <th>Room details</th>
-                                    <th>Price</th>
+                                    <th>Price ({process.env.REACT_APP_CURRENCY})</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {reservationList.map(rs => {
                                 return (
-                                    <tr key={rs.Id} style={{textAlign: 'center'}}>
+                                    <tr key={rs.Id} style={{textAlign: 'center', verticalAlign: 'middle'}}>
                                         <td style={{ width: '25%'}}>{rs.HotelName}</td>
                                         <td style={{ width: '12%'}}>{rs.FromDate}</td>
                                         <td style={{ width: '12%'}}>{rs.ToDate}</td>
@@ -74,7 +74,7 @@ const ViewCustomerReservations = () => {
                                                             </Row>
                                                         )
                                                     })}
-
+ 
                                                 </Card.Body>
                                             </Card>
                                         </td>
@@ -98,5 +98,5 @@ const ViewCustomerReservations = () => {
         </>
     );
 }
-
+ 
 export default ViewCustomerReservations;

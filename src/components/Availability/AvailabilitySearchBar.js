@@ -6,8 +6,6 @@ import DateFunctions from "../../helpers/DateFunctions";
 import {useLocation, useNavigate} from "react-router-dom";
 import "./styles.scss"
 
-
-// http://localhost:3000/availability?check-in-date=2023/03/23&check-out-date=2023/03/25&people=3&rooms=2
 function AvailabilitySearchBar(props) {
     const history = useNavigate();
     const location = useLocation();
