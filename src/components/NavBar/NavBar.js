@@ -138,10 +138,10 @@ function NavBar(props) {
                     </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem onClick={() => goToMyTransactionsPage()}>
-                      My account
+                      My Account
                     </DropdownItem>
                     <DropdownItem onClick={() => logout()}>
-                      Log out
+                      Logout
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

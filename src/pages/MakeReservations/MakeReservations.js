@@ -17,7 +17,7 @@ const ReservationForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [step, setStep] = useState(1);
-  const [reservationDetails, setReservationDetails] = useState({});
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState([]);
   const [searchDetails, setSearchDetails] = useState({
     Name: "",
     Address: "",
@@ -49,9 +49,10 @@ const ReservationForm = () => {
       selectedDetails.RoomTypes &&
       selectedDetails.RoomTypes.length > 0
     ) {
+      setSelectedRoomDetails(selectedDetails.RoomTypes);
       let totalPrice = 0;
       selectedDetails.RoomTypes.forEach((element) => {
-        totalPrice += (parseFloat(element.roomData.Price)*(element.count));
+        totalPrice += parseFloat(element.roomData.Price) * element.count * parseInt(selectedDetails.Nights);
       });
 
       setTotalPrice(totalPrice);
@@ -59,11 +60,6 @@ const ReservationForm = () => {
 
     setSearchDetails(selectedDetails);
   }, []);
-
-  const handleNext = (data) => {
-    setReservationDetails((prevDetails) => ({ ...prevDetails, ...data }));
-    setStep((prevStep) => prevStep + 1);
-  };
 
   const handleConfirm = (finalDetails) => {
     console.log("Reservation confirmed:", finalDetails);
@@ -75,6 +71,7 @@ const ReservationForm = () => {
         <Row>
           <Col md={4}>
             <BookingDetails
+              selectedRoomDetails={selectedRoomDetails}
               checkindate={searchDetails.CheckIn}
               checkoutdate={searchDetails.CheckOut}
               noOfDays={searchDetails.Nights}
