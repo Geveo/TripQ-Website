@@ -24,6 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faArrowsRotate } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import {setShowScreenLoader} from '../../features/screenLoader/ScreenLoaderSlice'
+import CoinRankingService from "../../services-common/coinranking-service";
 
 
 const  AccountTransactions = () => {
@@ -33,6 +34,8 @@ const  AccountTransactions = () => {
     const [transactionForTable, setTransactionsForTable] = useState([]);
     const [totalEVR, setTotalEVR] = useState('0.00');
     const [totalXAHDrops, setTotalXAHDrops] = useState('0')
+    const [totalEVRinUSD, setTotalEVRinUSD] = useState(0);
+    const [totalXAHinUSD, setTotalXAHinUSD] = useState(0);
 
     const [issuer, setIssuer ] = useState(process.env.REACT_APP_CURRENCY_ISSUER);
     const currency = process.env.REACT_APP_CURRENCY;
@@ -70,15 +73,24 @@ const  AccountTransactions = () => {
                 getTrustlines(accountAddress, process.env.REACT_APP_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER).then(res => {
                     if(res && res.length > 0) {
                         const balanceValue = res.find(ob => ob.account === process.env.REACT_APP_CURRENCY_ISSUER)?.balance;
-                        const evrBalance = balanceValue ? parseFloat(balanceValue).toFixed(2) : 0.00;                        
-                       
+                        const evrBalance = balanceValue ? parseFloat(balanceValue).toFixed(6) : 0.00;
                         setTotalEVR(evrBalance);
+                        // CoinRankingService.getEVR2USDT(evrBalance).then(val => {
+                        //     setTotalEVRinUSD(val);
+                        // })
+                        setTotalEVRinUSD(evrBalance * 115000);
                     }
                 } ).catch(e => {throw e});
 
                 getAccountInfo(accountAddress).then(res => {
-                    if(res && res.Balance && res.Balance.length > 0)
+                    if(res && res.Balance && res.Balance.length > 0){
                         setTotalXAHDrops(res.Balance);
+                        // CoinRankingService.getXAH2USDT(Number(res.Balance)/1000000).then(val => {
+                        //     setTotalXAHinUSD(val);
+                        // })
+                        setTotalXAHinUSD(res.Balance/1000000 * 23000);
+                    }
+
                 }).catch(e => {throw e});
 
                 getTransactions(accountAddress).then(res => {
@@ -117,6 +129,14 @@ const  AccountTransactions = () => {
             return `${amount/1000000} XAH`
         } else {
             return `${amount.value} ${amount.currency}`
+        }
+    }
+
+    const formatAmountTooltip = async (amount) => {
+        if(typeof amount === 'string') {
+            return `${ await CoinRankingService.getXAH2USDT(amount/1000000)} LKR `
+        } else {
+            return `${await CoinRankingService.getXAH2USDT(amount)} LKR`
         }
     }
 
@@ -176,31 +196,31 @@ const  AccountTransactions = () => {
                 </Row>
 
                 <Row className={`mt-5`}>
-                    <Col lg={1}></Col>
-                    <Col lg={4}>
+                    {/*<Col lg={1}></Col>*/}
+                    <Col lg={5}>
                         <Card className={`text-center p-5 balance-card`} style={{position: 'relative'}}>
                             <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> EVR balance</div>
-                            <Card.Body>
-                                <div className={`ever-balance-value`}>
-                                    {totalEVR}
+                            <Card.Body style={{ marginTop: '33px'}}>
+                                <div className={`ever-balance-value`} title={`LKR ${totalEVRinUSD}`}>
+                                    {totalEVR} <br /> <span style={{ fontSize: '30px', lineHeight: '12px'}}>({totalEVRinUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} LKR)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
                             </Card.Body>
                         </Card>
                     </Col>
                     <Col lg={2}></Col>
-                    <Col lg={4}>
+                    <Col lg={5}>
                         <Card className={`text-center p-5 balance-card`} style={{position: 'relative'}}>
                             <div style={{ position: 'absolute', left: 10, top: 5}} className={`card-label`}> XAH balance</div>
-                            <Card.Body>
-                                <div className={`ever-balance-value`}>
-                                    {(parseFloat(totalXAHDrops)/1000000).toFixed(2)}
+                            <Card.Body style={{marginTop: '33px'}}>
+                                <div className={`ever-balance-value`} title={`LKR ${totalXAHinUSD}`}>
+                                    {(parseFloat(totalXAHDrops) / 1000000).toFixed(6)} <br/> <span style={{fontSize: '30px', lineHeight: '12px'}}>({totalXAHinUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} LKR)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col lg={1}></Col>
+                    {/*<Col lg={1}></Col>*/}
                 </Row>
 
                 <Row className='mt-5 mb-2'>
@@ -244,7 +264,7 @@ const  AccountTransactions = () => {
                                                 <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{formatAndGetDate(tx.date)}</div></td>
                                                 <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{formatAndGetTime(tx.date)}</div></td>
                                                 <td><div className='cell-texts' style={{ color: 'rgb(44 44 118)'}}>{ tx.Account === accountAddress ? tx.Destination : tx.Account  }</div></td>
-                                                <td><div className={`cell-texts ${tx.Account === accountAddress ? 'text-red' : 'text-green'} `}>{formatAmount(tx.Amount)}</div></td>
+                                                <td><div className={`cell-texts ${tx.Account === accountAddress ? 'text-red' : 'text-green'} `} >{formatAmount(tx.Amount)}</div></td>
                                             </tr>
                                         )
                                     }
