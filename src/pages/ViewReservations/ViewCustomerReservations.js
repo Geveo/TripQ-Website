@@ -42,7 +42,8 @@ const ViewCustomerReservations = () => {
                         </div>
                     </Col>
                 </Row>
-                <Row className='mt-3'>
+                {reservationList.length > 0 ? (
+                    <Row className='mt-3'>
                     <Col>
                         <Table striped bordered>
                             <thead>
@@ -85,6 +86,14 @@ const ViewCustomerReservations = () => {
                         </Table>
                     </Col>
                 </Row>
+                ):(<Row>
+                    <Col lg={10}>
+                        <div className=' mt-4' style={{color: 'rgb(44 44 118)', fontWeight: 500, fontSize: '15px'}}>
+                            No reservations currently.
+                        </div>
+                    </Col>
+                </Row>) }
+                
             </Container>
         </>
     );

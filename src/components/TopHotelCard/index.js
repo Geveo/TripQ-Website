@@ -27,10 +27,7 @@ function TopHotelCard(props) {
           <CardSubtitle className="mb-2 text-muted" tag="h6">
             {props.hotel.location}
           </CardSubtitle>
-          <p className={`m-0 ${style.price}`}>
-            {" "}
-            from ${props.hotel.price} per night{" "}
-          </p>
+          
           <div className={` ${style.stars}`}>
             <StarRatings
               rating={props.hotel.rating}

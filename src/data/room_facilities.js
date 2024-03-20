@@ -16,7 +16,7 @@ const roomFacilitiesData = [
     },
     {
         Id: 4,
-        Name: "TV",
+        Name: "Flat screen TV",
         Description: "These rooms have this facility."
     },
     {
@@ -56,7 +56,7 @@ const roomFacilitiesData = [
     },
     {
         Id: 12,
-        Name: "Entire unit located on ground floor",
+        Name: "Free toiletries",
         Description: "These rooms have this facility."
     },
     {
@@ -66,32 +66,37 @@ const roomFacilitiesData = [
     },
     {
         Id: 14,
-        Name: "Toilet with grab rails",
+        Name: "Safety deposit box",
         Description: "These rooms have this facility."
     },
     {
         Id: 15,
-        Name: "Adapted Bath",
+        Name: "Bath or shower",
         Description: "These rooms have this facility."
     },
     {
         Id: 16,
-        Name: "Walk-in Shower",
+        Name: "Hairdryer",
         Description: "These rooms have this facility."
     },
     {
         Id: 17,
-        Name: "Raised toilet",
+        Name: "Ironing facility",
         Description: "These rooms have this facility."
     },
     {
         Id: 18,
-        Name: "Lowered sink",
+        Name: "Bidet",
         Description: "These rooms have this facility."
     },
     {
         Id: 19,
-        Name: "Shower Chair",
+        Name: "Wake-up service",
+        Description: "These rooms have this facility."
+    },
+    {
+        Id: 20,
+        Name: "Wardrobe/Closet",
         Description: "These rooms have this facility."
     }
 ]
