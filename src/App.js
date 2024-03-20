@@ -76,13 +76,13 @@ function App() {
                     <Route path="/roomType/:id" element={<RoomTypeDetails/>} exact />
                     <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
+                    <Route path="/availability/:id/:checkInDate/:checkOutDate" element={<AvailabilityPage/>} exact />
                     {loginState.isLoggedIn && (
                         <>
                             <Route path="/my-transactions" element={<AccountTransactions />} exact />
                             <Route path="/hotel-list" element={<HotelsList />} exact />
                             <Route path="/register-hotel" element={<RegisterHotel />} exact />
                             <Route path="/my-reservations" element={<ViewCustomerReservations />} exact />
-                            <Route path="/availability/:id/:checkInDate/:checkOutDate" element={<AvailabilityPage/>} exact />
                             <Route path="/make-reservations" element={<MakeReservations />} exact />
                         </>
                     )}

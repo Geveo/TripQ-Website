@@ -65,8 +65,6 @@ export default class HotelService {
       result = await this.contractService.submitInputToContract(submitObject);
 
       SharedStateService.instance.currentHotelId = result.rowId.lastId;
-      //accepting the NFT offer...
-      // result = await this.#acceptHotelRegistrationOffer(result);
     } catch (error) {
       console.log(error);
       throw error;

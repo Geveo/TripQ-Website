@@ -11,10 +11,13 @@ import { add as selectionDetailsAdd } from "../features/SelectionDetails/Selecti
 import { LocalStorageKeys } from "../constants/constants";
 import { useDispatch } from "react-redux";
 import { format } from 'date-fns';
-
+import {xummAuthorize} from "../services-common/xumm-api-service";
+import { useSelector } from "react-redux";
 
 function AvailabilityPage() {
   const hotelService = HotelService.instance;
+  const loginState = useSelector((state) => state.loginState);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -55,6 +58,7 @@ const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
             StarRating: data.hotelDetails[0].StarRatings,
             Location: data.hotelDetails[0].Location,
             ImageURLs: data.hotelImages,
+            HotelOwnerWalletAddress: data.hotelDetails[0].WalletAddress,
           };
 
           setHotelData(hotelData);
@@ -202,7 +206,11 @@ const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
 
 
 
-  const onReserve = () => {
+  const onReserve = async () => {
+    console.log("llllllllllllllllllllllllllll")
+    if(!loginState.isLoggedIn) {
+      await xummAuthorize()
+    }
     let roomsCount = 0;
     const selectedRoomsArray = Object.values(selectedRooms);
     const checkIn = new Date(checkInFormatted);
@@ -224,6 +232,7 @@ const checkOutFormatted = format(checkOut, 'yyyy-MM-dd');
       CheckOut: checkOutFormatted,
       Nights: differenceInDays,
       RoomTypes: selectedRoomsArray,
+      HotelOwnerWalletAddress: hotelData.HotelOwnerWalletAddress,
     };
 
     dispatch(
