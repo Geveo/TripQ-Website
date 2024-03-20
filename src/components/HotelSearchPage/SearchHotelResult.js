@@ -13,7 +13,7 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
     };
     console.log("hotel", hotel)
     const location = JSON.parse(hotel.City)
-    const contact = hotel.ContactDetails
+    const contact = JSON.parse(hotel.ContactDetails)
 
     return (
         <div className={"hotel_card mb-5"} style={{width: "1000px"}}>

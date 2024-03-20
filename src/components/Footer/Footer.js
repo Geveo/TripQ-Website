@@ -56,9 +56,8 @@ function Footer(props) {
                         <p>+94 11 4443 333</p>
 
                         <div style={{ marginTop: 'auto' }}>
-                        <h8 > Powered by EVERNODE</h8>
-                        <br/>
-                        <h8 > Made with ❤ by GEVEO</h8>
+                        <h6> Powered by EVERNODE</h6>
+                        <h6 style={{ marginTop: '0px', marginBottom: '20px' }} > Made with ❤ by GEVEO</h6>
                         </div>
                     </div>
                     </Col>

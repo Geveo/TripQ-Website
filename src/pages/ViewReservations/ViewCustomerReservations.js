@@ -93,7 +93,7 @@ const ViewCustomerReservations = () => {
                         </div>
                     </Col>
                 </Row>) }
-               
+                
             </Container>
         </>
     );
