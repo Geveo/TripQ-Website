@@ -39,7 +39,6 @@ function CustomerDashboard() {
     hotelService.getRecentHotels()
     .then((data) => {
       data.forEach((element) => {
-        console.log(element)
         let hotel = 
         {
           name: element.Name,
@@ -51,7 +50,6 @@ function CustomerDashboard() {
         }
         hotelList.push(hotel);
       });
-      console.log(hotelList)
       setRecentHotel(hotelList)
     });
 }, []); 
