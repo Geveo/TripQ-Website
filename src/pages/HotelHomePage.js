@@ -8,22 +8,16 @@ import FacilitiesReadOnly from "../components/HotelHomePage/FacilitiesReadOnly";
 import React, { useRef, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import CreateRoomModal from "../components/HotelHomePage/CreateRoomModal";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from "reactstrap";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import RoomTypesGrid from "../components/HotelHomePage/RoomTypesGrid";
 import HotelService from "../services-domain/hotel-service copy";
 import SharedStateService from "../services-domain/sharedState-service";
 import { toast } from "react-hot-toast";
 import ContractService from "../services-common/contract-service";
 import { HotelDto } from "../dto/HotelDto";
-import {LocalStorageKeys} from "../constants/constants";
-import{store} from "./../app/store";
-import { setShowScreenLoader} from "../features/screenLoader/ScreenLoaderSlice";
+import { LocalStorageKeys } from "../constants/constants";
+import { store } from "./../app/store";
+import { setShowScreenLoader } from "../features/screenLoader/ScreenLoaderSlice";
 const { useDispatch } = require("react-redux");
 
 function HotelHomePage() {
@@ -48,11 +42,14 @@ function HotelHomePage() {
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
-    getRoomTypes();
+    //getRoomTypes();
     const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
-    hotelService.getHotelsList(walletAddress).then((data) => {
+
+    hotelService
+      .getHotelsList(walletAddress)
+      .then((data) => {
         if (data && data.length > 0) {
-          const matchingHotel = data.filter(element => element.id === id);
+          const matchingHotel = data.filter((element) => element.id === id);
           if (matchingHotel.length > 0) {
             let selectedHotel = new HotelDto({
               Id: matchingHotel[0].id,
@@ -63,7 +60,9 @@ function HotelHomePage() {
               Location: matchingHotel[0].location,
               Facilities: matchingHotel[0].facilities,
               ImageURLs: matchingHotel[0].imageUrls,
-              WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
+              WalletAddress: localStorage.getItem(
+                LocalStorageKeys.AccountAddress
+              ),
             });
             store.dispatch(setShowScreenLoader(false));
             setIsDataLoading(false);
@@ -84,34 +83,33 @@ function HotelHomePage() {
             });
             setSelectedFacilityIds(selectedFacilitiesIDs);
 
-            getRoomTypes(id).then(rms => {
-              setRooms(rms);
-            }).catch(e => {
-              console.log(e)
-            }).finally(() =>  {
-              store.dispatch(setShowScreenLoader(false));
-            });
+            getRoomTypes(id)
+              .then((rms) => {
+                setRooms(rms);
 
-          } else {
-            store.dispatch(setShowScreenLoader(false));
+                // Get hotel images
+                hotelService
+                  .getHotelImagesById(id)
+                  .then((data) => {
+                    if (data && data.length > 0) setImages(data);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    toast.error("Error in fetching hotel images.");
+                  });
+              })
+              .catch((e) => {
+                console.log(e);
+              });
           }
         }
+        store.dispatch(setShowScreenLoader(false));
       })
       .catch((err) => {
         store.dispatch(setShowScreenLoader(false));
         console.log(err.thrownError);
         toast.error("Error in fetching hotels list.");
       });
-
-    // Get hotel images
-    hotelService.getHotelImagesById(id).then((data) => {
-      if(data && data.length > 0)
-        setImages(data);
-    }).catch((err) => {
-      console.log(err);
-      toast.error("Error in fetching hotel images.");
-    });
-
   }, [id]);
 
   async function innnit() {
@@ -187,19 +185,17 @@ function HotelHomePage() {
   // Load RoomType details
   async function getRoomTypes(hotelId) {
     const res = await hotelService.getHotelRoomTypes(hotelId);
-    if(res && res.length > 0) {
+    if (res && res.length > 0) {
       return res;
     } else {
-      return []
+      return [];
     }
-
   }
 
   const onDeleteRoom = async () => {
     // delete the room and call to get rooms again
     const res = await HotelService.instance.deleteMyRoom(deleteRoomDetails.Id);
     console.log(res);
-
 
     setDeleteRoomDetails(null);
     setDeletingRoom(false);
@@ -225,17 +221,21 @@ function HotelHomePage() {
 
   return (
     <>
-    <div className=" z-index: 1;" ><Modal
-        isOpen={creatingRoom}
-        toggle={onCloseCreateRoomModal}
-        size="lg"
-        centered
-        className={""}
-        style={{ maxWidth: "850px", width: "100%" }}
-      >
-        <CreateRoomModal onSubmitRoom={onSubmitRoom} onClose={onCloseCreateRoomModal} />
-      </Modal></div>
-      
+      <div className=" z-index: 1;">
+        <Modal
+          isOpen={creatingRoom}
+          toggle={onCloseCreateRoomModal}
+          size="lg"
+          centered
+          className={""}
+          style={{ maxWidth: "850px", width: "100%" }}
+        >
+          <CreateRoomModal
+            onSubmitRoom={onSubmitRoom}
+            onClose={onCloseCreateRoomModal}
+          />
+        </Modal>
+      </div>
 
       {deletingRoom && (
         <Modal isOpen={deletingRoom} toggle={onCloseDeleteRoomModal}>
@@ -258,70 +258,69 @@ function HotelHomePage() {
       )}
 
       <MainContainer>
-          <>
-            <section>
-              <div className={"row"}>
-                <div className={"title_1"} style={{ width: "80%" }}>
-                  {hotelName}
-                  <StarRating ratings={selectedHotel.StarRate} />
-                </div>
+        <>
+          <section>
+            <div className={"row"}>
+              <div className={"title_1"} style={{ width: "80%" }}>
+                {hotelName}
+                <StarRating ratings={selectedHotel.StarRate} />
               </div>
+            </div>
 
-              <div className={"row left_div"} style={{ marginTop: "-0.7rem" }}>
-                <div style={{ width: "20px" }}>
-                  <FaMapMarkerAlt />
-                </div>
-                <div className={"subtext pt-2 col"}>{getFullAddress()}</div>
+            <div className={"row left_div"} style={{ marginTop: "-0.7rem" }}>
+              <div style={{ width: "20px" }}>
+                <FaMapMarkerAlt />
               </div>
+              <div className={"subtext pt-2 col"}>{getFullAddress()}</div>
+            </div>
 
-              <div className={"pt-4 pb-4 center_div"}>
-                <button
-                  className={
-                    "navigation_button " +
-                    (activeTab === "info" ? "navigation_button_active" : "")
-                  }
-                  onClick={onClickInfoSectionButton}
-                >
-                  Images
-                </button>
-                <button
-                  className={
-                    "navigation_button " +
-                    (activeTab === "facilities"
-                      ? "navigation_button_active"
-                      : "")
-                  }
-                  onClick={onClickFacilitiesSectionButton}
-                >
-                  Facilities
-                </button>
-                <button
-                  className={
-                    "navigation_button " +
-                    (activeTab === "house_rules"
-                      ? "navigation_button_active"
-                      : "")
-                  }
-                  onClick={onClickHouseRulesSectionButton}
-                >
-                  House rules
-                </button>
-                <button
-                  className={
-                    "navigation_button " +
-                    (activeTab === "room_layout"
-                      ? "navigation_button_active"
-                      : "")
-                  }
-                  onClick={onClickRoomLayoutSectionButton}
-                >
-                  Room Types
-                </button>
-              </div>
-            </section>
-            <section ref={infoSection} id="info_section" className={"pt-2"}>
-             <div>
-                {images && images.map((image, index) => (
+            <div className={"pt-4 pb-4 center_div"}>
+              <button
+                className={
+                  "navigation_button " +
+                  (activeTab === "info" ? "navigation_button_active" : "")
+                }
+                onClick={onClickInfoSectionButton}
+              >
+                Images
+              </button>
+              <button
+                className={
+                  "navigation_button " +
+                  (activeTab === "facilities" ? "navigation_button_active" : "")
+                }
+                onClick={onClickFacilitiesSectionButton}
+              >
+                Facilities
+              </button>
+              <button
+                className={
+                  "navigation_button " +
+                  (activeTab === "house_rules"
+                    ? "navigation_button_active"
+                    : "")
+                }
+                onClick={onClickHouseRulesSectionButton}
+              >
+                House rules
+              </button>
+              <button
+                className={
+                  "navigation_button " +
+                  (activeTab === "room_layout"
+                    ? "navigation_button_active"
+                    : "")
+                }
+                onClick={onClickRoomLayoutSectionButton}
+              >
+                Room Types
+              </button>
+            </div>
+          </section>
+          <section ref={infoSection} id="info_section" className={""}>
+            <div>
+              {images &&
+                images.map((image, index) => (
                   <img
                     key={index}
                     style={{ margin: 10, width: 350, height: 250 }}
@@ -329,9 +328,9 @@ function HotelHomePage() {
                     alt={`Displayed Image ${index}`}
                   />
                 ))}
-              </div>
-            </section>
-            {/* <section ref={infoSection} id="info_section" className={"pt-2"}>
+            </div>
+          </section>
+          {/* <section ref={infoSection} id="info_section" className={"pt-2"}>
               <div
                 className={"subtext"}
                 style={{
@@ -344,72 +343,54 @@ function HotelHomePage() {
               </div>
             </section> */}
 
-            <section ref={facilitiesSection} id="facilities" className={"pt-2"}>
-              <FacilitiesReadOnly
-                facilitiesSection={facilitiesSection}
-                selectedFacilityIds={selectedFacilityIds}
+          <section ref={facilitiesSection} id="facilities" className={""}>
+            <FacilitiesReadOnly
+              facilitiesSection={facilitiesSection}
+              selectedFacilityIds={selectedFacilityIds}
+            />
+          </section>
+          <section id={"house_rules_section"} ref={houseRulesSection}>
+            <div className="title_2 pt-2 pb-2">House Rules</div>
+
+            <div
+              className={"subtext"}
+              style={{ lineHeight: "25px", textAlign: "justify" }}
+            >
+              To ensure a pleasant and safe stay for all guests, please abide by
+              the following rules:
+              <br />
+              <br />
+              check-in and check-out times, presentation of valid
+              identification, prompt settlement of charges, adherence to our
+              smoke-free policy, respect for noise levels and privacy,
+              prohibition of pets (except service animals), accountability for
+              damages, vigilance in safety and security, personal responsibility
+              for lost items, and courteous conduct towards others. Any
+              disruptive behavior may result in immediate eviction without
+              refund. Thank you for choosing TripQ for your accommodation needs;
+              we're here to make your stay enjoyable and comfortable.
+            </div>
+          </section>
+
+          <section id={"room_layout_section"} ref={roomLayoutSection}>
+            <div className="title_2 pt-2 pb-2">Room Types</div>
+            <div className={"subtext"}>Details about your rooms.</div>
+            {rooms.length > 0 && (
+              <RoomTypesGrid
+                rooms={rooms}
+                onOpenDeleteRoomModal={onOpenDeleteRoomModal}
               />
-            </section>
-            <section id={"house_rules_section"} ref={houseRulesSection}>
-              <div className="title_2 pt-2 pb-2">House Rules</div>
+            )}
 
-              <div
-                className={"subtext"}
-                style={{ lineHeight: "25px", textAlign: "justify" }}
-              >
-                You are liable for any damage howsoever caused (whether by
-                deliberate, negligent, or reckless act) to the room(s), hotel's
-                premises or property caused by you or any person in your party,
-                whether or not staying at the hotel during your stay. Crest Wave
-                Boutique Hotel reserves the right to retain your credit card
-                and/or debit card details, or forfeit your security deposit of
-                MYR50.00 as presented at registration and charge or debit the
-                credit/debit card such amounts as it shall, at its sole
-                discretion, deem necessary to compensate or make good the cost
-                or expenses incurred or suffered by Crest Wave Boutique Hotel as
-                a result of the aforesaid. Should this damage come to light
-                after the guest has departed, we reserve the right, and you
-                hereby authorize us, to charge your credit or debit card for any
-                damage incurred to your room or the Hotel property during your
-                stay, including and without limitation for all property damage,
-                missing or damaged items, smoking fee, cleaning fee, guest
-                compensation, etc. We will make every effort to rectify any
-                damage internally prior to contracting specialist to make the
-                repairs, and therefore will make every effort to keep any costs
-                that the guest would incur to a minimum.
-                <br />
-                <br />
-                Damage to rooms, fixtures, furnishing and equipment including
-                the removal of electronic equipment, towels, artwork, etc. will
-                be charged at 150% of full and new replacement value plus any
-                shipping and handling charges. Any damage to hotel property,
-                whether accidental or wilful, is the responsibility of the
-                registered guest for each particular room. Any costs associated
-                with repairs and/or replacement will be charged to the credit
-                card of the registered guest. In extreme cases, criminal charges
-                will be pursued.
-              </div>
-            </section>
-
-            <section id={"room_layout_section"} ref={roomLayoutSection}>
-              <div className="title_2 pt-2 pb-2">Room Types</div>
-              <div className={"subtext"}>Details about your rooms.</div>
-              {rooms.length > 0 && (
-                <RoomTypesGrid
-                  rooms={rooms}
-                  onOpenDeleteRoomModal={onOpenDeleteRoomModal}
-                />
-              )}
-
-              <button
-                className={"create_room_button mt-5"}
-                style={{ width: "200px" }}
-                onClick={onOpenCreateRoomModal}
-              >
-                <FaPlusCircle size={26} /> <span>&nbsp;Add Room Type</span>
-              </button>
-            </section>
-          </>
+            <button
+              className={"create_room_button mt-5"}
+              style={{ width: "200px" }}
+              onClick={onOpenCreateRoomModal}
+            >
+              <FaPlusCircle size={26} /> <span>&nbsp;Add Room Type</span>
+            </button>
+          </section>
+        </>
       </MainContainer>
     </>
   );

@@ -65,8 +65,6 @@ export default class HotelService {
       result = await this.contractService.submitInputToContract(submitObject);
 
       SharedStateService.instance.currentHotelId = result.rowId.lastId;
-      //accepting the NFT offer...
-      // result = await this.#acceptHotelRegistrationOffer(result);
     } catch (error) {
       console.log(error);
       throw error;
@@ -151,50 +149,69 @@ export default class HotelService {
     }
   }
 
+  async getRecentHotels() {
+    const submitObject = {
+      type: constants.RequestTypes.HOTEL,
+      subType: constants.RequestSubTypes.GET_RECENT_HOTEL,
+      filters: {},
+    };
+    try {
+      const res = await this.contractService?.submitReadRequest(submitObject);
+      if (res) {
+        return res;
+      } else {
+        console.log("No hotel found.");
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
-    /**
-     *
-     * @param {Object} filterObj
-     * @returns An array of objects || []
-     */
-    async SearchHotelsWithRooms(filterObj) {
-        const submitObject = {
-            type: constants.RequestTypes.HOTEL,
-            subType: constants.RequestSubTypes.SEARCH_HOTELS_WITH_ROOM,
-            filters: filterObj
-        }
-        let result;
-        try {
-            console.log(submitObject)
-            result = await this.contractService.submitReadRequest(submitObject);
+
+  /**
+   *
+   * @param {Object} filterObj
+   * @returns An array of objects || []
+   */
+  async SearchHotelsWithRooms(filterObj) {
+    const submitObject = {
+      type: constants.RequestTypes.HOTEL,
+      subType: constants.RequestSubTypes.SEARCH_HOTELS_WITH_ROOM,
+      filters: filterObj,
+    };
+    let result;
+    try {
+      result = await this.contractService.submitReadRequest(submitObject);
         } catch (error) {
             console.log(error);
             throw (error);
         }
         return result;
-    }
+  }
 
-    /**
-     *
-     * @param {number} hotelId | Hotel Id
-     * @returns | An array of rooms || []
-     */
-    async getHotelRoomTypes(hotelId) {
-        const submitObject = {
-            type: constants.RequestTypes.ROOM,
-            subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
-            data: { HotelId: hotelId }
-        };
+  /**
+   *
+   * @param {number} hotelId | Hotel Id
+   * @returns | An array of rooms || []
+   */
+  async getHotelRoomTypes(hotelId) {
+    const submitObject = {
+      type: constants.RequestTypes.ROOM,
+      subType: constants.RequestSubTypes.GET_ROOMS_BY_HOTELID,
+      data: { HotelId: hotelId },
+    };
 
-        let result;
-        try {
-            result = await this.contractService.submitReadRequest(submitObject);
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
-        return result;
+    let result;
+    try {
+      result = await this.contractService.submitReadRequest(submitObject);
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
+    return result;
+  }
 
   async getRoomTypeById(RTypeId) {
     const submitObject = {
@@ -292,7 +309,6 @@ export default class HotelService {
     let result;
     try {
       result = await this.contractService.submitInputToContract(submitObj);
-      console.log(result)
     } catch (e) {
       console.log(e);
       throw e;
@@ -345,7 +361,7 @@ export default class HotelService {
     };
     try {
       const res = await this.contractService?.submitReadRequest(submitObject);
-      if (res && res.length > 0) {
+      if (res) {
         return res;
       } else {
         console.log("No hotel found.");
@@ -357,29 +373,56 @@ export default class HotelService {
     }
   }
 
-    /**
-    *
-    * @returns hotel images || null
-    */
-    async getHotelImagesById(id) {
-        const submitObject = {
-            type: constants.RequestTypes.HOTEL,
-            subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,
-            filters: {
-                Id: id
-            }
-        }
-        try {
-            const res = await this.contractService?.submitReadRequest(submitObject);
-            if (res && res.length > 0) {
-                return res;
-            } else {
-                return [];
-            }
-        } catch (error) {
-            console.log(error);
-            throw (error);
-        }
+  /**
+   *
+   * @returns hotel images || null
+   */
+  async getHotelImagesById(id) {
+    const submitObject = {
+      type: constants.RequestTypes.HOTEL,
+      subType: constants.RequestSubTypes.GET_HOTEL_IMAGES_BY_ID,
+      filters: {
+        Id: id,
+      },
+    };
+    try {
+      const res = await this.contractService?.submitReadRequest(submitObject);
+      if (res && res.length > 0) {
+        return res;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
-}
+  }
 
+  /**
+   *
+   * @param {Object} filterObj
+   * @returns An array of objects || []
+   */
+  async getAvailableRoomCount(hotelId, fromDate, toDate) {
+    const submitObject = {
+      type: constants.RequestTypes.ROOM,
+      subType: constants.RequestSubTypes.GET_AVAILABLE_ROOM_COUNT,
+      filter: {
+        hotelId: hotelId,
+        fromDate: new Date(fromDate).toISOString().split('T')[0],
+        toDate: new Date(toDate).toISOString().split('T')[0],
+      },
+    };
+    try {
+      const res = await this.contractService?.submitReadRequest(submitObject);
+      if (res) {
+        return res;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+}

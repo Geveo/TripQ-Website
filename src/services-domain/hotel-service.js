@@ -32,39 +32,6 @@ export default class HotelService {
   }
 
   /**
-   * Fund  thje seed wallet
-   * @param {secret} accounts
-   */
-  // async fundSeedWallet(accounts = []) {
-  //   console.log("Start funding");
-  //   try {
-  //     await this.#xrplClient.connect();
-
-  //     for (const sc of accounts) {
-  //       const _wallet = xrpl.Wallet.fromSeed(sc);
-  //       console.log(_wallet);
-  //       const prepared = await this.#xrplClient.autofill({
-  //         TransactionType: "Payment",
-  //         Account: _wallet.address,
-  //         Amount: xrpl.xrpToDrops("9750"),
-  //         Destination: fundWalletAddress,
-  //       });
-
-  //       const signed = _wallet.sign(prepared);
-  //       const tx = await this.#xrplClient.submitAndWait(signed.tx_blob);
-  //       console.log("Transaction result:", tx.result.meta.TransactionResult);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     throw error;
-  //   } finally {
-  //     await this.#xrplClient.disconnect();
-  //   }
-
-  //   console.log("Funding finished.");
-  // }
-
-  /**
    * Return {walletAddress, walletSecret}
    */
   async createNewUserWallet() {
@@ -94,20 +61,6 @@ export default class HotelService {
       walletSecret: this.userWallet.secret,
     };
   }
-
-  // async #getFunded(toAccountAddress, xrpAmount, fromAccountSecret = fundWalletSecret) {
-  //   const _wallet = xrpl.Wallet.fromSeed(fromAccountSecret);
-  //   const prepared = await this.#xrplClient.autofill({
-  //     TransactionType: "Payment",
-  //     Account: fundWalletAddress,
-  //     Amount: xrpl.xrpToDrops(xrpAmount.toString()),
-  //     Destination: toAccountAddress,
-  //   });
-
-  //   const signed = _wallet.sign(prepared);
-  //   const tx = await this.#xrplClient.submitAndWait(signed.tx_blob);
-  //   console.log("Transaction result:", tx.result.meta.TransactionResult);
-  // }
 
   /**
    * Set Account from the seed entered when logging

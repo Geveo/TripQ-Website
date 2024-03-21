@@ -46,6 +46,13 @@ function AvailabilityRooms(props) {
                       ({room.RoomsCount} rooms available)
                     </span>
                   </div>
+                  <div>
+                    <div className={"sleeps"}>Total Sleeps - {room.TotalSleeps}
+                      <span className={"beds"}>(Single Beds - {room.SingleBedCount}  Double Beds - {room.DoubleBedCount}  Triple Beds - {room.TripleBedCount})
+                      </span>
+                    </div>
+                  </div>
+
                   <div className={"facilities"}>
                     {getFacilities(room.Facilities).map((facility) => {
                       return (
@@ -61,11 +68,13 @@ function AvailabilityRooms(props) {
                 </td>
                 <td className={"td-price"}>
                   <div className={"price-text"}>
-                    {" "}
-                    {parseFloat(room.Price).toFixed(2)} EVR
+                  {" "}
+                    {parseFloat(room.Price *115000).toFixed(2)} LKR - <span className={"price-subtext"}>
+                  ( {parseFloat(room.Price).toFixed(6)} EVR )
+                  </span>
+                    
                   </div>
-                  <div className={"price-subtext"}>
-                    Includes taxes and charges
+                  <div className={"price-subtext"}> Includes taxes and charges
                   </div>
                 </td>
                 <td className={"td-room-count"}>

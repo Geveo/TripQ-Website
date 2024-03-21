@@ -9,7 +9,7 @@ function Footer(props) {
             <Container>
                 <Row>
                     <Col>
-                        <h4>About Us</h4>
+                    <h4>About Us</h4>
                         <div className="image-container" onClick={() => {
                             navigate("/");
                             navigate(0);
@@ -45,7 +45,8 @@ function Footer(props) {
                         </List>
                     </Col>
                     <Col>
-                        <h4>Newsletter</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <h4>Newsletter</h4>
                         <p>Save time, save money!</p>
                         <InputGroup>
                             <Input type="text" name="newsletter" placeholder="Your email address"/>
@@ -53,6 +54,12 @@ function Footer(props) {
                         </InputGroup>
                         <h4 className="customer_support">Customer Support</h4>
                         <p>+94 11 4443 333</p>
+
+                        <div style={{ marginTop: 'auto' }}>
+                        <h6> Powered by EVERNODE</h6>
+                        <h6 style={{ marginTop: '0px', marginBottom: '20px' }} > Made with ❤ by GEVEO</h6>
+                        </div>
+                    </div>
                     </Col>
                 </Row>
                 <Row>

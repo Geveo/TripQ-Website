@@ -1,13 +1,5 @@
-import React, {useState} from "react";
-import {
-  Col,
-  Container,
-  Row,
-  InputGroup,
-  Input,
-  Button,
-  Label,
-} from "reactstrap";
+import React, {useState, useEffect} from "react";
+import {Col,Container,Row,InputGroup,Input,Button,Label} from "reactstrap";
 import "./../styles/customer_dashboard_styles.scss";
 import {RangeDatePicker} from "@y0c/react-datepicker";
 import "@y0c/react-datepicker/assets/styles/calendar.scss";
@@ -25,22 +17,43 @@ import SearchMenu from "../components/SearchMenu";
 import bestOffers from "../data/bestOffers";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
-// import 'moment/locale/ko';
+import HotelService from "../services-domain/hotel-service copy";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
-
+  
+  const hotelService = HotelService.instance;
   const [open, setOpen] = useState(false);
-
   const [dateRange, setDateRange] = useState(null);
   const [city, setCity] = useState("");
   const [peopleCount, setPeopleCount] = useState(0);
-
+  const [recentHotels, setRecentHotel] = useState([]);
   const [errorMessage, setErrorMessge] = useState(null);
 
   const onDateChange = (...args) => {
     setDateRange(args);
   };
+
+  useEffect(() => {
+    let hotelList = [];
+    hotelService.getRecentHotels()
+    .then((data) => {
+      data.forEach((element) => {
+        let hotel = 
+        {
+          name: element.Name,
+          location: JSON.parse(element.Location).City,
+          image: element.ImageURL,
+          price: element.Price,
+          rating: element.StarRatings,
+          ratingCount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
+        }
+        hotelList.push(hotel);
+      });
+      setRecentHotel(hotelList)
+    });
+}, []); 
+
 
     function onSearchSubmit() {
         if (!city || city.length < 3) {
@@ -52,7 +65,6 @@ function CustomerDashboard() {
                     duration: Infinity,
                 }
             );
-            //setErrorMessge("Requires a valid city.");
             return;
         }
 
@@ -66,7 +78,6 @@ function CustomerDashboard() {
                     duration: Infinity,
                 }
             );
-            //setErrorMessge("Invalid date range.");
             return;
         }
 
@@ -79,7 +90,6 @@ function CustomerDashboard() {
                     duration: Infinity,
                 }
             );
-            //setErrorMessge("Invalid people count.");
             return;
         }
 
@@ -128,6 +138,7 @@ function CustomerDashboard() {
                   <Input
                     placeholder="0"
                     type="number"
+                    min="1" 
                     onChange={(e) => setPeopleCount(e.target.value)}
                   />
                 </InputGroup>
@@ -156,6 +167,18 @@ function CustomerDashboard() {
             </Row>
           </div>
         </div>
+        <section>
+          <div className="top_rated_hotels">
+            <h2 className="best_offers">Explore New Hotels!</h2>
+            <div className="hotel_items_flexbox">
+              {recentHotels.slice(0, 8).map((recentHotel, index) => (
+                <div className="hotel_card" key={index}>
+                  <TopHotelCard hotel={recentHotel} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
         <section className="best_offers">
           <div className="best_offers">
             <h1 style={{ margin: 0 }}>Best Offers</h1>

@@ -207,7 +207,7 @@ function CreateRoomModal(props) {
                 <div className={"subtext"} style={{ lineHeight: "20px" }}>
                 </div>
 
-                <div className="title_3_sub mt-3">Price per day (Evers)</div>
+                <div className="title_3_sub mt-3">Price per day (EVR)</div>
                 <input type="text" className="form-control input_half" id="price_per_day"
                     style={{ backgroundColor: '#ffffff', borderColor: "#908F8F", width: "50%" }} value={pricePerDay}
                     onChange={onChangePricePerDay} />

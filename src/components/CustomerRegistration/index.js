@@ -20,7 +20,7 @@ import { toast } from "react-hot-toast";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import { PaymentResults } from "../../constants/constants";
 import { ReservationDto } from "../../dto/ReservationDto";
-import { LocalStorageKeys } from "../../constants/constants";
+import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
 import { store } from "../../app/store";
@@ -60,7 +60,6 @@ const CustomerRegistration = (props) => {
   const validation = (body) => {
     // only when validate, body will pass
     if (firstName.length !== 0 && lastName.length !== 0 && email.length !== 0) {
-      console.log("body", body);
       return true;
     }
     return false;
@@ -68,7 +67,6 @@ const CustomerRegistration = (props) => {
 
   const registerCustomer = async (e) => {
     e.preventDefault();
-    // setdisableAll(true);
     const body = {
       firstName,
       lastName,
@@ -93,7 +91,6 @@ const CustomerRegistration = (props) => {
     }
 
     if (validation(body)) {
-      // await props.createReservation(body);
     } else {
       props.setConfirmLoading(false);
       props.setDisableConfirm(false);
@@ -101,14 +98,13 @@ const CustomerRegistration = (props) => {
     return;
   };
   const submitForm = async () => {
-    const selectionData =
+      let selectionData =
       selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
     if (!selectionData) {
       selectionData = JSON.parse(
         localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
       );
-      console.log(selectionData);
     }
 
     if (
@@ -117,21 +113,16 @@ const CustomerRegistration = (props) => {
       email.length > 0 &&
       phoneNo
     ) {
-      const result = await showPayQRWindow(
-        loginState.loggedInAddress,
-        `raQLbdsGp4FXtesk5BSGBayBFJv4DESuaf`,
-        "0.6",
-        process.env.REACT_APP_CURRENCY,
-        process.env.REACT_APP_CURRENCY_ISSUER
-      );
+      const result = await showPayQRWindow(loginState.loggedInAddress, selectionData.HotelOwnerWalletAddress, props.totalPrice.toString(), DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CRYPTO_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
+    
       console.log(result);
-      if (result === PaymentResults.COMPLETED) {
+     if (result === PaymentResults.COMPLETED) {
         store.dispatch(setShowScreenLoader(true));
 
         let reservationData = new ReservationDto({
           HotelId: selectionData.HotelId,
           WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
-          Price: "0.6",
+          Price: props.totalPrice,
           FromDate: selectionData.CheckIn,
           ToDate: selectionData.CheckOut,
           NoOfNights: selectionData.Nights,
@@ -144,7 +135,6 @@ const CustomerRegistration = (props) => {
         });
 
         hotelService.makeReservation(reservationData).then((res) => {
-          console.log(res)
           store.dispatch(setShowScreenLoader(false));
           if (res.rowId.lastId > 0) {
             toast.success("Reserved successfully!", {
@@ -258,7 +248,27 @@ const CustomerRegistration = (props) => {
             </FormGroup>
           </Col>
         </Row>
-        <div
+        <Row>
+          <Col md={6}>
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 25,
+          }}
+        >
+          <Button
+            className="secondaryButton"
+            style={{ width: "180px" }}
+            onClick={() => navigate(-1)}
+          >
+            Back
+          </Button>
+        </div>
+          </Col>
+          <Col md={6}>
+          <div
           style={{
             display: "flex",
             justifyContent: "center",
@@ -275,6 +285,9 @@ const CustomerRegistration = (props) => {
             Continue To Payment
           </Button>
         </div>
+          </Col>
+        </Row>
+    
       </Form>
     </Card1>
   );
