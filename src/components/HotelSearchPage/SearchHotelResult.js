@@ -34,7 +34,7 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
                             <FaMapMarkerAlt color={"#908F8F"}/>
                         </div>
                         <div className={"col"} style={{paddingTop: "4px"}}>
-                            {location.AddressLine01},{location.AddressLine02},{location.City}
+                            {location.AddressLine01}{location.AddressLine02}{location.City}
                         </div>
                     </div>
                     <div className={"row_fit"}>
