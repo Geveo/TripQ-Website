@@ -157,7 +157,6 @@ export default class HotelService {
     };
     try {
       const res = await this.contractService?.submitReadRequest(submitObject);
-      console.log("res.",res );
       if (res) {
         return res;
       } else {
@@ -184,7 +183,6 @@ export default class HotelService {
     };
     let result;
     try {
-      console.log(submitObject);
       result = await this.contractService.submitReadRequest(submitObject);
         } catch (error) {
             console.log(error);

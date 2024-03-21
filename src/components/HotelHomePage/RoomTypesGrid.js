@@ -19,7 +19,7 @@ function RoomTypesGrid(props) {
                             <th style={{ padding: '8px', textAlign: 'left' }}>Room Type</th>
                             <th style={{ padding: '8px', textAlign: 'center' }}>Sqft</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Rooms Count</th>
-                            <th style={{ padding: '8px', textAlign: 'center'  }}>Price (Evers)</th>
+                            <th style={{ padding: '8px', textAlign: 'center'  }}>Price (EVR)</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Single Bed Count</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Double Bed Count</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Triple Bed Count</th>
@@ -31,7 +31,7 @@ function RoomTypesGrid(props) {
                                 <td style={{ padding: '8px', textAlign: 'left'  }}><Link to={`/roomType/${roomType.Id}`}>{roomType.Code}</Link></td>
                                 <td style={{ padding: '8px', textAlign: 'center'  }}>{roomType.Sqft}</td>
                                 <td style={{ padding: '8px', textAlign: 'center'  }}>{roomType.RoomsCount}</td>
-                                <td style={{ padding: '8px', textAlign: 'center'  }}>{parseFloat(roomType.Price).toFixed(2)} </td>
+                                <td style={{ padding: '8px', textAlign: 'center'  }}>{Number(parseFloat(roomType.Price).toFixed(6))} </td>
                                 <td style={{ padding: '8px', textAlign: 'center' }}>{roomType.SingleBedCount}</td>
                                 <td style={{ padding: '8px', textAlign: 'center' }}>{roomType.DoubleBedCount}</td>
                                 <td style={{ padding: '8px', textAlign: 'center' }}>{roomType.TripleBedCount}</td>
