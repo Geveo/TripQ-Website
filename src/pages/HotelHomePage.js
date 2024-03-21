@@ -213,8 +213,8 @@ function HotelHomePage() {
 
   const getFullAddress = () => {
     let address = address1 ?? "";
-    address += address2 ? `, ${address2}` : "";
-    address += city ? `, ${city}` : "";
+    address += address2 ? ` ${address2}` : "";
+    address += city ? ` ${city}` : "";
 
     return address;
   };
@@ -318,9 +318,9 @@ function HotelHomePage() {
             </div>
           </section>
           <section ref={infoSection} id="info_section" className={""}>
-            <div>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
               {images &&
-                images.map((image, index) => (
+                images.slice(0,3).map((image, index) => (
                   <img
                     key={index}
                     style={{ margin: 10, width: 350, height: 250 }}
