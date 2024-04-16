@@ -26,7 +26,7 @@ const HeaderSectionLandingPageHotelOwner = () => {
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
 
   const registerHotel = async () => {
-    if(!loginState.isLoggedIn) {
+     if(!loginState.isLoggedIn) {
       if(await xummAuthorize()) {
         navigate("/register-hotel");
       }

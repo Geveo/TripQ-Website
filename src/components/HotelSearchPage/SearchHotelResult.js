@@ -20,7 +20,7 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
             <div className={"row_fit p-5"}>
                 <img
                     key={hotel.Id}
-                    src={hotel.ImageURL}
+                    src={hotel.ImageURL[0].ImageURL}
                     alt={"Hotel image"}
                     style={styles.image}
                 />
@@ -53,7 +53,7 @@ function SearchHotelResult({hotel, numOfPeople, onViewAvailableClicked}) {
                     </div>
 
                     <div className={"pt-3 row_right"} style={{}}>
-                        <button className={"view_availability_button"} style={{width: "200px"}} onClick={() => onViewAvailableClicked(hotel.Id)} >
+                        <button className={"view_availability_button"} style={{width: "200px"}} onClick={() => onViewAvailableClicked(hotel)} >
                             View Availability
                         </button>
                     </div>

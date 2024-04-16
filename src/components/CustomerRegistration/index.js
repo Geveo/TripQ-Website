@@ -114,7 +114,7 @@ const CustomerRegistration = (props) => {
       phoneNo
     ) {
       const result = await showPayQRWindow(loginState.loggedInAddress, selectionData.HotelOwnerWalletAddress, props.totalPrice.toString(), DestinationTags.RESERVATION_PAYMENT, process.env.REACT_APP_CRYPTO_CURRENCY, process.env.REACT_APP_CURRENCY_ISSUER )
-    
+  
       console.log(result);
      if (result === PaymentResults.COMPLETED) {
         store.dispatch(setShowScreenLoader(true));

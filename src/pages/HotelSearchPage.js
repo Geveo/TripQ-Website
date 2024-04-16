@@ -10,12 +10,15 @@ import HotelList from "../components/HotelSearchPage/HotelList";
 import HotelService from "../services-domain/hotel-service copy";
 import {Alert, Spinner} from 'reactstrap'
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
+import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
+import { LocalStorageKeys } from "../constants/constants";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const location = useLocation();
     const hotelService = HotelService.instance;
     const loginState = useSelector(state => state.loginState)
@@ -75,7 +78,8 @@ function HotelSearchPage(props) {
                             ImageURL: hh.ImageURL,
                             StarRatings: hh.StarRatings, 
                             ContactDetails: hh.ContactDetails,
-                            Description: hh.Description
+                            Description: hh.Description,
+                            WalletAddress: hh.WalletAddress
                         };
                     });
                     setCity(city);
@@ -188,8 +192,19 @@ function HotelSearchPage(props) {
         setRoomFacilities(room_facilities);
     }
 
-    function onViewAvailableClicked(hotelId) {
-        navigate(`/availability/${hotelId}/${checkInDate}/${checkOutDate}`);
+    function onViewAvailableClicked(hotel) {
+        dispatch(
+            selectionDetailsAdd({
+              key: localStorage.getItem(LocalStorageKeys.AccountAddress),
+              value: hotel,
+            })
+          );
+      
+          localStorage.setItem(
+            LocalStorageKeys.HotelSelectionDetails,
+            JSON.stringify(hotel)
+          );
+        navigate(`/availability/${hotel.Id}/${checkInDate}/${checkOutDate}`);
     }
 
     function onCitySearchChanged(newCity) {
