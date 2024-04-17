@@ -19,7 +19,7 @@ function RoomTypesGrid(props) {
                             <th style={{ padding: '8px', textAlign: 'left' }}>Room Type</th>
                             <th style={{ padding: '8px', textAlign: 'center' }}>Sqft</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Rooms Count</th>
-                            <th style={{ padding: '8px', textAlign: 'center'  }}>Price (EVR)</th>
+                            <th style={{ padding: '8px', textAlign: 'center'  }}>Price (TPQ)</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Single Bed Count</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Double Bed Count</th>
                             <th style={{ padding: '8px', textAlign: 'center'  }}>Triple Bed Count</th>
