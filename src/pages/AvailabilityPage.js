@@ -17,6 +17,7 @@ import { xummAuthorize } from "../services-common/xumm-api-service";
 function AvailabilityPage() {
   const hotelService = HotelService.instance;
   const loginState = useSelector((state) => state.loginState);
+  const selectionDetails = useSelector((state) => state.selectionDetails);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -48,84 +49,59 @@ function AvailabilityPage() {
 
   useEffect(() => {
     // Get hotel details
+    let selectedDetails =
+      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+
+    if (!selectedDetails) {
+      selectedDetails = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
+      );
+    }
+    let hotelData = {
+      Id: selectedDetails.Id,
+      Name: selectedDetails.Name,
+      StarRating: selectedDetails.StarRatings,
+      Location: selectedDetails.City,
+      ImageURLs: selectedDetails.ImageURL,
+      HotelOwnerWalletAddress: selectedDetails.WalletAddress,
+      Description: selectedDetails.Description,
+    };
+    
+    setHotelData(hotelData);
+    setAddress1(JSON.parse(selectedDetails.City).AddressLine01);
+    setAddress2(JSON.parse(selectedDetails.City).AddressLine02);
+    setCity(JSON.parse(selectedDetails.City).City);
+    setImages(Array.from(selectedDetails.ImageURL));
+
+
+    // Get available room count
     hotelService
-      .getHotelById(id)
-      .then((data) => {
-        if (data) {
-          let hotelData = {
-            Id: data.hotelDetails[0].Id,
-            Name: data.hotelDetails[0].Name,
-            StarRating: data.hotelDetails[0].StarRatings,
-            Location: data.hotelDetails[0].Location,
-            ImageURLs: data.hotelImages,
-            HotelOwnerWalletAddress: data.hotelDetails[0].WalletAddress,
-            Description: data.hotelDetails[0].Description,
-          };
-          setHotelData(hotelData);
+      .getAvailableRoomCount(id, checkInDate, checkOutDate)
+      .then((res) => {        
+        // Get room details
+        let newRoomTypes = [];
+        let id = 0;
+        for (const roomType of res) {
+          let facilitiesIds = [];
 
-          setAddress1(JSON.parse(data.hotelDetails[0].Location).AddressLine01);
-          setAddress2(JSON.parse(data.hotelDetails[0].Location).AddressLine02);
-          setCity(JSON.parse(data.hotelDetails[0].Location).City);
-          setImages(data.hotelImages);
-        }
-
-        // Get available room count
-        hotelService
-          .getAvailableRoomCount(id, checkInDate, checkOutDate)
-          .then((res) => {
-            let availableRoomCount = res;
-            // Get room details
-            hotelService
-              .getHotelRoomTypes(id)
-              .then(async (res) => {
-                let newRoomTypes = [];
-                let id = 0;
-                for (const roomType of res) {
-                  const resObj = await hotelService.getRoomTypeById(
-                    roomType.Id
-                  );
-
-                  let facilitiesIds = [];
-
-                  for (const facility of resObj.Facilities) {
-                    facilitiesIds.push(facility.id);
-                  }
-                  newRoomTypes.push({
-                    Id: roomType.Id,
-                    RoomName: roomType.Code,
-                    Price: roomType.Price,
-                    RoomsCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).RoomsCount,
-                    SingleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).SingleBedCount,
-                    DoubleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).DoubleBedCount,
-                    TripleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).TripleBedCount,
-                    TotalSleeps: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).TotalSleeps,
-                    Facilities: facilitiesIds,
-                    SelectedRooms: 0,
-                  });
-                  id++;
-                }
-                setRoomTypes(newRoomTypes);
-              })
-              .catch((error) => {
-                console.error("Error fetching room types:", error);
-              });
-          })
-          .catch((error) => {
-            console.error("Error fetching available rooms count:", error);
+          newRoomTypes.push({
+            Id: roomType.Id,
+            RoomName: roomType.Code,
+            Price: roomType.Price,
+            RoomsCount: roomType.RoomsCount,
+            SingleBedCount: roomType.SingleBedCount,
+            DoubleBedCount: roomType.DoubleBedCount,
+            TripleBedCount: roomType.TripleBedCount,
+            TotalSleeps: roomType.TotalSleeps,
+            Facilities: facilitiesIds,
+            SelectedRooms: 0,
           });
+          id++;
+        }
+        setRoomTypes(newRoomTypes);
       })
       .catch((error) => {
-        console.error("Error fetching hotel details:", error);
+        console.error("Error fetching available rooms count:", error);
       });
   }, [id]);
 
@@ -219,9 +195,9 @@ function AvailabilityPage() {
   };
 
   const onReserve = async () => {
-    if (!loginState.isLoggedIn) {
-      await xummAuthorize();
-    }
+     if (!loginState.isLoggedIn) {
+       await xummAuthorize();
+     }
     let roomsCount = 0;
     const selectedRoomsArray = Object.values(selectedRooms);
     const checkIn = new Date(checkInFormatted);
@@ -300,7 +276,9 @@ function AvailabilityPage() {
             <div style={{ width: "20px" }}>
               <FaWallet />
             </div>
-            <div className={"subtext pt-2 col"}>{hotelData.HotelOwnerWalletAddress}</div>
+            <div className={"subtext pt-2 col"}>
+              {hotelData.HotelOwnerWalletAddress}
+            </div>
           </div>
 
           <div className={"pt-4 pb-4 center_div"}>
