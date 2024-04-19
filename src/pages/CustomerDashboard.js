@@ -1,7 +1,15 @@
-import React, {useState, useEffect} from "react";
-import {Col,Container,Row,InputGroup,Input,Button,Label} from "reactstrap";
+import React, { useState, useEffect } from "react";
+import {
+  Col,
+  Container,
+  Row,
+  InputGroup,
+  Input,
+  Button,
+  Label,
+} from "reactstrap";
 import "./../styles/customer_dashboard_styles.scss";
-import {RangeDatePicker} from "@y0c/react-datepicker";
+import { RangeDatePicker } from "@y0c/react-datepicker";
 import "@y0c/react-datepicker/assets/styles/calendar.scss";
 import OfferCard from "../components/OfferCard/OfferCard";
 import { useNavigate } from "react-router-dom";
@@ -18,10 +26,13 @@ import bestOffers from "../data/bestOffers";
 import toast from "react-hot-toast";
 import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
 import HotelService from "../services-domain/hotel-service copy";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import SpeechService from "../services-common/speech-service";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
-  
+
   const hotelService = HotelService.instance;
   const [open, setOpen] = useState(false);
   const [dateRange, setDateRange] = useState(null);
@@ -29,6 +40,8 @@ function CustomerDashboard() {
   const [peopleCount, setPeopleCount] = useState(0);
   const [recentHotels, setRecentHotel] = useState([]);
   const [errorMessage, setErrorMessge] = useState(null);
+  const [speechService] = useState(new SpeechService());
+  const [searchText, setSearchText] = useState("");
 
   const onDateChange = (...args) => {
     setDateRange(args);
@@ -36,66 +49,77 @@ function CustomerDashboard() {
 
   useEffect(() => {
     let hotelList = [];
-    hotelService.getRecentHotels()
-    .then((data) => {
+    hotelService.getRecentHotels().then((data) => {
       data.forEach((element) => {
-        let hotel = 
-        {
+        let hotel = {
           name: element.Name,
           location: JSON.parse(element.Location).City,
           image: element.ImageURL,
           price: element.Price,
           rating: element.StarRatings,
           ratingCount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
-        }
+        };
         hotelList.push(hotel);
       });
-      setRecentHotel(hotelList)
+      setRecentHotel(hotelList);
     });
-}, []); 
+  }, []);
 
-
-    function onSearchSubmit() {
-        if (!city || city.length < 3) {
-            toast(
-                (element) => (
-                    <ToastInnerElement message={"Requires a valid city."} id={element.id}/>
-                ),
-                {
-                    duration: Infinity,
-                }
-            );
-            return;
+  function onSearchSubmit() {
+    if (!city || city.length < 3) {
+      toast(
+        (element) => (
+          <ToastInnerElement
+            message={"Requires a valid city."}
+            id={element.id}
+          />
+        ),
+        {
+          duration: Infinity,
         }
+      );
+      return;
+    }
 
-        if (!dateRange || !dateRange[0] || !dateRange[1]) {
-            console.log("Invalid date range.")
-            toast(
-                (element) => (
-                    <ToastInnerElement message={"Invalid date range."} id={element.id}/>
-                ),
-                {
-                    duration: Infinity,
-                }
-            );
-            return;
+    if (!dateRange || !dateRange[0] || !dateRange[1]) {
+      console.log("Invalid date range.");
+      toast(
+        (element) => (
+          <ToastInnerElement message={"Invalid date range."} id={element.id} />
+        ),
+        {
+          duration: Infinity,
         }
+      );
+      return;
+    }
 
-        if (peopleCount < 1) {
-            toast(
-                (element) => (
-                    <ToastInnerElement message={"Invalid guest count."} id={element.id}/>
-                ),
-                {
-                    duration: Infinity,
-                }
-            );
-            return;
+    if (peopleCount < 1) {
+      toast(
+        (element) => (
+          <ToastInnerElement message={"Invalid guest count."} id={element.id} />
+        ),
+        {
+          duration: Infinity,
         }
+      );
+      return;
+    }
 
     navigate(
       `/search-hotel?city=${city}&fromDate=${dateRange[0]}&toDate=${dateRange[1]}&peopleCount=${peopleCount}`
     );
+  }
+
+  async function handleSpeechToTextFromMic() {
+    speechService
+      .speechToTextFromMic()
+      .then((displayText) => {
+        setSearchText(displayText);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   return (
@@ -112,59 +136,35 @@ function CustomerDashboard() {
             <SearchMenu />
           </div>
           <div className="search-area">
-            <Row className="search-wrapper-row">
-              <Col style={{ flex: "1 0" }}>
-                <Label>Destination</Label>
-                <InputGroup>
+            <div>
+              <Row>
+                <Col md={10} style={{ position: "relative" }}>
                   <Input
-                    placeholder="City"
-                    onChange={(e) => setCity(e.target.value)}
+                    type="text"
+                    placeholder="Search your next stay here..."
+                    value={searchText}
                   />
-                </InputGroup>
-              </Col>
-              <Col style={{ flex: "3 0" }}>
-                <Label>Check in - Check out</Label>
-                <br />
-                <RangeDatePicker
-                  onChange={onDateChange}
-                  startPlaceholder="From date"
-                  endPlaceholder="To date"
-                  dateFormat="YYYY/MM/DD"
-                />
-              </Col>
-              <Col>
-                <Label>No. of Guests</Label>
-                <InputGroup>
-                  <Input
-                    placeholder="0"
-                    type="number"
-                    min="1" 
-                    onChange={(e) => setPeopleCount(e.target.value)}
-                  />
-                </InputGroup>
-              </Col>
-              <Col>
-                <Button
-                  className="secondaryButton overrideSearchButton"
-                  onClick={onSearchSubmit}
-                >
-                  Search your stay
-                </Button>
-                {errorMessage ? (
-                  <p
-                    style={{
-                      margin: "0px",
-                      marginBottom: "-23px",
-                      color: "red",
-                    }}
+                  <div
+                    className="microphone-icon"
+                    onClick={handleSpeechToTextFromMic}
                   >
-                    {errorMessage}
-                  </p>
-                ) : (
-                  ""
-                )}
-              </Col>
-            </Row>
+                    <FontAwesomeIcon
+                      size="lg"
+                      icon={faMicrophone}
+                      className="fa fa-microphone"
+                    />
+                  </div>
+                </Col>
+                <Col md={2}>
+                  <Button
+                    className="secondaryButton overrideSearchButton"
+                    onClick={onSearchSubmit}
+                  >
+                    Search your stay
+                  </Button>
+                </Col>
+              </Row>
+            </div>
           </div>
         </div>
         <section>
