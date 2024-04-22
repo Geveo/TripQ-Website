@@ -28,9 +28,7 @@
 
   .search-area {
     background-color: $light-purple-color;
-    height: 140px;
     padding: 30px;
-    display: flex;
     justify-content: center;
     margin-left: auto;
     margin-right: auto;
@@ -101,8 +99,19 @@ div.best_offers {
   width: 100%;
 }
 
-.search-wrapper-row {
-  height: 20px;
+.search-wrapper-row1 {
+  height: 40px;
+}
+.search-wrapper-row2 {
+ padding-top: 60px;
+}
+
+.microphone-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  margin-right: 15px;
 }
 
 div.top_rated_hotels {
