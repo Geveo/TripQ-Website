@@ -3,35 +3,42 @@ import {
   Col,
   Container,
   Row,
-  InputGroup,
   Input,
   Button,
-  Label,
 } from "reactstrap";
-import "./../styles/customer_dashboard_styles.scss";
+import "./customer_dashboard_styles.scss";
 import { RangeDatePicker } from "@y0c/react-datepicker";
 import "@y0c/react-datepicker/assets/styles/calendar.scss";
-import OfferCard from "../components/OfferCard/OfferCard";
+import OfferCard from "../../components/OfferCard/OfferCard";
 import { useNavigate } from "react-router-dom";
-import topRatedHotels from "../data/topRatedHotels";
-import properties from "../data/properties";
-import TopHotelCard from "../components/TopHotelCard";
-import Ellipse from "../Assets/Icons/ellipse.svg";
-import ExploreCard from "../components/ExploreCard";
-import QuickPlanner from "../components/QuickPlanner";
-import searches from "../data/searches";
-import SearchCard from "../components/SearchCard";
-import SearchMenu from "../components/SearchMenu";
-import bestOffers from "../data/bestOffers";
+import topRatedHotels from "../../data/topRatedHotels";
+import properties from "../../data/properties";
+import TopHotelCard from "../../components/TopHotelCard";
+import Ellipse from "../../Assets/Icons/ellipse.svg";
+import ExploreCard from "../../components/ExploreCard";
+import QuickPlanner from "../../components/QuickPlanner";
+import searches from "../../data/searches";
+import SearchCard from "../../components/SearchCard";
+import SearchMenu from "../../components/SearchMenu";
+import bestOffers from "../../data/bestOffers";
 import toast from "react-hot-toast";
-import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement";
-import HotelService from "../services-domain/hotel-service copy";
+import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
+import HotelService from "../../services-domain/hotel-service copy";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import SpeechService from "../services-common/speech-service";
+import SpeechService from "../../services-common/speech-service";
+import InputGroup from 'react-bootstrap/InputGroup';
+import Form from 'react-bootstrap/Form';
+import {AzureOpenaiService} from "../../services-common/azure-openai-service";
+import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
+import {useDispatch} from "react-redux";
+import {setAiHotelSearchResults} from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import {LocalStorageKeys} from "../../constants/constants";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
+  const openAiService = AzureOpenaiService.getInstance();
+  const dispatch = useDispatch()
 
   const hotelService = HotelService.instance;
   const [open, setOpen] = useState(false);
@@ -40,9 +47,11 @@ function CustomerDashboard() {
   const [peopleCount, setPeopleCount] = useState(0);
   const [recentHotels, setRecentHotel] = useState([]);
   const [errorMessage, setErrorMessge] = useState(null);
-  const [speechService] = useState(new SpeechService());
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
 
+  const speechService = new SpeechService();
   const onDateChange = (...args) => {
     setDateRange(args);
   };
@@ -66,64 +75,38 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
-    if (!city || city.length < 3) {
-      toast(
-        (element) => (
-          <ToastInnerElement
-            message={"Requires a valid city."}
-            id={element.id}
-          />
-        ),
-        {
-          duration: Infinity,
-        }
-      );
-      return;
-    }
+    setLoading(true)
+    openAiService.searchHotels(searchText).then(res => {
+      console.log(res)
+      setLoading(false)
+      if(res.hotel_names.length > 0) {
+        dispatch(setAiHotelSearchResults(res))
+        localStorage.setItem(LocalStorageKeys.AiHotelSearchResult, JSON.stringify(res));
+        navigate(`/search-hotel`);
+      }
+    }).catch(e => {
+      setLoading(false)
+    })
 
-    if (!dateRange || !dateRange[0] || !dateRange[1]) {
-      console.log("Invalid date range.");
-      toast(
-        (element) => (
-          <ToastInnerElement message={"Invalid date range."} id={element.id} />
-        ),
-        {
-          duration: Infinity,
-        }
-      );
-      return;
-    }
-
-    if (peopleCount < 1) {
-      toast(
-        (element) => (
-          <ToastInnerElement message={"Invalid guest count."} id={element.id} />
-        ),
-        {
-          duration: Infinity,
-        }
-      );
-      return;
-    }
-
-    navigate(
-      `/search-hotel?city=${city}&fromDate=${dateRange[0]}&toDate=${dateRange[1]}&peopleCount=${peopleCount}`
-    );
   }
 
   async function handleSpeechToTextFromMic() {
+    setIsListening(true)
     speechService
       .speechToTextFromMic()
       .then((displayText) => {
         setSearchText(displayText);
+        setIsListening(false)
       })
       .catch((error) => {
         console.error("Error:", error);
+        setIsListening(false)
       });
   }
 
   return (
     <>
+      <LoadingScreen showLoadPopup={loading} />
       <div className="main-image-div">
         <Container className="main-txt">
           <h3>Enjoy your next stay</h3>
@@ -137,27 +120,34 @@ function CustomerDashboard() {
           </div>
           <div className="search-area">
             <div>
-              <Row>
-                <Col md={10} style={{ position: "relative" }}>
-                  <Input
-                    type="text"
-                    placeholder="Search your next stay here..."
-                    value={searchText}
-                  />
-                  <div
-                    className="microphone-icon"
-                    onClick={handleSpeechToTextFromMic}
-                  >
-                    <FontAwesomeIcon
-                      size="lg"
-                      icon={faMicrophone}
-                      className="fa fa-microphone"
+              <Row style={{ justifyContent: 'center'}}>
+                <Col>
+                  {/*<Form.Label>Example: </Form.Label>*/}
+                  <InputGroup className="">
+                    <Button variant="outline-secondary" id="button-addon1" className={isListening ? `microphone-icon-isListening`: `microphone-icon`}
+                            onClick={handleSpeechToTextFromMic}
+                            title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk.">
+
+                      <FontAwesomeIcon
+                          size="lg"
+                          icon={faMicrophone}
+                          className="fa fa-microphone"
+                      />
+                    </Button>
+                    <Form.Control
+                                  placeholder="Search your next stay here..."
+                                  aria-label="Username"
+                                  aria-describedby="basic-addon1"
+                                  value={searchText}
+                                  onChange={(e) => setSearchText(e.target.value)}
                     />
-                  </div>
+
+                  </InputGroup>
+
                 </Col>
                 <Col md={2}>
                   <Button
-                    className="secondaryButton overrideSearchButton"
+                    className="overrideSearchButton"
                     onClick={onSearchSubmit}
                   >
                     Search your stay

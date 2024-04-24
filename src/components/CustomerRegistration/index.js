@@ -23,8 +23,8 @@ import { ReservationDto } from "../../dto/ReservationDto";
 import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
-import { store } from "../../app/store";
-import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
+import { store } from "../../redux/store";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 
 const CustomerRegistration = (props) => {
   const xrplService = XrplService.xrplInstance;

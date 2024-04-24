@@ -11,7 +11,7 @@ import HotelService from "../services-domain/hotel-service copy";
 import {Alert, Spinner} from 'reactstrap'
 import toast from "react-hot-toast";
 import { useSelector, useDispatch } from "react-redux";
-import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
+import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
 import { LocalStorageKeys } from "../constants/constants";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2

@@ -34,15 +34,19 @@ export class AzureOpenaiService {
         }
     }
 
+    /**
+     *
+     * @param message
+     * @param count
+     * @returns {Promise<any>} An object in the format { hotel_names: [], destination: "", from_date: "", to_date: "", total_head_count: 1}
+     */
     async searchHotels(message, count = 25) {
-        message += `Give me the reply in English with ${count} hotels as an array of strings of hotel names, only.`
+        message += `Give me only a json output in the following format.  { hotel_names: [], destination: "", from_date: "", to_date: "", total_head_count: 1} , where hotel_names is an array of string of searched ${count} hotel names that suit the requirement mentioned earlier or closer to the requirement, and destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description and in the form of dd/mm/yyyy or null if not found. total_head_count is an integer value extracted, if not found its value is 0. Language must be english`
         console.log(message)
         const reply = await this.client.getChatCompletions(
             this.modelInstanceName, // assumes a matching model deployment or model name
             [{role: "user", content: message}]
         );
-
-        // console.log(reply.choices[0].message.content)
 
         return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
     }

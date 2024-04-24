@@ -30,8 +30,8 @@ import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
 import { LocalStorageKeys } from "../constants/constants";
-import { store } from "../app/store";
-import { setShowScreenLoader } from "../features/screenLoader/ScreenLoaderSlice";
+import { store } from "../redux/store";
+import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 
 const { useSelector, useDispatch } = require("react-redux");
 

@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AvailabilityRooms from "../components/AvailabiityRooms/AvailabilityRooms";
 import DateFunctions from "../helpers/DateFunctions";
 import HotelService from "../services-domain/hotel-service copy";
-import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
+import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
 import { LocalStorageKeys } from "../constants/constants";
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
