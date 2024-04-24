@@ -3,7 +3,7 @@ import { Input, Button } from "reactstrap";
 import styles from "./index.module.scss";
 import "../../index.scss";
 import { useSelector, useDispatch } from "react-redux";
-import { hide } from "../../features/visibility/visibleSlice";
+import { hide } from "../../redux/visibility/visibleSlice";
 import { useNavigate } from "react-router-dom";
 import XrplService from "../../services-common/xrpl-service";
 import HotelService from "../../services-domain/hotel-service copy";

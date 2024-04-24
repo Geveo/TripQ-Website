@@ -1,5 +1,5 @@
 import RegisterHotel from "./pages/RegisterHotel";
-import CustomerDashboard from "./pages/CustomerDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard/CustomerDashboard";
 import "./App.scss";
 import { Route, Routes } from "react-router-dom";
 import ContractService from "./services-common/contract-service";
@@ -18,7 +18,7 @@ import AccountTransactions from "./pages/AccountTransactions/AccountTransactions
 import { useSelector } from "react-redux";
 import { LocalStorageKeys } from "./constants/constants";
 import { xummAuthorize } from "./services-common/xumm-api-service";
-import { loginSuccessfully } from "./features/LoginState/LoginStateSlice";
+import { loginSuccessfully } from "./redux/LoginState/LoginStateSlice";
 import MakeReservations from "./pages/MakeReservations/MakeReservations";
 import CustomerDetails from "./pages/MakeReservations/CustomerDetails";
 import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReservations";

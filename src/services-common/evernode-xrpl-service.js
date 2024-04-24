@@ -1,6 +1,6 @@
 import evernode from 'evernode-js-client'
-import { add as txListenerAdd, remove as txListenerRemove, removeAll as txListenerRemoveAll }  from "../features/transactionListener/transactionListenerSlice";
-import { store } from './../app/store'; 
+import { add as txListenerAdd, remove as txListenerRemove, removeAll as txListenerRemoveAll }  from "../redux/transactionListener/transactionListenerSlice";
+import { store } from '../redux/store';
 const { XRPLAccountEventTypes } = require('./../constants/constants')
 
 
@@ -27,7 +27,7 @@ export async function init() {
 
 export async function deinit() {
     try{
-        await Promise.all(clients.map(c => { c.unsubscribe(); })); // Cleanup clients.
+        await Promise.all(clients.map(c => { c.unsubscribe(); return null; })); // Cleanup clients.
         await xrplApi.disconnect();
     } catch (e) {
         console.log("Error occurred in disconnecting XRPL connection: ", e);

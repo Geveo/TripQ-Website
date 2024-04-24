@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faArrowUp, faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
-import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import CoinRankingService from "../../services-common/coinranking-service";
 
 
