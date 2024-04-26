@@ -70,7 +70,7 @@ function AvailabilityRooms(props) {
                   <div className={"price-text"}>
                   {" "}
                     {parseFloat(room.Price *115000).toFixed(2)} LKR - <span className={"price-subtext"}>
-                  ( {parseFloat(room.Price).toFixed(6)} EVR )
+                  ( {parseFloat(room.Price).toFixed(6)} TPQ )
                   </span>
                     
                   </div>

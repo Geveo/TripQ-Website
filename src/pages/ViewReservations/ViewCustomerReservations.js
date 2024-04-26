@@ -78,7 +78,7 @@ const ViewCustomerReservations = () => {
                                                 </Card.Body>
                                             </Card>
                                         </td>
-                                        <td style={{ width: '12%'}} title={`${rs.Price} EVR`}>{(rs.Price * 115000).toFixed(2)}</td>
+                                        <td style={{ width: '12%'}} title={`${rs.Price} TPQ`}>{(rs.Price * 115000).toFixed(2)}</td>
                                     </tr>
                                 )
                             })}

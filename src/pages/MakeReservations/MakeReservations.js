@@ -39,7 +39,9 @@ const ReservationForm = () => {
 
   useEffect(() => {
     let selectedDetails =
-      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+      selectionDetails[
+        localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
+      ];
 
     if (!selectedDetails) {
       selectedDetails = JSON.parse(
@@ -54,7 +56,10 @@ const ReservationForm = () => {
       setSelectedRoomDetails(selectedDetails.RoomTypes);
       let totalPrice = 0;
       selectedDetails.RoomTypes.forEach((element) => {
-        totalPrice += parseFloat(element.roomData.Price) * element.count * parseInt(selectedDetails.Nights);
+        totalPrice +=
+          parseFloat(element.roomData.Price) *
+          element.count *
+          parseInt(selectedDetails.Nights);
       });
 
       setTotalPrice(totalPrice);

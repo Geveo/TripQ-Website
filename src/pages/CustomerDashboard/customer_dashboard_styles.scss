@@ -1,6 +1,7 @@
-@import "../index.scss";
+@import "../../index";
+
 .main-image-div {
-  background: url("./../../public/Assets/Images/dashboard/Sigiriya.webp");
+  background: url("../../../public/Assets/Images/dashboard/Sigiriya.webp");
   height: 575px;
   background-size: cover;
   background-position: center -150px;
@@ -26,11 +27,10 @@
   margin-top: -80px;
   z-index: 2;
 
+
   .search-area {
     background-color: $light-purple-color;
-    height: 140px;
     padding: 30px;
-    display: flex;
     justify-content: center;
     margin-left: auto;
     margin-right: auto;
@@ -38,11 +38,12 @@
     .row {
       align-items: flex-end;
       justify-content: space-between;
-      width: 95%;
+      width: 100%;
 
-      input {
-        border: 2px solid rgb(102, 102, 102);
-        background-color: #ececf200;
+
+      input:hover, input:active, input:focus {
+        outline: none!important;
+        box-shadow: none;
       }
     }
 
@@ -99,10 +100,29 @@ div.best_offers {
 .overrideSearchButton {
   height: 40px;
   width: 100%;
+  background-color: $purple-color!important;
 }
 
-.search-wrapper-row {
-  height: 20px;
+.search-wrapper-row1 {
+  height: 40px;
+}
+.search-wrapper-row2 {
+ padding-top: 60px;
+}
+
+.microphone-icon {
+  background-color: green!important ;
+  border: 0px;
+}
+
+.microphone-icon:hover {
+  background-color: #f6cd47 !important ;
+  border: 0px;
+}
+
+.microphone-icon-isListening {
+  background-color: #c42121 !important ;
+  border: 0px;
 }
 
 div.top_rated_hotels {
@@ -190,7 +210,7 @@ div.quickPlanner {
 
 .connect {
   height: 364px;
-  background: url("../Assets/Images/ariel-beach.webp");
+  background: url("../../Assets/Images/ariel-beach.webp");
 
   background-size: cover;
 }
