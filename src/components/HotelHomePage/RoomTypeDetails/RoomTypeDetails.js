@@ -32,7 +32,6 @@ function RoomTypeDetails() {
             setIsLoading(true);
             HotelService.instance.getRoomTypeById(id)
              .then((data) => {
-                console.log("data: ",data);
                 setRoomDetails(data.roomType);
                 setFacilities(data.Facilities);
                 let selectedFacilitiesIDs = [];
