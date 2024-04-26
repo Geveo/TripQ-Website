@@ -425,4 +425,25 @@ export default class HotelService {
       throw error;
     }
   }
+
+  /**
+   *
+   * @param {Object} filterObj
+   * @returns An array of objects || []
+   */
+  async GetHotelsListMappedWithAISearch(filterObj) {
+    const submitObject = {
+      type: constants.RequestTypes.HOTEL,
+      subType: constants.RequestSubTypes.GET_HOTELS_LIST_MAPPED_WITH_AI_SEARCH,
+      filters: filterObj,
+    };
+    let result;
+    try {
+      result = await this.contractService.submitReadRequest(submitObject);
+        } catch (error) {
+            console.log(error);
+            throw (error);
+        }
+        return result;
+  }
 }

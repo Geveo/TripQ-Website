@@ -76,8 +76,7 @@ function CustomerDashboard() {
 
   function onSearchSubmit() {
     setLoading(true)
-    openAiService.searchHotels(searchText).then(res => {
-      console.log(res)
+      openAiService.searchHotels(searchText).then(res => {
       setLoading(false)
       if(res.hotel_names.length > 0) {
         dispatch(setAiHotelSearchResults(res))
@@ -91,6 +90,7 @@ function CustomerDashboard() {
   }
 
   async function handleSpeechToTextFromMic() {
+    setSearchText("")
     setIsListening(true)
     speechService
       .speechToTextFromMic()
