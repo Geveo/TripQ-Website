@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import BookingDetails from "../../components/BookingDetails/index";
+import StripePayment from "../../components/Payment/StripePayment";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
 import { Row, Col } from "reactstrap";
 import MainContainer from "../../layout/MainContainer";
@@ -32,6 +33,7 @@ const ReservationForm = () => {
   });
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const loginState = useSelector((state) => state.loginState);
 
@@ -64,6 +66,13 @@ const ReservationForm = () => {
   const handleConfirm = (finalDetails) => {
     console.log("Reservation confirmed:", finalDetails);
   };
+  const handlePaymentEnabled = (data) => {
+    setPaymentEnabled(data);
+  };
+  
+  const handleBackToPayment = (data) => {
+    setPaymentEnabled(data);
+  };
 
   return (
     <>
@@ -81,19 +90,29 @@ const ReservationForm = () => {
           </Col>
 
           <Col md={8}>
-            <BookedHotelDetails
-              hotelName={searchDetails.Name}
-              hotelAddress={searchDetails.Address}
-              starRate={searchDetails.StarRate}
-              image={searchDetails.Images}
-            />
-            <CustomerRegistration
-              totalPrice={totalPrice}
-              disableConfirm={disableConfirm}
-              setDisableConfirm={setDisableConfirm}
-              confirmLoading={confirmLoading}
-              setConfirmLoading={setConfirmLoading}
-            />
+            <div>
+              { !paymentEnabled ?
+                <>
+                <BookedHotelDetails
+                  hotelName={searchDetails.Name}
+                  hotelAddress={searchDetails.Address}
+                  starRate={searchDetails.StarRate}
+                  image={searchDetails.Images} />
+                  
+                  <CustomerRegistration
+                    totalPrice={totalPrice}
+                    disableConfirm={disableConfirm}
+                    setDisableConfirm={setDisableConfirm}
+                    confirmLoading={confirmLoading}
+                    setConfirmLoading={setConfirmLoading}
+                    setPaymentEnabled={handlePaymentEnabled} />
+                </>
+                :
+                <StripePayment 
+                totalPrice={totalPrice}
+                setBackToPayment={handleBackToPayment}/>}
+            </div>
+
           </Col>
         </Row>
       </MainContainer>

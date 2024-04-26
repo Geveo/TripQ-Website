@@ -4,6 +4,7 @@ import registerCustomerReducer from "../features/registerCustomer/registerCustom
 import transactionListenerReducer from "./../features/transactionListener/transactionListenerSlice";
 import loginStateReducer from "./../features/LoginState/LoginStateSlice";
 import selectionDetailsReducer from "../features/SelectionDetails/SelectionDetailsSlice";
+import bookingCustomerReducer from "../features/BookingCustomer/BookingCustomerSlice";
 import ScreenLoaderReducer from "../features/screenLoader/ScreenLoaderSlice";
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     loginState: loginStateReducer,
     selectionDetails: selectionDetailsReducer,
     screenLaoder: ScreenLoaderReducer,
+    bookingCustomer: bookingCustomerReducer
   },
 });
 

@@ -43,7 +43,8 @@ const LocalStorageKeys ={
     AccountAddress: "account-address",
     XummPkceJwt: 'XummPkceJwt',
     pkce_state: 'pkce_state',
-    HotelSelectionDetails: 'hotel-selection-details'
+    HotelSelectionDetails: 'hotel-selection-details',
+    BookingCustomer: 'booking-customer'
 }
 
 const XRPLAccountEventTypes = {

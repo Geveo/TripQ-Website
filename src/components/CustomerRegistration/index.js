@@ -24,6 +24,7 @@ import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
 import { store } from "../../app/store";
+import { add as bookingCustomerAdd } from "../../features/BookingCustomer/BookingCustomerSlice";
 import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
 
 const CustomerRegistration = (props) => {
@@ -42,7 +43,7 @@ const CustomerRegistration = (props) => {
   const [lastNameInvalid, setLastNameInvalid] = useState(false);
   const [emailInvalid, setEmailInvalid] = useState(false);
   const loginState = useSelector((state) => state.loginState);
-
+  //const [paymentEnabled, setPaymentEnabled] = useState(false);
   const selectionDetails = useSelector((state) => state.selectionDetails);
 
   const dispatch = useDispatch();
@@ -64,6 +65,29 @@ const CustomerRegistration = (props) => {
     }
     return false;
   };
+
+
+  const proceedToPay = () => {
+    const body = {
+      firstName,
+      lastName,
+      email,
+      phoneNo,
+    };
+
+    dispatch(
+      bookingCustomerAdd({
+        key: localStorage.getItem(LocalStorageKeys.AccountAddress),
+        value:JSON.stringify(body),
+      })
+    );
+    localStorage.setItem(
+      LocalStorageKeys.BookingCustomer,
+      JSON.stringify(body)
+    );
+    props.setPaymentEnabled(true)
+
+  }
 
   const registerCustomer = async (e) => {
     e.preventDefault();
@@ -95,6 +119,7 @@ const CustomerRegistration = (props) => {
       props.setConfirmLoading(false);
       props.setDisableConfirm(false);
     }
+   
     return;
   };
   const submitForm = async () => {
@@ -279,8 +304,9 @@ const CustomerRegistration = (props) => {
           <Button
             className="secondaryButton"
             style={{ width: "180px" }}
-            onClick={() => submitForm()}
+           // onClick={() => submitForm()}
             disabled={props.disableConfirm}
+            onClick={() => proceedToPay()}
           >
             Continue To Payment
           </Button>
