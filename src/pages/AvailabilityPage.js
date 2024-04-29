@@ -7,16 +7,15 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import AvailabilityRooms from "../components/AvailabiityRooms/AvailabilityRooms";
 import DateFunctions from "../helpers/DateFunctions";
 import HotelService from "../services-domain/hotel-service copy";
-import { add as selectionDetailsAdd } from "../features/SelectionDetails/SelectionDetailsSlice";
+import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
 import { LocalStorageKeys } from "../constants/constants";
 import { useDispatch } from "react-redux";
-import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import { xummAuthorize } from "../services-common/xumm-api-service";
 
 function AvailabilityPage() {
-  const hotelService = HotelService.instance;
   const loginState = useSelector((state) => state.loginState);
+  let selectionDetails = useSelector((state) => state.selectionDetails.value);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -26,107 +25,63 @@ function AvailabilityPage() {
 
   const { checkInDate } = useParams();
   const { checkOutDate } = useParams();
-
-  const checkIn = new Date(checkInDate);
-  const checkOut = new Date(checkOutDate);
-
-  const checkInFormatted = format(checkIn, "yyyy-MM-dd");
-  const checkOutFormatted = format(checkOut, "yyyy-MM-dd");
-
   const [images, setImages] = useState([]);
   const [address1, setAddress1] = useState("P.O Box 11");
   const [address2, setAddress2] = useState("Heritance Kandalama");
   const [city, setCity] = useState("Sigiriya");
   const [roomTypes, setRoomTypes] = useState([]);
   const [hotelData, setHotelData] = useState([]);
-
   const [selectedRooms, setSelectedRooms] = useState([]);
-
   const [reserveBtnDisabled, setReserveBtnDisabled] = useState(true);
-
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Get hotel details
-    hotelService
-      .getHotelById(id)
-      .then((data) => {
-        if (data) {
-          let hotelData = {
-            Id: data.hotelDetails[0].Id,
-            Name: data.hotelDetails[0].Name,
-            StarRating: data.hotelDetails[0].StarRatings,
-            Location: data.hotelDetails[0].Location,
-            ImageURLs: data.hotelImages,
-            HotelOwnerWalletAddress: data.hotelDetails[0].WalletAddress,
-            Description: data.hotelDetails[0].Description,
-          };
-          setHotelData(hotelData);
+    if (!selectionDetails) {
+      selectionDetails = localStorage.getItem(
+        LocalStorageKeys.HotelSelectionDetails
+      );
+    }
 
-          setAddress1(JSON.parse(data.hotelDetails[0].Location).AddressLine01);
-          setAddress2(JSON.parse(data.hotelDetails[0].Location).AddressLine02);
-          setCity(JSON.parse(data.hotelDetails[0].Location).City);
-          setImages(data.hotelImages);
-        }
+    const hotelDetails = JSON.parse(selectionDetails);
 
-        // Get available room count
-        hotelService
-          .getAvailableRoomCount(id, checkInDate, checkOutDate)
-          .then((res) => {
-            let availableRoomCount = res;
-            // Get room details
-            hotelService
-              .getHotelRoomTypes(id)
-              .then(async (res) => {
-                let newRoomTypes = [];
-                let id = 0;
-                for (const roomType of res) {
-                  const resObj = await hotelService.getRoomTypeById(
-                    roomType.Id
-                  );
+    let hotelData = {
+      Id: hotelDetails.Id,
+      Name: hotelDetails.Name,
+      StarRating: hotelDetails.StarRatings,
+      Location: JSON.parse(hotelDetails.Location).City,
+      ImageURLs: hotelDetails.ImageURL,
+      HotelOwnerWalletAddress: hotelDetails.WalletAddress,
+      Description: hotelDetails.Description,
+    };
 
-                  let facilitiesIds = [];
+    setHotelData(hotelData);
+    setAddress1(JSON.parse(hotelDetails.Location).AddressLine01);
+    setAddress2(JSON.parse(hotelDetails.Location).AddressLine02);
+    setCity(JSON.parse(hotelDetails.Location).City);
+    setImages(Array.from(hotelDetails.ImageURL));
 
-                  for (const facility of resObj.Facilities) {
-                    facilitiesIds.push(facility.id);
-                  }
-                  newRoomTypes.push({
-                    Id: roomType.Id,
-                    RoomName: roomType.Code,
-                    Price: roomType.Price,
-                    RoomsCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).RoomsCount,
-                    SingleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).SingleBedCount,
-                    DoubleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).DoubleBedCount,
-                    TripleBedCount: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).TripleBedCount,
-                    TotalSleeps: availableRoomCount.find(
-                      (item) => item.Id == roomType.Id
-                    ).TotalSleeps,
-                    Facilities: facilitiesIds,
-                    SelectedRooms: 0,
-                  });
-                  id++;
-                }
-                setRoomTypes(newRoomTypes);
-              })
-              .catch((error) => {
-                console.error("Error fetching room types:", error);
-              });
-          })
-          .catch((error) => {
-            console.error("Error fetching available rooms count:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error fetching hotel details:", error);
+    let newRoomTypes = [];
+    for (const roomIndex in hotelDetails.AvailableRooms) {
+      let facilitiesIds = [];
+
+      let roomType = hotelDetails.AvailableRooms[roomIndex];
+
+      newRoomTypes.push({
+        Id: roomType.RoomTypeId,
+        RoomName: roomType.RoomTypeCode,
+        Price: roomType.Price,
+        RoomsCount: roomType.AvailableRooms,
+        SingleBedCount: roomType.SingleBedCount,
+        DoubleBedCount: roomType.DoubleBedCount,
+        TripleBedCount: roomType.TripleBedCount,
+        TotalSleeps: roomType.TotalSleepCapacity,
+        Facilities: facilitiesIds,
+        SelectedRooms: 0,
       });
+    }
+
+    setRoomTypes(newRoomTypes);
   }, [id]);
 
   const onChangeSelectedRooms = (room, isAdding) => {
@@ -206,8 +161,6 @@ function AvailabilityPage() {
     let checkOutDate = DateFunctions.convertDateObjectToDateOnlyString(
       new Date(checkOut)
     );
-
-    //setCheckInCheckOutDates({ checkIn: checkInDate, checkOut: checkOutDate });
   };
 
   const getFullAddress = () => {
@@ -219,19 +172,20 @@ function AvailabilityPage() {
   };
 
   const onReserve = async () => {
-    if (!loginState.isLoggedIn) {
-      await xummAuthorize();
-    }
+     if (!loginState.isLoggedIn) {
+       await xummAuthorize();
+     }
     let roomsCount = 0;
     const selectedRoomsArray = Object.values(selectedRooms);
-    const checkIn = new Date(checkInFormatted);
-    const checkOut = new Date(checkOutFormatted);
 
-    // Calculate the difference in milliseconds
-    const differenceInMilliseconds = checkOut - checkIn;
+    const dateParts1 = checkInDate.split("-");
+    const dateParts2 = checkOutDate.split("-");
+    const date1 = new Date(dateParts1[0], dateParts1[1] - 1, dateParts1[2]);
+    const date2 = new Date(dateParts2[0], dateParts2[1] - 1, dateParts2[2]);
 
-    // Convert milliseconds to days
-    const differenceInDays = differenceInMilliseconds / (1000 * 3600 * 24);
+    const differenceMs = Math.abs(date2 - date1);
+
+    const differenceDays = Math.ceil(differenceMs / (1000 * 60 * 60 * 24));
 
     let selectedObj = {
       HotelId: id,
@@ -239,9 +193,9 @@ function AvailabilityPage() {
       Address: getFullAddress(),
       StarRate: hotelData.StarRating,
       Images: hotelData.ImageURLs,
-      CheckIn: checkInFormatted,
-      CheckOut: checkOutFormatted,
-      Nights: differenceInDays,
+      CheckIn: checkInDate,
+      CheckOut: checkOutDate,
+      Nights: differenceDays,
       RoomTypes: selectedRoomsArray,
       HotelOwnerWalletAddress: hotelData.HotelOwnerWalletAddress,
     };
@@ -257,10 +211,9 @@ function AvailabilityPage() {
       LocalStorageKeys.HotelSelectionDetails,
       JSON.stringify(selectedObj)
     );
+
     let selectedRoomList = [];
     for (const [roomId, values] of Object.entries(selectedRooms)) {
-      console.log(roomId, values);
-
       if (values.count === 0) continue;
 
       let temp = {
@@ -273,8 +226,6 @@ function AvailabilityPage() {
       selectedRoomList.push(temp);
     }
     let result = { selections: selectedRoomList };
-
-    console.log(result);
 
     navigate("/make-reservations");
   };
@@ -300,7 +251,9 @@ function AvailabilityPage() {
             <div style={{ width: "20px" }}>
               <FaWallet />
             </div>
-            <div className={"subtext pt-2 col"}>{hotelData.HotelOwnerWalletAddress}</div>
+            <div className={"subtext pt-2 col"}>
+              {hotelData.HotelOwnerWalletAddress}
+            </div>
           </div>
 
           <div className={"pt-4 pb-4 center_div"}>

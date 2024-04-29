@@ -1,7 +1,7 @@
 import {Xumm} from 'xumm'
 import {LocalStorageKeys, PaymentResults} from "../constants/constants";
-import {loginSuccessfully, logoutSuccessfully} from "../features/LoginState/LoginStateSlice";
-import {store}  from '../app/store'
+import {loginSuccessfully, logoutSuccessfully} from "../redux/LoginState/LoginStateSlice";
+import {store}  from '../redux/store'
 
 let xumm = null;
 

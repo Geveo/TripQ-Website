@@ -8,7 +8,7 @@ import "./styles.scss";
 import XrplService from "../../services-common/xrpl-service";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { loginSuccessfully } from "../../features/LoginState/LoginStateSlice";
+import { loginSuccessfully } from "../../redux/LoginState/LoginStateSlice";
 import { LocalStorageKeys } from "../../constants/constants";
 
 /**

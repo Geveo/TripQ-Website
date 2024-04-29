@@ -19,6 +19,7 @@ const RequestSubTypes = {
     GET_HOTEL_IMAGES_BY_ID: "GetHotelImagesById",
     GET_AVAILABLE_ROOM_COUNT: "GetAvailableRoomCount",
     GET_RECENT_HOTEL: "GetRecentHotels",
+    GET_HOTELS_LIST_MAPPED_WITH_AI_SEARCH: "GetHotelsListMappedWithAISearch",
 
     GET_ROOMS: "GetRooms",
     GET_ROOMS_BY_HOTELID: "GetRoomTypes",

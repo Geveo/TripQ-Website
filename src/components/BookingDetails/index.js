@@ -19,7 +19,6 @@ const BookHotelRoom = (props) => {
     }
 
     setSelectedRoomDetails(selectedDetails.RoomTypes);
-    console.log("selection details:", selectedDetails);
     if (
       selectedDetails &&
       selectedDetails.RoomTypes &&

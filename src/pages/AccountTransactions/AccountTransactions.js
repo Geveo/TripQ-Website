@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faArrowUp, faArrowsRotate } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
-import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import CoinRankingService from "../../services-common/coinranking-service";
 
 
@@ -241,7 +241,7 @@ const  AccountTransactions = () => {
                     {/*<Col lg={1}></Col>*/}
                     <Col lg={5}>
                         <Card className={`text-center p-5 balance-card`} style={{position: 'relative'}}>
-                            <div style={{position: 'absolute', left: 10, top: 5}} className={`card-label`}> EVR
+                            <div style={{position: 'absolute', left: 10, top: 5}} className={`card-label`}> TPQ
                                 balance
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
@@ -254,7 +254,7 @@ const  AccountTransactions = () => {
                                     maximumFractionDigits: 2
                                 })} LKR)</span>
                                 </div>
-                                {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
+                                {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>
                         </Card>
                     </Col>
@@ -274,7 +274,7 @@ const  AccountTransactions = () => {
                                     maximumFractionDigits: 2
                                 })} LKR)</span>
                                 </div>
-                                {/*<div className={`font-size-10 evr-label mt-5`}>EVR.{issuer}</div>*/}
+                                {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>
                         </Card>
                     </Col>

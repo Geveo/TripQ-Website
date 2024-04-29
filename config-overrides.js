@@ -14,7 +14,8 @@ module.exports = function override(config) {
         "buffer": require.resolve("buffer/"),
         "zlib": require.resolve("browserify-zlib"),
         "path": require.resolve("path-browserify"),
-        "fs": require.resolve("fs")
+        "fs": require.resolve("fs"),
+        'process/browser': require.resolve('process/browser')
     })
     config.resolve.fallback = fallback;
     config.externals = {
