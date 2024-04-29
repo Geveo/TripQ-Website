@@ -32,7 +32,6 @@ function RoomTypeDetails() {
             setIsLoading(true);
             HotelService.instance.getRoomTypeById(id)
              .then((data) => {
-                console.log("data: ",data);
                 setRoomDetails(data.roomType);
                 setFacilities(data.Facilities);
                 let selectedFacilitiesIDs = [];
@@ -94,7 +93,7 @@ function RoomTypeDetails() {
         <div style={{paddingLeft:'15px'}} className=" mt-3">Number of Triple Beds : {roomDetails.TripleBedCount}</div>
 
         <div className="title_3 mt-4">Base price per day</div>
-        <div style={{paddingLeft:'15px'}} className="mt-3">Price in EVR : {parseFloat(roomDetails.Price).toFixed(6)}</div>
+        <div style={{paddingLeft:'15px'}} className="mt-3">Price in TPQ : {parseFloat(roomDetails.Price).toFixed(6)}</div>
 
         <section ref={facilitiesSection} id="facilities" className={"pt-2"}>
               <RoomFacilitiesReadOnly

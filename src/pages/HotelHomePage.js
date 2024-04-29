@@ -16,8 +16,8 @@ import { toast } from "react-hot-toast";
 import ContractService from "../services-common/contract-service";
 import { HotelDto } from "../dto/HotelDto";
 import { LocalStorageKeys } from "../constants/constants";
-import { store } from "./../app/store";
-import { setShowScreenLoader } from "../features/screenLoader/ScreenLoaderSlice";
+import { store } from "../redux/store";
+import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 const { useDispatch } = require("react-redux");
 
 function HotelHomePage() {

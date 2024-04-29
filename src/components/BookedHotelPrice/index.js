@@ -7,7 +7,7 @@ const BookedHotelPrice = (props) => {
             <Row>
                 <Col>
                     <h4>Price: {(props.totalPrice*115000).toFixed(2)} {process.env.REACT_APP_CURRENCY}</h4>
-                    { <small>{parseFloat(props.totalPrice).toFixed(6)} EVR</small> }
+                    { <small>{parseFloat(props.totalPrice).toFixed(6)} TPQ</small> }
                 </Col>
             </Row>
         </Card>
