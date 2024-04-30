@@ -11,6 +11,8 @@ import { Alert, Spinner } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys } from "../constants/constants";
 import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
+import { store } from "../redux/store";
+import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
@@ -45,10 +47,11 @@ function HotelSearchPage(props) {
 
   const isFilerDisable = true;
 
-  const [hotelResultList, setHotelResultList] = useState(null);
-  const [hotelResultListCopy, setHotelResultListCopy] = useState(null);
+  const [hotelResultList, setHotelResultList] = useState([]);
+  const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
 
   useEffect(() => {
+    store.dispatch(setShowScreenLoader(true));
     // Get AI searched results
     if (!aiHotelSearchState) {
       aiHotelSearchState = localStorage.getItem(
@@ -63,14 +66,16 @@ function HotelSearchPage(props) {
       AISearchedList: aiHotelSearchState.hotel_names,
     };
 
+    setCity(aiHotelSearchState.destination);
+    setSearchCity(aiHotelSearchState.destination);
+    setSearchText(aiHotelSearchState.destination);
+    setCheckInDate(aiHotelSearchState.from_date);
+    setCheckOutDate(aiHotelSearchState.to_date);
+
     hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
-      setCity(aiHotelSearchState.destination);
-      setSearchCity(aiHotelSearchState.destination);
-      setSearchText(aiHotelSearchState.destination);
-      setCheckInDate(aiHotelSearchState.from_date);
-      setCheckOutDate(aiHotelSearchState.to_date);
       setHotelResultList(res);
       setHotelResultListCopy(res);
+      store.dispatch(setShowScreenLoader(false));
     });
   }, []);
 
@@ -128,43 +133,8 @@ function HotelSearchPage(props) {
     }
   }
 
-  useEffect(() => {
-    let convenienceWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let quickPlannersWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let bedTypeAvailability = bed_types.map((bed_type) => {
-      return {
-        ...bed_type,
-        status: false,
-      };
-    });
-
-    let roomFacilityAvailability = roomFacilitiesData.map((room_facility) => {
-      return {
-        ...room_facility,
-        status: false,
-      };
-    });
-
-    setConveniences(convenienceWithAvailability);
-    setRoomFacilities(roomFacilityAvailability);
-    setBedTypes(bedTypeAvailability);
-    setSearchCity(city);
-    searchHotelsWithRooms(city, checkInDate, checkOutDate, guestCount);
-  }, []);
-
   const onClickSearch = async () => {
+    store.dispatch(setShowScreenLoader(true));
     setCity(searchCity);
 
     const obj = {
@@ -181,12 +151,13 @@ function HotelSearchPage(props) {
             return {
               Id: hh.Id,
               Name: hh.Name,
-              City: hh.Location,
+              Location: hh.Location,
               ImageURL: hh.ImageURL,
               StarRatings: hh.StarRatings,
               ContactDetails: hh.ContactDetails,
               Description: hh.Description,
               WalletAddress: hh.WalletAddress,
+              AvailableRooms: hh.AvailableRooms,
             };
           });
           setCity(city);
@@ -195,9 +166,11 @@ function HotelSearchPage(props) {
           setHotelResultListCopy(newHotellist);
 
           setIsDataLoading(false);
+          store.dispatch(setShowScreenLoader(false));
         } else {
           setIsDataLoading(false);
           setHotelResultListCopy([]);
+          store.dispatch(setShowScreenLoader(false));
         }
       });
     } catch (error) {

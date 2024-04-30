@@ -30,8 +30,8 @@ function HotelsList() {
 
   const getFullAddress = (address1, address2, city) => {
     let address = address1 ?? "";
-    address += address2 ? `, ${address2}` : "";
-    address += city ? `, ${city}` : "";
+    address += address2 ? ` ${address2}` : "";
+    address += city ? ` ${city}` : "";
 
     return address;
   };
