@@ -63,12 +63,13 @@ function HotelSearchPage(props) {
       AISearchedList: aiHotelSearchState.hotel_names,
     };
 
+    setCity(aiHotelSearchState.destination);
+    setSearchCity(aiHotelSearchState.destination);
+    setSearchText(aiHotelSearchState.destination);
+    setCheckInDate(aiHotelSearchState.from_date);
+    setCheckOutDate(aiHotelSearchState.to_date);
+
     hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
-      setCity(aiHotelSearchState.destination);
-      setSearchCity(aiHotelSearchState.destination);
-      setSearchText(aiHotelSearchState.destination);
-      setCheckInDate(aiHotelSearchState.from_date);
-      setCheckOutDate(aiHotelSearchState.to_date);
       setHotelResultList(res);
       setHotelResultListCopy(res);
     });
@@ -128,42 +129,6 @@ function HotelSearchPage(props) {
     }
   }
 
-  useEffect(() => {
-    let convenienceWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let quickPlannersWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let bedTypeAvailability = bed_types.map((bed_type) => {
-      return {
-        ...bed_type,
-        status: false,
-      };
-    });
-
-    let roomFacilityAvailability = roomFacilitiesData.map((room_facility) => {
-      return {
-        ...room_facility,
-        status: false,
-      };
-    });
-
-    setConveniences(convenienceWithAvailability);
-    setRoomFacilities(roomFacilityAvailability);
-    setBedTypes(bedTypeAvailability);
-    setSearchCity(city);
-    searchHotelsWithRooms(city, checkInDate, checkOutDate, guestCount);
-  }, []);
-
   const onClickSearch = async () => {
     setCity(searchCity);
 
@@ -181,12 +146,13 @@ function HotelSearchPage(props) {
             return {
               Id: hh.Id,
               Name: hh.Name,
-              City: hh.Location,
+              Location: hh.Location,
               ImageURL: hh.ImageURL,
               StarRatings: hh.StarRatings,
               ContactDetails: hh.ContactDetails,
               Description: hh.Description,
               WalletAddress: hh.WalletAddress,
+              AvailableRooms: hh.AvailableRooms,
             };
           });
           setCity(city);

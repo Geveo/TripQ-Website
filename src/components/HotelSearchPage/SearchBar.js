@@ -5,7 +5,7 @@ import "./styles.scss";
 import { RangeDatePicker } from "@y0c/react-datepicker";
 
 function SearchBar(props) {
-  const [dateRange, setDateRange] = useState(null);
+  const [dateRange, setDateRange] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
   const [guests, setGuests] = useState(props.numOfPeople);
   const [displayCity, setDisplayCity] = useState("");
@@ -23,10 +23,13 @@ function SearchBar(props) {
 
   useEffect(() => {
     setDisplayCity(props.city);
-  }, [props.city]);
+    dateRange.push(props.checkInDate)
+    dateRange.push(props.checkOutDate)
+  }, [props.city,props.checkInDate, props.checkOutDate]);
 
   const onDateChange = (...args) => {
     setIsDirty(true);
+    setDateRange(args)
     console.log(new Date(args[0]).toISOString().split("T")[0]);
   };
 
@@ -78,7 +81,7 @@ function SearchBar(props) {
                 style={{
                   position: "absolute",
                   top: "18px",
-                  right: "10px",
+                  right: "8px",
                   transform: "translateY(-50%)",
                 }}
                 color={"#908F8F"}
@@ -101,7 +104,7 @@ function SearchBar(props) {
                 style={{
                   position: "absolute",
                   top: "16px",
-                  right: "18px",
+                  right: "8px",
                   transform: "translateY(-50%)",
                 }}
                 color={"#908F8F"}
@@ -123,7 +126,7 @@ function SearchBar(props) {
                 style={{
                   position: "absolute",
                   top: "18px",
-                  right: "10px",
+                  right: "8px",
                   transform: "translateY(-50%)",
                 }}
                 color={"#908F8F"}
