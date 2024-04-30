@@ -11,6 +11,8 @@ import { Alert, Spinner } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys } from "../constants/constants";
 import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
+import { store } from "../redux/store";
+import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
@@ -45,10 +47,11 @@ function HotelSearchPage(props) {
 
   const isFilerDisable = true;
 
-  const [hotelResultList, setHotelResultList] = useState(null);
-  const [hotelResultListCopy, setHotelResultListCopy] = useState(null);
+  const [hotelResultList, setHotelResultList] = useState([]);
+  const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
 
   useEffect(() => {
+    store.dispatch(setShowScreenLoader(true));
     // Get AI searched results
     if (!aiHotelSearchState) {
       aiHotelSearchState = localStorage.getItem(
@@ -72,6 +75,7 @@ function HotelSearchPage(props) {
     hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
       setHotelResultList(res);
       setHotelResultListCopy(res);
+      store.dispatch(setShowScreenLoader(false));
     });
   }, []);
 
@@ -130,6 +134,7 @@ function HotelSearchPage(props) {
   }
 
   const onClickSearch = async () => {
+    store.dispatch(setShowScreenLoader(true));
     setCity(searchCity);
 
     const obj = {
@@ -161,9 +166,11 @@ function HotelSearchPage(props) {
           setHotelResultListCopy(newHotellist);
 
           setIsDataLoading(false);
+          store.dispatch(setShowScreenLoader(false));
         } else {
           setIsDataLoading(false);
           setHotelResultListCopy([]);
+          store.dispatch(setShowScreenLoader(false));
         }
       });
     } catch (error) {
