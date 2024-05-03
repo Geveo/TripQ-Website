@@ -58,12 +58,21 @@ function HotelSearchPage(props) {
         LocalStorageKeys.AiHotelSearchResult
       );
     }
+
+    let hotelNames = [];
+    let searchResult = [];
+    let hotelList = [];
+
+    aiHotelSearchState.hotels.forEach((hotel) => {
+      hotelNames.push(hotel.hotel_name);
+    });
+
     const obj = {
       City: aiHotelSearchState.destination,
       CheckInDate: new Date(aiHotelSearchState.from_date),
       CheckOutDate: new Date(aiHotelSearchState.to_date),
       GuestCount: aiHotelSearchState.total_head_count,
-      AISearchedList: aiHotelSearchState.hotel_names,
+      AISearchedList: hotelNames,
     };
 
     setCity(aiHotelSearchState.destination);
@@ -74,7 +83,77 @@ function HotelSearchPage(props) {
 
     hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
       setHotelResultList(res);
-      setHotelResultListCopy(res);
+
+      if(res){
+        res.forEach((hotel) => {
+          searchResult.push(hotel.Name);
+        });
+      }
+     
+      let hotelsNotInDatabase = [];
+      hotelNames.forEach((hotelAI) => {
+        let found = false;
+        
+        // Case-insensitive wildcard match
+        const regex = new RegExp(`^${hotelAI.replace(/\*/g, ".*")}$`, "i"); 
+
+        searchResult.forEach((hotelDB) => {
+          if (regex.test(hotelDB)) {
+            found = true;
+          }
+        });
+        if (!found) {
+          hotelsNotInDatabase.push(hotelAI);
+        }
+      });
+
+      if(res){
+        res.forEach(hotel => {
+          const hotelObj = {
+            AvailableRooms: hotel.AvailableRooms,
+            ContactDetails: JSON.parse(hotel.ContactDetails),
+            CreatedOn: hotel.CreatedOn,
+            Description: hotel.Description,
+            Facilities: JSON.parse(hotel.Facilities),
+            Id: hotel.Id,
+            ImageURL: hotel.ImageURL,
+            LastUpdateOn: hotel.LastUpdateOn,
+            Location: JSON.parse(hotel.Location),
+            Name: hotel.Name,
+            StarRatings: hotel.StarRatings,
+            WalletAddress: hotel.WalletAddress,
+            WebsiteURL: "",
+            PhoneNumber: JSON.parse(hotel.ContactDetails).PhoneNumber,
+          };
+          hotelList.push(hotelObj)
+        });
+      }
+      
+      hotelsNotInDatabase.forEach(hotel => {
+        aiHotelSearchState.hotels.forEach(aiHotel => {
+          if(aiHotel.hotel_name === hotel){
+            const hotelObj = {
+              AvailableRooms: [],
+              ContactDetails: "",
+              CreatedOn: "",
+              Description: aiHotel.hotel_description,
+              Facilities: "",
+              Id: "",
+              ImageURL: aiHotel.star_ratings,
+              LastUpdateOn: "",
+              Location: aiHotel.hotel_address,
+              Name: aiHotel.hotel_name,
+              StarRatings: aiHotel.star_ratings,
+              WalletAddress:"",
+              WebsiteURL: aiHotel.website_link,
+              PhoneNumber: aiHotel.phone
+            };
+            hotelList.push(hotelObj)
+          }
+        });
+        
+      });
+      setHotelResultListCopy(hotelList);
       store.dispatch(setShowScreenLoader(false));
     });
   }, []);
@@ -228,11 +307,16 @@ function HotelSearchPage(props) {
       LocalStorageKeys.HotelSelectionDetails,
       JSON.stringify(hotel)
     );
-    navigate(
-      `/availability/${hotel.Id}/${formatDate(checkInDate)}/${formatDate(
-        checkOutDate
-      )}`
-    );
+
+    if(hotel.WebsiteURL.length > 0){
+      window.open(hotel.WebsiteURL, '_blank');
+    }else{
+      navigate(
+        `/availability/${hotel.Id}/${formatDate(checkInDate)}/${formatDate(
+          checkOutDate
+        )}`
+      );
+    }
   }
 
   function onCitySearchChanged(newCity) {
