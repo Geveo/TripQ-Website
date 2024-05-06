@@ -38,10 +38,10 @@ export class AzureOpenaiService {
      *
      * @param message
      * @param count
-     * @returns {Promise<any>} An object in the format { hotel_names: [], destination: "", from_date: "", to_date: "", total_head_count: 1}
+     * @returns {Promise<any>} An object in the format  { hotels: [hotel_name: "", hotel_address: "", hotel_description: "", website_link: "", star_ratings: 0, phone: ""], destination: "", from_date: "", to_date: "", total_head_count: 1}
      */
     async searchHotels(message, count = 5) {
-        message += `Give me only a json output in the following format.  { hotel_names: [], destination: "", from_date: "", to_date: "", total_head_count: 1} , where hotel_names is an array of string of searched ${count} hotel names that suit the requirement mentioned earlier or closer to the requirement, and destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description and in the form of dd/mm/yyyy or null if not found. total_head_count is an integer value extracted, if not found its value is 0. Language must be english. While searching, don't consider the start date, end date and the number of people for hotel search`
+        message += `Give me only a json output in the following format.  { hotels: [hotel_name: "", hotel_address: "", hotel_description: "", website_link: "", star_ratings: 0, phone: ""], destination: "", from_date: "", to_date: "", total_head_count: 1} , where hotels is an array of searched ${count} hotels that suit the requirement mentioned earlier or closer to the requirement, hotel_name shouldn't include the city and "hotel" word,destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description and in the form of dd/mm/yyyy or null if not found. total_head_count is an integer value extracted, if not found its value is 0. Language must be english. While searching, only consider the destination`
         console.log(message)
         const reply = await this.client.getChatCompletions(
             this.modelInstanceName, // assumes a matching model deployment or model name
