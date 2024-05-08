@@ -6,10 +6,11 @@ function CGPayment() {
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('');
   const [description, setDescription] = useState('');
+  const [redirectUrl, setRedirectUrl] = useState(null);
 
   const handlePayment = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/api/payment', {
+      const response = await axios.post('http://localhost:4200/api/payment', {
         amount,
         currency,
         description,
@@ -19,7 +20,13 @@ function CGPayment() {
         },
       });
       console.log('response.data:', response.data);
-      setPaymentStatus(response.data);
+      const paymentUrl = response.data.paymentUrl;
+      setRedirectUrl(response.data.paymentUrl);
+      window.location.href = response.data.paymentUrl; 
+      if (response.data.paymentUrl) {
+        window.location.href = response.data.paymentUrl; // Redirect the user
+        return null; // Render nothing if redirecting
+    }
     } catch (error) {
       console.error('Payment error:', error);
       setPaymentStatus('Payment error. Please try again later.');
