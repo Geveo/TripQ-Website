@@ -65,6 +65,31 @@ const CustomerRegistration = (props) => {
     return false;
   };
 
+
+  const proceedToPay = () => {
+    const body = {
+      firstName,
+      lastName,
+      email,
+      phoneNo,
+    };
+/*
+    dispatch(
+      bookingCustomerAdd({
+        key: localStorage.getItem(LocalStorageKeys.AccountAddress),
+        value:JSON.stringify(body),
+      })
+    );
+    localStorage.setItem(
+      LocalStorageKeys.BookingCustomer,
+      JSON.stringify(body)
+    );*/
+   // props.setPaymentEnabled(true)
+
+    navigate(`/cg-payment`);
+
+  }
+
   const registerCustomer = async (e) => {
     e.preventDefault();
     const body = {
@@ -279,8 +304,8 @@ const CustomerRegistration = (props) => {
           <Button
             className="secondaryButton"
             style={{ width: "180px" }}
-            onClick={() => submitForm()}
-            disabled={props.disableConfirm}
+            onClick={() => proceedToPay()}
+           // disabled={props.disableConfirm}
           >
             Continue To Payment
           </Button>
