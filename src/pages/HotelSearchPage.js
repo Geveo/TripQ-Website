@@ -168,31 +168,11 @@ function HotelSearchPage(props) {
       hotelNames.forEach((element) => {
         openAiService.getHotelDetails(element, city).then((res) => {
           hotels.set(element, res);
-          setHotelMap(hotels);
+          setHotelMap(new Map(hotels));
         });
       });
     }
   }, [hotelNames]);
-
-  useEffect(() => {
-    if (hotelResultListCopy.length > 0 && hotelMap.size > 0) {
-      let newHotellist = [];
-      hotelResultListCopy.forEach((element) => {
-        const hotelDetails = hotelMap.get(element.Name);
-        if (hotelDetails) {
-          element.Description = hotelDetails.hotel_description;
-          element.Location = hotelDetails.hotel_address;
-          element.PhoneNumber = hotelDetails.phone;
-          element.StarRatings = hotelDetails.star_ratings;
-          element.WebsiteURL = hotelDetails.website_link;
-          newHotellist.push(element);
-        } else {
-          newHotellist.push(element);
-        }
-      });
-      setHotelResultListCopy(newHotellist);
-    }
-  }, [hotelResultListCopy, hotelMap]);
 
   const onClickSearch = () => {
     store.dispatch(setShowScreenLoader(true));
@@ -329,6 +309,7 @@ function HotelSearchPage(props) {
             {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
               <HotelList
                 data={hotelResultListCopy}
+                hotelMap={hotelMap}
                 numOfPeople={guestCount}
                 onViewAvailableClicked={onViewAvailableClicked}
               />
