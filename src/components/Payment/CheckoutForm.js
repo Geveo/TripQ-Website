@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {PaymentElement, useStripe, useElements} from "@stripe/react-stripe-js";
 import { useNavigate } from "react-router-dom";
-import { store } from "../../app/store";
-import { setShowScreenLoader } from "../../features/screenLoader/ScreenLoaderSlice";
+import { store } from "../../redux/store";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import { ReservationDto } from "../../dto/ReservationDto";
 import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import { toast } from "react-hot-toast";
 import HotelService from "./../../services-domain/hotel-service copy";
-import { remove as bookingCustomerRemove } from "../../features/BookingCustomer/BookingCustomerSlice";
+import { remove as bookingCustomerRemove } from "../../redux/BookingCustomer/BookingCustomerSlice";
 
 const CheckoutForm  = (props) => {
   const hotelService = HotelService.instance;

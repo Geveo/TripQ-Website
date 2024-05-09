@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import BookingDetails from "../../components/BookingDetails/index";
 import StripePayment from "../../components/Payment/StripePayment";
+import CoingatePayment from "../../components/Payment/CGPayment";
+import PaymentSelection from "../../components/Payment/PaymentSelection";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
 import { Row, Col } from "reactstrap";
 import MainContainer from "../../layout/MainContainer";
-import CustomerRegistration from "../../components/CustomerRegistration";
+import CustomerRegistration from "../../components/CustomerRegistration/CustometRegistration";
 import BookedHotelPrice from "../../components/BookedHotelPrice";
 import "../../styles/layout_styles.scss";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -34,6 +36,7 @@ const ReservationForm = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
   const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [selectedGateway, setSelectedGateway] = useState('');
   const [totalPrice, setTotalPrice] = useState(0);
   const loginState = useSelector((state) => state.loginState);
 
@@ -79,6 +82,10 @@ const ReservationForm = () => {
     setPaymentEnabled(data);
   };
 
+  const handleSelectedGateway = (data) => {
+    setSelectedGateway(data);
+  };
+
   return (
     <>
       <MainContainer>
@@ -96,7 +103,54 @@ const ReservationForm = () => {
 
           <Col md={8}>
             <div>
-              { !paymentEnabled ?
+
+              {!paymentEnabled ? (
+                <>
+                  <BookedHotelDetails
+                    hotelName={searchDetails.Name}
+                    hotelAddress={searchDetails.Address}
+                    starRate={searchDetails.StarRate}
+                    image={searchDetails.Images} />
+
+                  <CustomerRegistration
+                    totalPrice={totalPrice}
+                    disableConfirm={disableConfirm}
+                    setDisableConfirm={setDisableConfirm}
+                    confirmLoading={confirmLoading}
+                    setConfirmLoading={setConfirmLoading}
+                    setPaymentEnabled={handlePaymentEnabled} />
+                </>
+              ) : (
+                <>
+                  { selectedGateway == '' ? 
+                    (
+                      <PaymentSelection
+                        //totalPrice={totalPrice}
+                        setSelectedGateway={handleSelectedGateway} />
+                    ) : selectedGateway == 'Stripe' ?
+                      (
+                        <StripePayment
+                          totalPrice={totalPrice}
+                          setBackToPayment={handleBackToPayment} />
+                      ) : selectedGateway == 'Coingate' ?
+                        (
+                        <CoingatePayment />
+                        ) : null
+                  }
+                </>
+              )}
+            </div>
+          </Col>
+        </Row>
+      </MainContainer>
+    </>
+  );
+};
+
+export default ReservationForm;
+
+
+/* { !paymentEnabled ?
                 <>
                 <BookedHotelDetails
                   hotelName={searchDetails.Name}
@@ -113,16 +167,19 @@ const ReservationForm = () => {
                     setPaymentEnabled={handlePaymentEnabled} />
                 </>
                 :
-                <StripePayment 
-                totalPrice={totalPrice}
-                setBackToPayment={handleBackToPayment}/>}
+                <PaymentSelection 
+                //totalPrice={totalPrice}
+                setSelectedGateway={handleSelectedGateway}/>}
             </div>
 
-          </Col>
-        </Row>
-      </MainContainer>
-    </>
-  );
-};
-
-export default ReservationForm;
+            <div>
+              {  selectedGateway == 'Stripe' ?
+                <>
+                 <StripePayment 
+                totalPrice={totalPrice}
+                setBackToPayment={handleBackToPayment}/>
+                </>
+                :
+                <CoingatePayment/>}
+            </div>
+*/

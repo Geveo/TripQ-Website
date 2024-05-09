@@ -34,43 +34,30 @@ const PaymentSelection = (props) => {
 */
 
   const proceedToPayWithStripe = () => {
-    
-/*
-    dispatch(
-      bookingCustomerAdd({
-        key: localStorage.getItem(LocalStorageKeys.AccountAddress),
-        value:JSON.stringify(body),
-      })
-    );
-    localStorage.setItem(
-      LocalStorageKeys.BookingCustomer,
-      JSON.stringify(body)
-    );*/
-   // props.setPaymentEnabled(true)
-
-    navigate(`/cg-payment`);
+    props.setSelectedGateway('Coingate')
 
   }
 
    const proceedToPayWithCoingate = () => {
-    //send the props as enabled to parent
-    navigate(`/cg-payment`);
+    props.setSelectedGateway('Coingate')
+   // navigate(`/cg-payment`);
+
+  }
+
+  const goBack = () => {
+    console.log("hit")
+    props.setBackToPayment(false)
 
   }
 
   return (
     <Card1>
-      
         <Row>
           <Col md={12}>
-            
               <Label for="firstName">
                 Please select the payment gateway?
               </Label>
-              
-      
           </Col>
-     
         </Row>
        
         <Row>
@@ -83,13 +70,7 @@ const PaymentSelection = (props) => {
             paddingTop: 25,
           }}
         >
-          <Button
-            className="secondaryButton"
-            style={{ width: "180px" }}
-            onClick={() => navigate(-1)}
-          >
-            Back
-          </Button>
+        
         </div>
           </Col>
           <Col md={6}>

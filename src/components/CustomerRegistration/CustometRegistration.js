@@ -17,11 +17,11 @@ import "react-phone-input-2/lib/style.css";
 import "./styles.scss";
 import { showPayQRWindow } from "../../services-common/xumm-api-service";
 import { toast } from "react-hot-toast";
-import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
+import ToastInnerElement from "../ToastInnerElement/ToastInnerElement";
 import { PaymentResults } from "../../constants/constants";
 import { ReservationDto } from "../../dto/ReservationDto";
 import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
-import HotelService from "./../../services-domain/hotel-service copy";
+import HotelService from "../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
 import { add as bookingCustomerAdd } from "../../redux/BookingCustomer/BookingCustomerSlice";
 
