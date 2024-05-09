@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Card1 from "../../layout/Card";
 
 function CGPayment() {
   const [paymentStatus, setPaymentStatus] = useState('');
@@ -20,8 +21,8 @@ function CGPayment() {
         },
       });
       console.log('response.data:', response.data);
-      const paymentUrl = response.data.paymentUrl;
       setRedirectUrl(response.data.paymentUrl);
+
       window.location.href = response.data.paymentUrl; 
       if (response.data.paymentUrl) {
         window.location.href = response.data.paymentUrl; // Redirect the user
@@ -34,6 +35,7 @@ function CGPayment() {
   };
 
   return (
+    <Card1>
     <div>
       <h1>Hotel Booking Payment</h1>
       <input
@@ -57,6 +59,7 @@ function CGPayment() {
       <button onClick={handlePayment}>Pay Now</button>
       <p>{paymentStatus}</p>
     </div>
+    </Card1>
   );
 }
 
