@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys } from "../constants/constants";
 import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
 import { store } from "../redux/store";
+import { AzureOpenaiService } from "../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
@@ -21,6 +22,7 @@ function HotelSearchPage(props) {
 
   const location = useLocation();
   const hotelService = HotelService.instance;
+  const openAiService = AzureOpenaiService.getInstance();
 
   const loginState = useSelector((state) => state.loginState);
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
@@ -48,6 +50,7 @@ function HotelSearchPage(props) {
   const isFilerDisable = true;
 
   const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
+  const [hotelNames, setHotelNames] = useState([]);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
@@ -66,6 +69,8 @@ function HotelSearchPage(props) {
     aiHotelSearchState.hotels.forEach((hotel) => {
       hotelNames.push(hotel.hotel_name);
     });
+
+    setHotelNames(hotelNames);
 
     const obj = {
       City: aiHotelSearchState.destination,
@@ -155,6 +160,34 @@ function HotelSearchPage(props) {
     });
   }, [aiHotelSearchState]);
 
+  useEffect(() => {
+    if (hotelNames.length > 0) {
+      hotelNames.forEach((element) => {
+        openAiService
+          .getHotelDetails(element, city)
+          .then((res) => {
+            let newHotellist = [];
+            hotelResultListCopy.forEach((hotel) => {
+              if (hotel.Name == res.hotel_name) {
+                hotel.Description = res.hotel_description;
+                hotel.Location = res.hotel_address;
+                hotel.PhoneNumber = res.phone;
+                hotel.StarRatings = res.star_ratings;
+                hotel.WebsiteURL = res.website_link;
+                newHotellist.push(hotel);
+                setHotelResultListCopy(newHotellist);
+              } else {
+                newHotellist.push(hotel);
+                setHotelResultListCopy(newHotellist);
+              }
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching hotel details:", error);
+          });
+      });
+    }
+  }, [hotelNames, hotelResultListCopy.length]);
   const onClickSearch = async () => {
     store.dispatch(setShowScreenLoader(true));
     setCity(searchCity);
@@ -203,35 +236,6 @@ function HotelSearchPage(props) {
     }
   };
 
-  const resetFilters = () => {
-    let temp_conveniences = conveniences.map((convenience) => {
-      return {
-        ...convenience,
-        status: false,
-      };
-    });
-
-    let bed_types = bedTypes.map((bed_type) => {
-      return {
-        ...bed_type,
-        status: false,
-      };
-    });
-
-    let room_facilities = roomFacilities.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-    setBudget("");
-    setConveniences(temp_conveniences);
-    setDistance("");
-    setCancellationPolicy("None");
-    setBedTypes(bed_types);
-    setRoomFacilities(room_facilities);
-  };
-
   function onViewAvailableClicked(hotel) {
     dispatch(
       selectionDetailsAdd({
@@ -245,7 +249,7 @@ function HotelSearchPage(props) {
       JSON.stringify(hotel)
     );
 
-    if (hotel.WebsiteURL.length > 0) {
+    if (hotel.WebsiteURL && hotel.WebsiteURL.length > 0) {
       window.open(hotel.WebsiteURL, "_blank");
     } else {
       navigate(
