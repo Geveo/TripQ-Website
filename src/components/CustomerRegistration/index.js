@@ -23,6 +23,8 @@ import { ReservationDto } from "../../dto/ReservationDto";
 import { LocalStorageKeys, DestinationTags } from "../../constants/constants";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { useNavigate } from "react-router-dom";
+import { add as bookingCustomerAdd } from "../../redux/BookingCustomer/BookingCustomerSlice";
+
 import { store } from "../../redux/store";
 import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 
@@ -42,7 +44,7 @@ const CustomerRegistration = (props) => {
   const [lastNameInvalid, setLastNameInvalid] = useState(false);
   const [emailInvalid, setEmailInvalid] = useState(false);
   const loginState = useSelector((state) => state.loginState);
-
+  //const [paymentEnabled, setPaymentEnabled] = useState(false);
   const selectionDetails = useSelector((state) => state.selectionDetails);
 
   const dispatch = useDispatch();
@@ -73,7 +75,7 @@ const CustomerRegistration = (props) => {
       email,
       phoneNo,
     };
-/*
+
     dispatch(
       bookingCustomerAdd({
         key: localStorage.getItem(LocalStorageKeys.AccountAddress),
@@ -83,10 +85,8 @@ const CustomerRegistration = (props) => {
     localStorage.setItem(
       LocalStorageKeys.BookingCustomer,
       JSON.stringify(body)
-    );*/
-   // props.setPaymentEnabled(true)
-
-    navigate(`/cg-payment`);
+    );
+    props.setPaymentEnabled(true)
 
   }
 
@@ -120,6 +120,7 @@ const CustomerRegistration = (props) => {
       props.setConfirmLoading(false);
       props.setDisableConfirm(false);
     }
+   
     return;
   };
   const submitForm = async () => {
@@ -304,8 +305,9 @@ const CustomerRegistration = (props) => {
           <Button
             className="secondaryButton"
             style={{ width: "180px" }}
-            onClick={() => proceedToPay()}
+           // onClick={() => submitForm()}
            // disabled={props.disableConfirm}
+            onClick={() => proceedToPay()}
           >
             Continue To Payment
           </Button>

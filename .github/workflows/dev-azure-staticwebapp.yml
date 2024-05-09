@@ -48,6 +48,9 @@ env:
   REACT_APP_SPEECH_KEY: c6459573a62c4903aed5fb82adc37d30
   REACT_APP_SPEECH_REGION: eastasia
   REACT_APP_SPEECH_LANGUAGES: en-US,si-LK,af-ZA,am-ET
+  STRIPE_PUB_CLIENT_KEY: "pk_test_51P6rTa02oeEelUOpCbc5JEgNqb33HZQMAhJeD0t3WgsTykXDMcIVMHFbnlmI2XCUWvfIZVm6dGQiBJWVWfL9hVof003Xvk8zeK"
+
+
   
 permissions:
   contents: read
