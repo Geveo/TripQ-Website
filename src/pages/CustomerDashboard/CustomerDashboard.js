@@ -19,6 +19,7 @@ import toast from "react-hot-toast";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import HotelService from "../../services-domain/hotel-service copy";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import { faArrowAltCircleDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SpeechService from "../../services-common/speech-service";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -70,21 +71,26 @@ function CustomerDashboard() {
 
   function onSearchSubmit() {
     setLoading(true);
-    openAiService
-      .searchHotels(searchText)
-      .then((res) => {
+
+      const promises = [
+      openAiService.searchHotels(searchText),
+    ];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
         setLoading(false);
-        if (res.hotels.length > 0) {
-          dispatch(setAiHotelSearchResults(res));
+        if (searchResult.hotels.length > 0) {
+          dispatch(setAiHotelSearchResults(searchResult));
           localStorage.setItem(
             LocalStorageKeys.AiHotelSearchResult,
-            JSON.stringify(res)
+            JSON.stringify(searchResult)
           );
           navigate(`/search-hotel`);
         }
       })
-      .catch((e) => {
+      .catch((error) => {
         setLoading(false);
+        console.error("Error occurred:", error);
       });
   }
 
@@ -119,9 +125,26 @@ function CustomerDashboard() {
           </div>
           <div className="search-area">
             <div>
+              <Row>
+                <Col>
+                  <div className="container">
+                    <div className="icon-and-text">
+                      <FontAwesomeIcon
+                        icon={faArrowAltCircleDown}
+                        className="fa-fade"
+                        size="lg"
+                      />
+                      <div className="search-area-phrase">
+                        Unlock the power of your voice! Tap the microphone and
+                        effortlessly convey your destination, check-in and
+                        check-out dates, and guest count to our AI search
+                      </div>
+                    </div>
+                  </div>
+                </Col>
+              </Row>
               <Row style={{ justifyContent: "center" }}>
                 <Col>
-                  {/*<Form.Label>Example: </Form.Label>*/}
                   <InputGroup className="">
                     <Button
                       variant="outline-secondary"
@@ -153,11 +176,14 @@ function CustomerDashboard() {
                   <Button
                     className="overrideSearchButton"
                     onClick={onSearchSubmit}
+                    disabled={searchText.length == 0}
                   >
                     Search your stay
                   </Button>
                 </Col>
               </Row>
+              {isListening ? (<div className="listening">Listening..</div>): null}
+              
             </div>
           </div>
         </div>
