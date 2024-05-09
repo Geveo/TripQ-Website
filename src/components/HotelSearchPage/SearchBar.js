@@ -39,6 +39,7 @@ function SearchBar(props) {
 
   const onSearchClick = () => {
     setDisplayCity(city);
+    props.setSearchCity(city)
     props.setCheckInDate(new Date(dateRange[0]).toISOString().split("T")[0]);
     props.setCheckOutDate(new Date(dateRange[1]).toISOString().split("T")[0]);
     props.onClickSearch();
