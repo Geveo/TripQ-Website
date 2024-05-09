@@ -11,6 +11,8 @@ import { Alert, Spinner } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys } from "../constants/constants";
 import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
+import { store } from "../redux/store";
+import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
@@ -45,32 +47,114 @@ function HotelSearchPage(props) {
 
   const isFilerDisable = true;
 
-  const [hotelResultList, setHotelResultList] = useState(null);
-  const [hotelResultListCopy, setHotelResultListCopy] = useState(null);
+  const [hotelResultList, setHotelResultList] = useState([]);
+  const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
 
   useEffect(() => {
+    store.dispatch(setShowScreenLoader(true));
     // Get AI searched results
     if (!aiHotelSearchState) {
       aiHotelSearchState = localStorage.getItem(
         LocalStorageKeys.AiHotelSearchResult
       );
     }
+
+    let hotelNames = [];
+    let searchResult = [];
+    let hotelList = [];
+
+    aiHotelSearchState.hotels.forEach((hotel) => {
+      hotelNames.push(hotel.hotel_name);
+    });
+
     const obj = {
       City: aiHotelSearchState.destination,
       CheckInDate: new Date(aiHotelSearchState.from_date),
       CheckOutDate: new Date(aiHotelSearchState.to_date),
       GuestCount: aiHotelSearchState.total_head_count,
-      AISearchedList: aiHotelSearchState.hotel_names,
+      AISearchedList: hotelNames,
     };
 
+    setCity(aiHotelSearchState.destination);
+    setSearchCity(aiHotelSearchState.destination);
+    setSearchText(aiHotelSearchState.destination);
+    setCheckInDate(aiHotelSearchState.from_date);
+    setCheckOutDate(aiHotelSearchState.to_date);
+
     hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
-      setCity(aiHotelSearchState.destination);
-      setSearchCity(aiHotelSearchState.destination);
-      setSearchText(aiHotelSearchState.destination);
-      setCheckInDate(aiHotelSearchState.from_date);
-      setCheckOutDate(aiHotelSearchState.to_date);
       setHotelResultList(res);
-      setHotelResultListCopy(res);
+
+      if(res){
+        res.forEach((hotel) => {
+          searchResult.push(hotel.Name);
+        });
+      }
+     
+      let hotelsNotInDatabase = [];
+      hotelNames.forEach((hotelAI) => {
+        let found = false;
+        
+        // Case-insensitive wildcard match
+        const regex = new RegExp(`^${hotelAI.replace(/\*/g, ".*")}$`, "i"); 
+
+        searchResult.forEach((hotelDB) => {
+          if (regex.test(hotelDB)) {
+            found = true;
+          }
+        });
+        if (!found) {
+          hotelsNotInDatabase.push(hotelAI);
+        }
+      });
+
+      if(res){
+        res.forEach(hotel => {
+          const hotelObj = {
+            AvailableRooms: hotel.AvailableRooms,
+            ContactDetails: JSON.parse(hotel.ContactDetails),
+            CreatedOn: hotel.CreatedOn,
+            Description: hotel.Description,
+            Facilities: JSON.parse(hotel.Facilities),
+            Id: hotel.Id,
+            ImageURL: hotel.ImageURL,
+            LastUpdateOn: hotel.LastUpdateOn,
+            Location: JSON.parse(hotel.Location),
+            Name: hotel.Name,
+            StarRatings: hotel.StarRatings,
+            WalletAddress: hotel.WalletAddress,
+            WebsiteURL: "",
+            PhoneNumber: JSON.parse(hotel.ContactDetails).PhoneNumber,
+          };
+          hotelList.push(hotelObj)
+        });
+      }
+      
+      hotelsNotInDatabase.forEach(hotel => {
+        aiHotelSearchState.hotels.forEach(aiHotel => {
+          if(aiHotel.hotel_name === hotel){
+            const hotelObj = {
+              AvailableRooms: [],
+              ContactDetails: "",
+              CreatedOn: "",
+              Description: aiHotel.hotel_description,
+              Facilities: "",
+              Id: "",
+              ImageURL: aiHotel.star_ratings,
+              LastUpdateOn: "",
+              Location: aiHotel.hotel_address,
+              Name: aiHotel.hotel_name,
+              StarRatings: aiHotel.star_ratings,
+              WalletAddress:"",
+              WebsiteURL: aiHotel.website_link,
+              PhoneNumber: aiHotel.phone
+            };
+            hotelList.push(hotelObj)
+          }
+        });
+        
+      });
+      setHotelResultListCopy(hotelList);
+      store.dispatch(setShowScreenLoader(false));
     });
   }, []);
 
@@ -128,43 +212,8 @@ function HotelSearchPage(props) {
     }
   }
 
-  useEffect(() => {
-    let convenienceWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let quickPlannersWithAvailability = facilitiesData.map((facility) => {
-      return {
-        ...facility,
-        status: false,
-      };
-    });
-
-    let bedTypeAvailability = bed_types.map((bed_type) => {
-      return {
-        ...bed_type,
-        status: false,
-      };
-    });
-
-    let roomFacilityAvailability = roomFacilitiesData.map((room_facility) => {
-      return {
-        ...room_facility,
-        status: false,
-      };
-    });
-
-    setConveniences(convenienceWithAvailability);
-    setRoomFacilities(roomFacilityAvailability);
-    setBedTypes(bedTypeAvailability);
-    setSearchCity(city);
-    searchHotelsWithRooms(city, checkInDate, checkOutDate, guestCount);
-  }, []);
-
   const onClickSearch = async () => {
+    store.dispatch(setShowScreenLoader(true));
     setCity(searchCity);
 
     const obj = {
@@ -181,12 +230,13 @@ function HotelSearchPage(props) {
             return {
               Id: hh.Id,
               Name: hh.Name,
-              City: hh.Location,
+              Location: hh.Location,
               ImageURL: hh.ImageURL,
               StarRatings: hh.StarRatings,
               ContactDetails: hh.ContactDetails,
               Description: hh.Description,
               WalletAddress: hh.WalletAddress,
+              AvailableRooms: hh.AvailableRooms,
             };
           });
           setCity(city);
@@ -195,9 +245,11 @@ function HotelSearchPage(props) {
           setHotelResultListCopy(newHotellist);
 
           setIsDataLoading(false);
+          store.dispatch(setShowScreenLoader(false));
         } else {
           setIsDataLoading(false);
           setHotelResultListCopy([]);
+          store.dispatch(setShowScreenLoader(false));
         }
       });
     } catch (error) {
@@ -255,11 +307,16 @@ function HotelSearchPage(props) {
       LocalStorageKeys.HotelSelectionDetails,
       JSON.stringify(hotel)
     );
-    navigate(
-      `/availability/${hotel.Id}/${formatDate(checkInDate)}/${formatDate(
-        checkOutDate
-      )}`
-    );
+
+    if(hotel.WebsiteURL.length > 0){
+      window.open(hotel.WebsiteURL, '_blank');
+    }else{
+      navigate(
+        `/availability/${hotel.Id}/${formatDate(checkInDate)}/${formatDate(
+          checkOutDate
+        )}`
+      );
+    }
   }
 
   function onCitySearchChanged(newCity) {

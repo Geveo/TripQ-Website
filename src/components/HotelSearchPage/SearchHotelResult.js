@@ -12,24 +12,28 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
     },
   };
 
-  let location = "";
-  if (hotel.Location) {
-    location = JSON.parse(hotel.Location);
+  const location = hotel.Location;
+  let address = "";
+  
+  if (!location.AddressLine01 || !location.AddressLine02) {
+    address = location;
   } else {
-    location = JSON.parse(hotel.City);
+    address = `${location.AddressLine01}, ${location.AddressLine02}, ${location.City}`;
   }
-  const contact = JSON.parse(hotel.ContactDetails);
 
   return (
     <div className={"hotel_card mb-5"} style={{ width: "1000px" }}>
       <div className={"row_fit p-5"}>
         <img
           key={hotel.Id}
-          src={hotel.ImageURL[0].ImageURL}
+          src={
+            hotel.ImageURL.length > 0
+              ? hotel.ImageURL[0].ImageURL
+              : "/Assets/Images/no_image.jpg"
+          }
           alt={"Hotel image"}
           style={styles.image}
         />
-
         <div className={"col-md"} style={{ paddingLeft: "20px" }}>
           <div className={"title_2"} style={{ fontSize: "22px" }}>
             {hotel.Name}{" "}
@@ -41,7 +45,7 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
               <FaMapMarkerAlt color={"#908F8F"} />
             </div>
             <div className={"col"} style={{ paddingTop: "4px" }}>
-              {location.AddressLine01},{location.AddressLine02},{location.City}
+              {address}
             </div>
           </div>
           <div className={"row_fit"}>
@@ -49,7 +53,7 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
               <FaMobile color={"#908F8F"} />
             </div>
             <div className={"col"} style={{ paddingTop: "4px" }}>
-              {contact.PhoneNumber}
+              {hotel.PhoneNumber}
             </div>
           </div>
           <div className={"row_fit"}>

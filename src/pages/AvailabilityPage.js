@@ -165,8 +165,8 @@ function AvailabilityPage() {
 
   const getFullAddress = () => {
     let address = address1 ?? "";
-    address += address2 ? `, ${address2}` : "";
-    address += city ? `, ${city}` : "";
+    address += address2 ? ` ${address2}` : "";
+    address += city ? ` ${city}` : "";
 
     return address;
   };
@@ -296,9 +296,9 @@ function AvailabilityPage() {
           </div>
         </section>
         <section ref={infoSection} id="info_section" className={"pt-2"}>
-          <div>
+          <div style={{display: 'flex', justifyContent: 'center'}}>
             {images.length > 0 &&
-              images.map((image, index) => (
+              images.slice(0,3).map((image, index) => (
                 <img
                   key={index}
                   style={{ margin: 10, width: 350, height: 250 }}
