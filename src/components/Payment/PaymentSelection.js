@@ -34,7 +34,7 @@ const PaymentSelection = (props) => {
 */
 
   const proceedToPayWithStripe = () => {
-    props.setSelectedGateway('Coingate')
+    props.setSelectedGateway('Stripe')
 
   }
 
