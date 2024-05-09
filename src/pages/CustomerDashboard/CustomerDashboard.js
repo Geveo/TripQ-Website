@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Col,
-  Container,
-  Row,
-  Input,
-  Button,
-} from "reactstrap";
+import { Col, Container, Row, Input, Button } from "reactstrap";
 import "./customer_dashboard_styles.scss";
 import { RangeDatePicker } from "@y0c/react-datepicker";
 import "@y0c/react-datepicker/assets/styles/calendar.scss";
@@ -27,18 +21,18 @@ import HotelService from "../../services-domain/hotel-service copy";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SpeechService from "../../services-common/speech-service";
-import InputGroup from 'react-bootstrap/InputGroup';
-import Form from 'react-bootstrap/Form';
-import {AzureOpenaiService} from "../../services-common/azure-openai-service";
+import InputGroup from "react-bootstrap/InputGroup";
+import Form from "react-bootstrap/Form";
+import { AzureOpenaiService } from "../../services-common/azure-openai-service";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
-import {useDispatch} from "react-redux";
-import {setAiHotelSearchResults} from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
-import {LocalStorageKeys} from "../../constants/constants";
+import { useDispatch } from "react-redux";
+import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { LocalStorageKeys } from "../../constants/constants";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
   const openAiService = AzureOpenaiService.getInstance();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const hotelService = HotelService.instance;
   const [open, setOpen] = useState(false);
@@ -75,32 +69,37 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
-    setLoading(true)
-      openAiService.searchHotels(searchText).then(res => {
-      setLoading(false)
-      if(res.hotel_names.length > 0) {
-        dispatch(setAiHotelSearchResults(res))
-        localStorage.setItem(LocalStorageKeys.AiHotelSearchResult, JSON.stringify(res));
-        navigate(`/search-hotel`);
-      }
-    }).catch(e => {
-      setLoading(false)
-    })
-
+    setLoading(true);
+    openAiService
+      .searchHotels(searchText)
+      .then((res) => {
+        setLoading(false);
+        if (res.hotels.length > 0) {
+          dispatch(setAiHotelSearchResults(res));
+          localStorage.setItem(
+            LocalStorageKeys.AiHotelSearchResult,
+            JSON.stringify(res)
+          );
+          navigate(`/search-hotel`);
+        }
+      })
+      .catch((e) => {
+        setLoading(false);
+      });
   }
 
   async function handleSpeechToTextFromMic() {
-    setSearchText("")
-    setIsListening(true)
+    setSearchText("");
+    setIsListening(true);
     speechService
       .speechToTextFromMic()
       .then((displayText) => {
         setSearchText(displayText);
-        setIsListening(false)
+        setIsListening(false);
       })
       .catch((error) => {
         console.error("Error:", error);
-        setIsListening(false)
+        setIsListening(false);
       });
   }
 
@@ -120,30 +119,35 @@ function CustomerDashboard() {
           </div>
           <div className="search-area">
             <div>
-              <Row style={{ justifyContent: 'center'}}>
+              <Row style={{ justifyContent: "center" }}>
                 <Col>
                   {/*<Form.Label>Example: </Form.Label>*/}
                   <InputGroup className="">
-                    <Button variant="outline-secondary" id="button-addon1" className={isListening ? `microphone-icon-isListening`: `microphone-icon`}
-                            onClick={handleSpeechToTextFromMic}
-                            title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk.">
-
+                    <Button
+                      variant="outline-secondary"
+                      id="button-addon1"
+                      className={
+                        isListening
+                          ? `microphone-icon-isListening`
+                          : `microphone-icon`
+                      }
+                      onClick={handleSpeechToTextFromMic}
+                      title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                    >
                       <FontAwesomeIcon
-                          size="lg"
-                          icon={faMicrophone}
-                          className="fa fa-microphone"
+                        size="lg"
+                        icon={faMicrophone}
+                        className="fa fa-microphone"
                       />
                     </Button>
                     <Form.Control
-                                  placeholder="Search your next stay here..."
-                                  aria-label="Username"
-                                  aria-describedby="basic-addon1"
-                                  value={searchText}
-                                  onChange={(e) => setSearchText(e.target.value)}
+                      placeholder="Search your next stay here..."
+                      aria-label="Username"
+                      aria-describedby="basic-addon1"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
                     />
-
                   </InputGroup>
-
                 </Col>
                 <Col md={2}>
                   <Button
