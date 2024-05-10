@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {PaymentElement, useStripe, useElements} from "@stripe/react-stripe-js";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useNavigate } from "react-router-dom";
+import { Col, Row, Label, Button, Form } from "reactstrap";
 import { store } from "../../redux/store";
 import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
@@ -11,7 +12,7 @@ import { toast } from "react-hot-toast";
 import HotelService from "./../../services-domain/hotel-service copy";
 import { remove as bookingCustomerRemove } from "../../redux/BookingCustomer/BookingCustomerSlice";
 
-const CheckoutForm  = (props) => {
+const CheckoutForm = () => {
   const hotelService = HotelService.instance;
   const stripe = useStripe();
   const elements = useElements();
@@ -28,7 +29,6 @@ const CheckoutForm  = (props) => {
     if (!stripe) {
       return;
     }
-
     const clientSecret = new URLSearchParams(window.location.search).get(
       "payment_intent_client_secret"
     );
@@ -59,22 +59,22 @@ const CheckoutForm  = (props) => {
     e.preventDefault();
 
     let selectionData =
-    selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+      selectionDetails[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
-  if (!selectionData) {
-    selectionData = JSON.parse(
-      localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
-    );
-  }
+    if (!selectionData) {
+      selectionData = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.HotelSelectionDetails)
+      );
+    }
 
-  let customerData =
-  bookingCustomer[localStorage.getItem(LocalStorageKeys.AccountAddress)];
+    let customerData =
+      bookingCustomer[localStorage.getItem(LocalStorageKeys.AccountAddress)];
 
-if (!customerData) {
-  customerData = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.BookingCustomer)
-  );
-}
+    if (!customerData) {
+      customerData = JSON.parse(
+        localStorage.getItem(LocalStorageKeys.BookingCustomer)
+      );
+    }
 
     if (!stripe || !elements) {
       // Stripe.js hasn't yet loaded.
@@ -87,106 +87,115 @@ if (!customerData) {
       const { paymentIntent, error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-           return_url: "http://localhost:3000/my-reservations"
+          return_url: "http://localhost:3000/my-reservations"
         },
         redirect: 'if_required'
       });
-    
+
       if (error) {
         console.error(error);
         if (error.type === "card_error" || error.type === "validation_error") {
           setMessage(error.message);
-        }else {
+        } else {
           setMessage("An unexpected error occurred.");
         }
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        toast.success("Booked successfully!", {
+        toast.success("Payment Completed!", {
           duration: 10000,
         });
-
-       /* if (paymentIntent && paymentIntent.status === "succeeded") {
-          console.log("Payment succeeded");
-          // handleSuccess();
-        } */
-
+        // handleSuccess(paymentIntent);
         console.log("PaymentIntent details:", paymentIntent);
-    
-        // Save relevant payment details to database
-        const paymentDetails = {
-          paymentIntentId: paymentIntent.id,
-          amount: paymentIntent.amount,
-          currency: paymentIntent.currency,
-          status: paymentIntent.status,
-          // Add more relevant details as needed
-        };
-        
 
-        let reservationData = new ReservationDto({
-          HotelId: selectionData.HotelId,
-          WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
-          Price: props.totalPrice,
-          FromDate: selectionData.CheckIn,
-          ToDate: selectionData.CheckOut,
-          NoOfNights: selectionData.Nights,
-          FirstName: customerData.firstName,
-          LastName: customerData.lastName,
-          Email: customerData.email,
-          Telephone: customerData.phoneNo,
-          RoomTypes: selectionData.RoomTypes,
-          NoOfRooms: selectionData.NoOfRooms,
-        });
-
-        hotelService.makeReservation(reservationData).then((res) => {
-          store.dispatch(setShowScreenLoader(false));
-          if (res.rowId.lastId > 0) {
-            toast.success("Tentative booking saved!", {
-              duration: 10000,
-            });
-            localStorage.removeItem(LocalStorageKeys.HotelSelectionDetails);
-            dispatch(
-              bookingCustomerRemove( bookingCustomer.email)
-            );
-            navigate(`/my-reservations`);
-          } else {
-            toast(
-              (element) => (
-                <ToastInnerElement
-                  message={"Booking saving failed!"}
-                  id={element.id}
-                />
-              ),
-              {
-                duration: Infinity,
-              }
-            );
-          }
-        });
       }
-        
+
     } catch (error) {
       console.error(error);
     }
-    
+
     setIsLoading(false);
   };
+
+  const handleSuccess = async (paymentIntent) => {
+    
+        // Save relevant payment details to database
+        /*  const paymentDetails = {
+            paymentIntentId: paymentIntent.id,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: paymentIntent.status,
+            // Add more relevant details as needed
+          };
+          
+  
+          let reservationData = new ReservationDto({
+            HotelId: selectionData.HotelId,
+            WalletAddress: localStorage.getItem(LocalStorageKeys.AccountAddress),
+            Price: props.totalPrice,
+            FromDate: selectionData.CheckIn,
+            ToDate: selectionData.CheckOut,
+            NoOfNights: selectionData.Nights,
+            FirstName: customerData.firstName,
+            LastName: customerData.lastName,
+            Email: customerData.email,
+            Telephone: customerData.phoneNo,
+            RoomTypes: selectionData.RoomTypes,
+            NoOfRooms: selectionData.NoOfRooms,
+          });
+  
+          hotelService.makeReservation(reservationData).then((res) => {
+            store.dispatch(setShowScreenLoader(false));
+            if (res.rowId.lastId > 0) {
+              toast.success("Tentative booking saved!", {
+                duration: 10000,
+              });
+              localStorage.removeItem(LocalStorageKeys.HotelSelectionDetails);
+              dispatch(
+                bookingCustomerRemove( bookingCustomer.email)
+              );
+              navigate(`/my-reservations`);
+            } else {
+              toast(
+                (element) => (
+                  <ToastInnerElement
+                    message={"Booking saving failed!"}
+                    id={element.id}
+                  />
+                ),
+                {
+                  duration: Infinity,
+                }
+              );
+            }
+          });
+          */
+   }
+
 
   const paymentElementOptions = {
     layout: "tabs"
   }
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit}>
-
+    <Form onSubmit={handleSubmit}>
       <PaymentElement id="payment-element" options={paymentElementOptions} />
-      <button disabled={isLoading || !stripe || !elements} id="submit">
-        <span id="button-text">
+    
+
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", paddingTop: 25, }}>
+        <Button
+          className="secondaryButton"
+          style={{ width: "180px" }}
+          type="submit"
+          disabled={isLoading || !stripe || !elements}
+        >
           {isLoading ? "Loading..." : "Pay now"}
-           {/* {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"} */}
-        </span>
-      </button>
+        </Button>
+      </div>
+
       {/* Show any error or success messages */}
       {message && <div id="payment-message">{message}</div>}
-    </form>
+    </Form>
+
+    // </form>
   );
 }
 

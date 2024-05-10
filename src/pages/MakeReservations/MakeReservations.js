@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import BookingDetails from "../../components/BookingDetails/index";
-import StripePayment from "../../components/Payment/StripePayment";
+import StripeCheckout from "../../components/Payment/StripeCheckout";
 import CoingatePayment from "../../components/Payment/CGPayment";
 import PaymentSelection from "../../components/Payment/PaymentSelection";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
@@ -60,7 +60,7 @@ const ReservationForm = () => {
       let totalPrice = 0;
       selectedDetails.RoomTypes.forEach((element) => {
         totalPrice +=
-          parseFloat(element.roomData.Price) *
+          parseFloat(element.roomData.Price).toFixed(4) *
           element.count *
           parseInt(selectedDetails.Nights);
       });
@@ -103,15 +103,14 @@ const ReservationForm = () => {
 
           <Col md={8}>
             <div>
-
-              {!paymentEnabled ? (
-                <>
-                  <BookedHotelDetails
+            <BookedHotelDetails
                     hotelName={searchDetails.Name}
                     hotelAddress={searchDetails.Address}
                     starRate={searchDetails.StarRate}
                     image={searchDetails.Images} />
 
+              {!paymentEnabled ? (
+                <>
                   <CustomerRegistration
                     totalPrice={totalPrice}
                     disableConfirm={disableConfirm}
@@ -129,12 +128,10 @@ const ReservationForm = () => {
                         setSelectedGateway={handleSelectedGateway} />
                     ) : selectedGateway == 'Stripe' ?
                       (
-                        <StripePayment
-                          totalPrice={totalPrice}
-                          setBackToPayment={handleBackToPayment} />
+                        <StripeCheckout  totalPrice={totalPrice}/>
                       ) : selectedGateway == 'Coingate' ?
                         (
-                        <CoingatePayment />
+                        <CoingatePayment totalPrice={totalPrice}/>
                         ) : null
                   }
                 </>

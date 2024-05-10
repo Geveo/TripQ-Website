@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
+import Card1 from "../../layout/Card";
 
 //const stripePromise = loadStripe(process.env.CLIENT_KEY);
 const StripeCheckout = (props) => {
@@ -10,11 +11,11 @@ const StripeCheckout = (props) => {
   const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
-    console.log(process.env.STRIPE_PUB_CLIENT_KEY)
-    setStripePromise(loadStripe(process.env.STRIPE_PUB_CLIENT_KEY))
+  console.log(process.env.REACT_APP_PUB_KEY_STRIPE)
+    setStripePromise(loadStripe(process.env.REACT_APP_PUB_KEY_STRIPE))
     const value = {
-      amount: props.totalPrice*100000000, 
-      currency: "LKR"
+      amount: (props.totalPrice*115000).toFixed(2)*100, 
+      currency: "usd"
     }
 
     console.log(value)
@@ -59,6 +60,7 @@ const StripeCheckout = (props) => {
   };
 
   return (
+    <Card1>
     <div>
       {clientSecret && stripePromise && (
         <Elements options={options} stripe={stripePromise}>
@@ -66,6 +68,7 @@ const StripeCheckout = (props) => {
         </Elements>
       )}
     </div>
+     </Card1>
   );
 }
 export default StripeCheckout;
