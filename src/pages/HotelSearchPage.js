@@ -15,6 +15,7 @@ import { store } from "../redux/store";
 import { AzureOpenaiService } from "../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 import { resetAiHotelSearchState } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { setAiHotelSearchResults } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
@@ -63,7 +64,11 @@ function HotelSearchPage(props) {
       localStorage.removeItem(LocalStorageKeys.AiHotelSearchResult);
     }
 
-    if (aiHotelSearchState.hotels.length > 0) {
+    if (
+      aiHotelSearchState &&
+      aiHotelSearchState.hotels &&
+      aiHotelSearchState.hotels.length > 0
+    ) {
       let hotelNames = [];
       let searchResult = [];
       let hotelList = [];
@@ -86,6 +91,7 @@ function HotelSearchPage(props) {
       setSearchText(aiHotelSearchState.destination);
       setCheckInDate(aiHotelSearchState.from_date);
       setCheckOutDate(aiHotelSearchState.to_date);
+      setGuestCount(aiHotelSearchState.total_head_count);
 
       hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
         if (res) {
@@ -160,7 +166,7 @@ function HotelSearchPage(props) {
         store.dispatch(setShowScreenLoader(false));
       });
     }
-  }, [aiHotelSearchState, aiHotelSearchState.hotels]);
+  }, [aiHotelSearchState]);
 
   useEffect(() => {
     if (hotelNames.length > 0) {
@@ -174,53 +180,29 @@ function HotelSearchPage(props) {
     }
   }, [hotelNames]);
 
-  const onClickSearch = () => {
+  const onClickSearch = (city, fromDate, toDate, guests) => {
     store.dispatch(setShowScreenLoader(true));
     setHotelNames([]);
     setHotelMap(new Map());
     store.dispatch(resetAiHotelSearchState());
     setCity(searchCity);
-    const obj = {
-      City: searchCity,
-      CheckInDate: checkInDate,
-      CheckOutDate: checkOutDate,
-      GuestCount: 2,
-    };
-    try {
-      hotelService.SearchHotelsWithRooms(obj).then((res) => {
-        setHotelResultListCopy([]);
-        aiHotelSearchState = null;
-        if (res && res.length > 0) {
-          const newHotellist = res.map((hh) => {
-            return {
-              Id: hh.Id,
-              Name: hh.Name,
-              Location: JSON.parse(hh.Location),
-              ImageURL: hh.ImageURL,
-              StarRatings: hh.StarRatings,
-              ContactDetails: hh.ContactDetails,
-              Description: hh.Description,
-              WalletAddress: hh.WalletAddress,
-              AvailableRooms: hh.AvailableRooms,
-              PhoneNumber: JSON.parse(hh.ContactDetails).PhoneNumber,
-            };
-          });
-          setCity(city);
-          setHotelResultListCopy(newHotellist);
 
-          setIsDataLoading(false);
-          store.dispatch(setShowScreenLoader(false));
-        } else {
-          setIsDataLoading(false);
-          setHotelResultListCopy([]);
-          store.dispatch(setShowScreenLoader(false));
+    const searchText = `${searchCity} hotels from ${fromDate} to ${toDate} for ${guests} people.`;
+    const promises = [openAiService.searchHotels(searchText)];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
+        if (searchResult.hotels.length > 0) {
+          dispatch(setAiHotelSearchResults(searchResult));
+          localStorage.setItem(
+            LocalStorageKeys.AiHotelSearchResult,
+            JSON.stringify(searchResult)
+          );
         }
+      })
+      .catch((error) => {
+        console.error("Error occurred:", error);
       });
-    } catch (error) {
-      setIsDataLoading(false);
-      console.log(error);
-      return;
-    }
   };
 
   function onViewAvailableClicked(hotel) {

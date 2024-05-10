@@ -10,6 +10,8 @@ function SearchBar(props) {
   const [guests, setGuests] = useState(props.numOfPeople);
   const [displayCity, setDisplayCity] = useState(props.city);
   const [city, setCity] = useState(props.city);
+  const [checkInDate, setCheckInDate] = useState(props.checkInDate);
+  const [checkOutDate, setCheckOutDate] = useState(props.checkOutDate);
 
   const onChangeBedRooms = (isAdding) => {
     props.setBedRooms((prevState) => {
@@ -21,16 +23,10 @@ function SearchBar(props) {
     });
   };
 
-  useEffect(() => {
-    dateRange.push(props.checkInDate)
-    dateRange.push(props.checkOutDate)
-  }, [props.city,props.checkInDate, props.checkOutDate]);
-
   const onDateChange = (...args) => {
     setIsDirty(true);
     setDateRange(args)
     setDisplayCity(city)
-    console.log(new Date(args[0]).toISOString().split("T")[0]);
   };
 
   const onChangeSearchText = (event) => {
@@ -39,10 +35,20 @@ function SearchBar(props) {
 
   const onSearchClick = () => {
     setDisplayCity(city);
-    props.setSearchCity(city)
-    props.setCheckInDate(new Date(dateRange[0]).toISOString().split("T")[0]);
-    props.setCheckOutDate(new Date(dateRange[1]).toISOString().split("T")[0]);
-    props.onClickSearch();
+    setCheckInDate(checkInDate);
+    setCheckOutDate(checkOutDate)
+
+    props.setSearchCity(city);
+    props.setGuestCount(guests);
+    if(dateRange.length>0){
+      props.setCheckInDate(new Date(dateRange[0]).toISOString().split("T")[0]);
+      props.setCheckOutDate(new Date(dateRange[1]).toISOString().split("T")[0]);
+    }else{
+      props.setCheckInDate(checkInDate);
+      props.setCheckOutDate(checkOutDate);
+    }
+   
+    props.onClickSearch(city, dateRange.length>0 ? new Date(dateRange[0]).toISOString().split("T")[0] : checkInDate, dateRange.length>0 ? new Date(dateRange[1]).toISOString().split("T")[0] : checkOutDate, guests);
   };
 
   const onChangeCity = (event) => {
@@ -75,7 +81,7 @@ function SearchBar(props) {
                 placeholder="City"
                 value={props.searchCity}
                 onChange={(e) => onChangeCity(e)}
-                style={{ position: "relative", width: "250px", height: "50px" }}
+                style={{ position: "relative", width: "250px", height: "50px",borderRadius: "0", }}
               />
               <FaCity
                 size={22}
@@ -94,11 +100,11 @@ function SearchBar(props) {
             <InputGroup>
               <RangeDatePicker
                 onChange={onDateChange}
-                startPlaceholder={props.checkInDate}
-                endPlaceholder={props.checkOutDate}
                 dateFormat="DD/MM/YYYY"
-                startText={props.checkInDate}
-                endText={props.checkOutDate}
+                startPlaceholder={checkInDate}
+                endPlaceholder={checkOutDate}
+                startText={checkInDate}
+                endText={checkOutDate}
               />
               <FaCalendarAlt
                 size={22}
@@ -120,7 +126,7 @@ function SearchBar(props) {
                 type="number"
                 value={guests}
                 onChange={(e) => onChangeGuestCount(e)}
-                style={{ position: "relative", height: "50px" }}
+                style={{ position: "relative", height: "50px", borderRadius: "0" }}
               />
               <FaUsers
                 size={22}
@@ -146,7 +152,7 @@ function SearchBar(props) {
               }}
             >
               <button
-                className={"clear_button"}
+                className={"search_button"}
                 style={{ maxWidth: "100px", marginTop: "10px" }}
                 onClick={onSearchClick}
               >
