@@ -25,8 +25,8 @@ function SearchBar(props) {
 
   const onDateChange = (...args) => {
     setIsDirty(true);
-    setDateRange(args)
-    setDisplayCity(city)
+    setDateRange(args);
+    setDisplayCity(city);
   };
 
   const onChangeSearchText = (event) => {
@@ -36,19 +36,28 @@ function SearchBar(props) {
   const onSearchClick = () => {
     setDisplayCity(city);
     setCheckInDate(checkInDate);
-    setCheckOutDate(checkOutDate)
+    setCheckOutDate(checkOutDate);
 
     props.setSearchCity(city);
     props.setGuestCount(guests);
-    if(dateRange.length>0){
+    if (dateRange.length > 0) {
       props.setCheckInDate(new Date(dateRange[0]).toISOString().split("T")[0]);
       props.setCheckOutDate(new Date(dateRange[1]).toISOString().split("T")[0]);
-    }else{
+    } else {
       props.setCheckInDate(checkInDate);
       props.setCheckOutDate(checkOutDate);
     }
-   
-    props.onClickSearch(city, dateRange.length>0 ? new Date(dateRange[0]).toISOString().split("T")[0] : checkInDate, dateRange.length>0 ? new Date(dateRange[1]).toISOString().split("T")[0] : checkOutDate, guests);
+
+    props.onClickSearch(
+      city,
+      dateRange.length > 0
+        ? new Date(dateRange[0]).toISOString().split("T")[0]
+        : checkInDate,
+      dateRange.length > 0
+        ? new Date(dateRange[1]).toISOString().split("T")[0]
+        : checkOutDate,
+      guests
+    );
   };
 
   const onChangeCity = (event) => {
@@ -61,7 +70,7 @@ function SearchBar(props) {
     setIsDirty(true);
     setGuests(event.target.value);
     props.setGuestCount(event.target.value);
-    setDisplayCity(city)
+    setDisplayCity(city);
   };
 
   return (
@@ -81,7 +90,12 @@ function SearchBar(props) {
                 placeholder="City"
                 value={props.searchCity}
                 onChange={(e) => onChangeCity(e)}
-                style={{ position: "relative", width: "250px", height: "50px",borderRadius: "0", }}
+                style={{
+                  position: "relative",
+                  width: "250px",
+                  height: "50px",
+                  borderRadius: "0",
+                }}
               />
               <FaCity
                 size={22}
@@ -126,7 +140,11 @@ function SearchBar(props) {
                 type="number"
                 value={guests}
                 onChange={(e) => onChangeGuestCount(e)}
-                style={{ position: "relative", height: "50px", borderRadius: "0" }}
+                style={{
+                  position: "relative",
+                  height: "50px",
+                  borderRadius: "0",
+                }}
               />
               <FaUsers
                 size={22}

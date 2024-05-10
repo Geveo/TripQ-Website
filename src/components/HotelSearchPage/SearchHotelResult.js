@@ -30,7 +30,7 @@ function SearchHotelResult({
     };
     hotel = updatedHotel;
   }
-  
+
   const location = hotel.Location;
   let address = "";
 
