@@ -19,7 +19,7 @@ function SearchHotelResult({
     },
   };
 
-  if (hotelDetails) {
+  if (hotelDetails && hotel.AvailableRooms.length === 0) {
     const updatedHotel = {
       ...hotel,
       Description: hotelDetails.hotel_description,
