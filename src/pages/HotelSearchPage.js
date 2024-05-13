@@ -16,6 +16,7 @@ import { AzureOpenaiService } from "../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 import { resetAiHotelSearchState } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
 import { setAiHotelSearchResults } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import toast from "react-hot-toast";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
@@ -220,6 +221,10 @@ function HotelSearchPage(props) {
 
     if (hotel.WebsiteURL && hotel.WebsiteURL.length > 0) {
       window.open(hotel.WebsiteURL, "_blank");
+    } else if (!checkInDate || !checkOutDate) {
+      toast.error(
+        "Please enter valid check-in, check-out dates and guest count"
+      );
     } else {
       navigate(
         `/availability/${hotel.Id}/${formatDate(checkInDate)}/${formatDate(
