@@ -29,7 +29,9 @@ function HotelSearchPage(props) {
 
   const loginState = useSelector((state) => state.loginState);
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
-  let moreAiHotelSearchState = useSelector((state) => state.moreAihotelSearchState);
+  let moreAiHotelSearchState = useSelector(
+    (state) => state.moreAihotelSearchState
+  );
 
   const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -249,6 +251,22 @@ function HotelSearchPage(props) {
 
     return formattedDate;
   };
+
+  // Event listener for the scroll event
+  window.addEventListener("scroll", function () {
+    if (isAtBottomOfPage()) {
+      loadMoreHotels();
+    }
+  });
+
+  function isAtBottomOfPage() {
+    return window.innerHeight + window.scrollY >= document.body.offsetHeight;
+  }
+
+  function loadMoreHotels() {
+   // window.location.reload(true);
+   console.log(moreAiHotelSearchState)
+  }
 
   return (
     <MainContainer>
