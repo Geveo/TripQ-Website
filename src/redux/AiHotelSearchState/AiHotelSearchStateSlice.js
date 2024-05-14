@@ -18,7 +18,7 @@ export const AiHotelSearchStateSlice = createSlice({
             state.to_date = action.payload.to_date;
             state.destination = action.payload.destination;
             state.total_head_count = action.payload.total_head_count;
-        },
+        }, 
         resetAiHotelSearchState: (state) => {
             state.hotels = [];
             state.from_date = null;
