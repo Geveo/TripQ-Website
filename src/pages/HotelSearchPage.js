@@ -29,6 +29,7 @@ function HotelSearchPage(props) {
 
   const loginState = useSelector((state) => state.loginState);
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
+  let moreAiHotelSearchState = useSelector((state) => state.moreAihotelSearchState);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
 
