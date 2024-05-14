@@ -28,6 +28,7 @@ import { AzureOpenaiService } from "../../services-common/azure-openai-service";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import { useDispatch } from "react-redux";
 import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { setMoreAiSearchResults } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { LocalStorageKeys } from "../../constants/constants";
 
 function CustomerDashboard() {
@@ -71,10 +72,7 @@ function CustomerDashboard() {
 
   function onSearchSubmit() {
     setLoading(true);
-
-      const promises = [
-      openAiService.searchHotels(searchText),
-    ];
+    const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
@@ -86,6 +84,26 @@ function CustomerDashboard() {
             JSON.stringify(searchResult)
           );
           navigate(`/search-hotel`);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error occurred:", error);
+      });
+  }
+
+  function loadMoreHotels() {
+    const promises = [openAiService.searchHotels(searchText, 25)];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
+        setLoading(false);
+        if (searchResult.hotels.length > 0) {
+          dispatch(setMoreAiSearchResults(searchResult.hotels));
+          localStorage.setItem(
+            LocalStorageKeys.MoreAiHotelSearchResult,
+            JSON.stringify(searchResult.hotels)
+          );
         }
       })
       .catch((error) => {
@@ -114,8 +132,10 @@ function CustomerDashboard() {
       <LoadingScreen showLoadPopup={loading} />
       <div className="main-image-div">
         <Container className="main-txt">
-          <h3>Enjoy your next stay</h3>
-          <p>Search low prices on hotels, homes and much more</p>
+          <h3>
+            Discover your next holiday by using our AI powered search engine
+          </h3>
+          <p>Simply type in your requirements and we will do the rest</p>
         </Container>
       </div>
       <Container>
@@ -135,9 +155,9 @@ function CustomerDashboard() {
                         size="lg"
                       />
                       <div className="search-area-phrase">
-                        Unlock the power of your voice! Tap the microphone and
-                        effortlessly convey your destination, check-in and
-                        check-out dates, and guest count to our AI search
+                        Eg-: I want to take my family(four) to a beach resort in
+                        Asia from the 1st December to the 31st December 2024. We
+                        are also interested in trekking.
                       </div>
                     </div>
                   </div>
@@ -163,12 +183,13 @@ function CustomerDashboard() {
                         className="fa fa-microphone"
                       />
                     </Button>
-                    <Form.Control
+                    <textarea
                       placeholder="Search your next stay here..."
-                      aria-label="Username"
-                      aria-describedby="basic-addon1"
+                      aria-label="Search your next stay here..."
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
+                      rows={4} // Set the number of rows for the textarea
+                      cols={125} // Set the number of columns for the textarea
                     />
                   </InputGroup>
                 </Col>
@@ -178,12 +199,13 @@ function CustomerDashboard() {
                     onClick={onSearchSubmit}
                     disabled={searchText.length == 0}
                   >
-                    Search your stay
+                    Search
                   </Button>
                 </Col>
               </Row>
-              {isListening ? (<div className="listening">Listening..</div>): null}
-              
+              {isListening ? (
+                <div className="listening">Listening..</div>
+              ) : null}
             </div>
           </div>
         </div>

@@ -51,6 +51,23 @@ export class AzureOpenaiService {
     return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
   }
 
+    /**
+   *
+   * @param message
+   * @param count
+   * @returns {Promise<any>}
+   */
+    async searchMoreHotels(message) {
+      message += `. Give me only a json output in the following format.  { hotels: [hotel_name: ""]} , where hotels is an array of searched hotels that suit the requirement mentioned earlier or closer to the requirement, hotel_name shouldn't include the city if it is not in it's name,destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description year should be in 2024 or higher and in the form of dd/mm/yyyy or null. total_head_count is an integer value extracted, if not found its value is 0. Language must be english. While searching, only consider the destination`;
+      console.log(message);
+      const reply = await this.client.getChatCompletions(
+        this.modelInstanceName, // assumes a matching model deployment or model name
+        [{ role: "user", content: message }]
+      );
+  
+      return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
+    }
+
   /**
    *
    * @param message
