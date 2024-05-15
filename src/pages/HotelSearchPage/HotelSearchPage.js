@@ -1,30 +1,42 @@
-import MainContainer from "../layout/MainContainer";
+import "./hotel_search_page_styles.scss";
+import MainContainer from "../../layout/MainContainer";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import SearchBar from "../components/HotelSearchPage/SearchBar";
-import HotelList from "../components/HotelSearchPage/HotelList";
-import HotelService from "../services-domain/hotel-service copy";
+import SearchBar from "../../components/HotelSearchPage/SearchBar";
+import HotelList from "../../components/HotelSearchPage/HotelList";
+import HotelService from "../../services-domain/hotel-service copy";
 import { Alert, Spinner } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { LocalStorageKeys } from "../constants/constants";
-import { add as selectionDetailsAdd } from "../redux/SelectionDetails/SelectionDetailsSlice";
-import { store } from "../redux/store";
-import { AzureOpenaiService } from "../services-common/azure-openai-service";
-import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
-import { resetAiHotelSearchState } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
-import { resetHotelSearchState } from "../redux/AiHotelSearchState/MoreAiSearchStateSlice";
-import { setAiHotelSearchResults } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
-import { setMoreAiSearchResults } from "../redux/AiHotelSearchState/MoreAiSearchStateSlice";
+import { LocalStorageKeys } from "../../constants/constants";
+import { add as selectionDetailsAdd } from "../../redux/SelectionDetails/SelectionDetailsSlice";
+import { store } from "../../redux/store";
+import { AzureOpenaiService } from "../../services-common/azure-openai-service";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
+import { resetAiHotelSearchState } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { resetHotelSearchState } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
+import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { setMoreAiSearchResults } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import toast from "react-hot-toast";
+import SearchMenu from "../../components/SearchMenu";
+import { Col, Container, Row, Input, Button } from "reactstrap";
+import InputGroup from "react-bootstrap/InputGroup";
+import SpeechService from "../../services-common/speech-service";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const searchTextMessage = queryParams.get("searchText");
+
   const hotelService = HotelService.instance;
   const openAiService = AzureOpenaiService.getInstance();
+  const speechService = new SpeechService();
 
   const loginState = useSelector((state) => state.loginState);
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
@@ -33,18 +45,17 @@ function HotelSearchPage(props) {
   );
 
   if (!moreAiHotelSearchState) {
-    moreAiHotelSearchState = JSON.parse(localStorage.getItem(
-      LocalStorageKeys.MoreAiHotelSearchResult
-    ));
-     //localStorage.removeItem(LocalStorageKeys.MoreAiHotelSearchResult);
+    moreAiHotelSearchState = JSON.parse(
+      localStorage.getItem(LocalStorageKeys.MoreAiHotelSearchResult)
+    );
+    //localStorage.removeItem(LocalStorageKeys.MoreAiHotelSearchResult);
   }
   const [isDataLoading, setIsDataLoading] = useState(false);
 
-  const queryParams = new URLSearchParams(location.search);
   const [city, setCity] = useState(queryParams.get("city"));
 
   const [bedRooms, setBedRooms] = useState(1);
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState(searchTextMessage);
   const [searchCity, setSearchCity] = useState("");
   const [guestCount, setGuestCount] = useState(0);
   const [checkInDate, setCheckInDate] = useState("");
@@ -63,6 +74,8 @@ function HotelSearchPage(props) {
   const [hotelNames, setHotelNames] = useState([]);
   const [hotelMap, setHotelMap] = useState(new Map());
   const [hotelsInDB, setHotelsInDB] = useState([]);
+  const [isListening, setIsListening] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
@@ -98,7 +111,7 @@ function HotelSearchPage(props) {
 
       setCity(aiHotelSearchState.destination);
       setSearchCity(aiHotelSearchState.destination);
-      setSearchText(aiHotelSearchState.destination);
+      //setSearchText(aiHotelSearchState.destination);
       setCheckInDate(aiHotelSearchState.from_date);
       setCheckOutDate(aiHotelSearchState.to_date);
       setGuestCount(aiHotelSearchState.total_head_count);
@@ -201,7 +214,7 @@ function HotelSearchPage(props) {
     store.dispatch(resetAiHotelSearchState());
     setCity(searchCity);
 
-    const searchText = `${searchCity} hotels from ${fromDate} to ${toDate} for ${guests} people.`;
+    //const searchText = `${searchCity} hotels from ${fromDate} to ${toDate} for ${guests} people.`;
     const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
@@ -268,9 +281,9 @@ function HotelSearchPage(props) {
   //       showMoreHotels();
   //     }
   //   };
-  
+
   //   window.addEventListener("scroll", handleScroll);
-  
+
   //   return () => {
   //     window.removeEventListener("scroll", handleScroll);
   //   };
@@ -283,20 +296,20 @@ function HotelSearchPage(props) {
   function showMoreHotels() {
     // window.location.reload(true);
     let hotelNames = [];
-    if(moreAiHotelSearchState){
-      setHotelResultListCopy([])
+    if (moreAiHotelSearchState) {
+      setHotelResultListCopy([]);
       moreAiHotelSearchState.forEach((hotel) => {
         hotelNames.push(hotel.hotel_name);
       });
-  
+
       setHotelNames(hotelNames);
       let hotelsNotInDatabase = [];
       hotelNames.forEach((hotelAI) => {
         let found = false;
-  
+
         // Case-insensitive wildcard match
         const regex = new RegExp(`^${hotelAI.replace(/\*/g, ".*")}$`, "i");
-  
+
         hotelsInDB.forEach((hotelDB) => {
           if (regex.test(hotelDB.Name)) {
             found = true;
@@ -306,7 +319,7 @@ function HotelSearchPage(props) {
           hotelsNotInDatabase.push(hotelAI);
         }
       });
-  
+
       let hotelList = hotelsInDB;
       hotelsNotInDatabase.forEach((hotel) => {
         moreAiHotelSearchState.forEach((aiHotel) => {
@@ -354,66 +367,189 @@ function HotelSearchPage(props) {
       });
   }
 
+  async function handleSpeechToTextFromMic() {
+    setSearchText("");
+    setIsListening(true);
+    speechService
+      .speechToTextFromMic()
+      .then((displayText) => {
+        setSearchText(displayText);
+        setIsListening(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setIsListening(false);
+      });
+  }
+
+  function onSearchSubmit() {
+    loadMoreHotels();
+    setLoading(true);
+    const promises = [openAiService.searchHotels(searchText)];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
+        setLoading(false);
+        if (searchResult.hotels.length > 0) {
+          dispatch(setAiHotelSearchResults(searchResult));
+          localStorage.setItem(
+            LocalStorageKeys.AiHotelSearchResult,
+            JSON.stringify(searchResult)
+          );
+          navigate(`/search-hotel`);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error occurred:", error);
+      });
+  }
+
   return (
-    <MainContainer>
+    <>
       <div className={"row_fit"} style={{ width: "100%" }}>
         {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
-          <SearchBar
-            searchCity={searchCity}
-            city={aiHotelSearchState.destination}
-            checkInDate={aiHotelSearchState.from_date}
-            checkOutDate={aiHotelSearchState.to_date}
-            numOfPeople={aiHotelSearchState.total_head_count}
-            hotelsData={hotelResultListCopy}
-            bedRooms={bedRooms}
-            setBedRooms={setBedRooms}
-            onCitySearchChanged={onCitySearchChanged}
-            searchText={searchText}
-            setSearchText={setSearchText}
-            onClearSearchText={onClearSearchText}
-            onClickSearch={onClickSearch}
-            setSearchCity={setSearchCity}
-            setGuestCount={setGuestCount}
-            setCheckInDate={setCheckInDate}
-            setCheckOutDate={setCheckOutDate}
-          />
+          // <SearchBar
+          //   searchCity={searchCity}
+          //   city={aiHotelSearchState.destination}
+          //   checkInDate={aiHotelSearchState.from_date}
+          //   checkOutDate={aiHotelSearchState.to_date}
+          //   numOfPeople={aiHotelSearchState.total_head_count}
+          //   hotelsData={hotelResultListCopy}
+          //   bedRooms={bedRooms}
+          //   setBedRooms={setBedRooms}
+          //   onCitySearchChanged={onCitySearchChanged}
+          //   searchText={searchText}
+          //   setSearchText={setSearchText}
+          //   onClearSearchText={onClearSearchText}
+          //   onClickSearch={onClickSearch}
+          //   setSearchCity={setSearchCity}
+          //   setGuestCount={setGuestCount}
+          //   setCheckInDate={setCheckInDate}
+          //   setCheckOutDate={setCheckOutDate}
+          // />
+          <div className="search_section hotel-search-page">
+            <div className={"title_2"}>
+              {hotelResultListCopy.length > 0
+                ? hotelResultListCopy.length
+                : `No `}{" "}
+              Hotels in {aiHotelSearchState.destination}
+            </div>
+            <div
+              className={"subtext"}
+              style={{ lineHeight: "15px", marginBottom: "40px" }}
+            >
+              Book your next stay at one of our properties
+            </div>
+            <div className="search-area">
+              <div>
+                <Row>
+                  <Col>
+                    <div className="container">
+                      <div className="icon-and-text">
+                        <div className="search-area-phrase">
+                          Eg-: I want to take my family of four to a beach
+                          resort in Asia from the 1st December to the 31st
+                          December 2024. We are also interested in trekking.
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+                <Row style={{ justifyContent: "center" }}>
+                  <Col md={10}>
+                    <InputGroup className="">
+                      <textarea
+                        placeholder="Search your next stay here..."
+                        aria-label="Search your next stay here..."
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        rows={3}
+                        cols={130}
+                      />
+                    </InputGroup>
+                  </Col>
+                  <Col
+                    md={2}
+                    className="d-flex justify-content-end align-items-center"
+                  >
+                    <Button
+                      variant="outline-secondary"
+                      id="button-addon1"
+                      className={`mr-2 ${
+                        isListening
+                          ? "microphone-icon-isListening remove-right-border-radius"
+                          : "microphone-icon remove-right-border-radius"
+                      }`}
+                      onClick={handleSpeechToTextFromMic}
+                      title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                    >
+                      <FontAwesomeIcon
+                        size="lg"
+                        icon={faMicrophone}
+                        className="fa fa-microphone"
+                      />
+                    </Button>
+                    <Button
+                      variant="outline-secondary"
+                      id="button-addon1"
+                      className={`mr-2 search-icon remove-left-border-radius`}
+                      onClick={onClickSearch}
+                      title="Search"
+                      disabled={searchText.length === 0}
+                    >
+                      <FontAwesomeIcon
+                        size="lg"
+                        icon={faSearch}
+                        className="fa fa-search"
+                      />
+                    </Button>
+                  </Col>
+                </Row>
+                {isListening ? (
+                  <div className="listening">Listening...</div>
+                ) : null}
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
-
-      {isDataLoading ? (
-        <div className="spinnerWrapper">
-          <Spinner
-            color="primary"
-            style={{
-              height: "3rem",
-              width: "3rem",
-            }}
-            type="grow"
-          >
-            Loading...
-          </Spinner>
-        </div>
-      ) : hotelResultListCopy?.length < 1 ? (
-        <Alert color="warning" style={{ marginBottom: "40vh" }}>
-          No Hotels Found!
-        </Alert>
-      ) : (
-        <div className={"row_fit"} style={{ width: "100%" }}>
-          <div className={"col"}>
-            {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
-              <HotelList
-                data={hotelResultListCopy}
-                hotelMap={hotelMap}
-                numOfPeople={guestCount}
-                onViewAvailableClicked={onViewAvailableClicked}
-              />
-            ) : (
-              ""
-            )}
+      <MainContainer>
+        {isDataLoading ? (
+          <div className="spinnerWrapper">
+            <Spinner
+              color="primary"
+              style={{
+                height: "3rem",
+                width: "3rem",
+              }}
+              type="grow"
+            >
+              Loading...
+            </Spinner>
           </div>
-        </div>
-      )}
-    </MainContainer>
+        ) : hotelResultListCopy?.length < 1 ? (
+          <Alert color="warning" style={{ marginBottom: "40vh" }}>
+            No Hotels Found!
+          </Alert>
+        ) : (
+          <div className={"row_fit hotel-list"} style={{ width: "100%" }}>
+            <div className={"col"}>
+              {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
+                <HotelList
+                  data={hotelResultListCopy}
+                  hotelMap={hotelMap}
+                  numOfPeople={guestCount}
+                  onViewAvailableClicked={onViewAvailableClicked}
+                />
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        )}
+      </MainContainer>
+    </>
   );
 }
 
