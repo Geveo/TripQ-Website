@@ -2,9 +2,6 @@ import MainContainer from "../layout/MainContainer";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import SearchBar from "../components/HotelSearchPage/SearchBar";
-import facilitiesData from "../data/facilities";
-import roomFacilitiesData from "../data/room_facilities";
-import { bed_types } from "../constants/constants";
 import HotelList from "../components/HotelSearchPage/HotelList";
 import HotelService from "../services-domain/hotel-service copy";
 import { Alert, Spinner } from "reactstrap";
@@ -15,7 +12,9 @@ import { store } from "../redux/store";
 import { AzureOpenaiService } from "../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
 import { resetAiHotelSearchState } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { resetHotelSearchState } from "../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { setAiHotelSearchResults } from "../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { setMoreAiSearchResults } from "../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import toast from "react-hot-toast";
 
 //http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
@@ -33,6 +32,12 @@ function HotelSearchPage(props) {
     (state) => state.moreAihotelSearchState
   );
 
+  if (!moreAiHotelSearchState) {
+    moreAiHotelSearchState = JSON.parse(localStorage.getItem(
+      LocalStorageKeys.MoreAiHotelSearchResult
+    ));
+     //localStorage.removeItem(LocalStorageKeys.MoreAiHotelSearchResult);
+  }
   const [isDataLoading, setIsDataLoading] = useState(false);
 
   const queryParams = new URLSearchParams(location.search);
@@ -57,6 +62,7 @@ function HotelSearchPage(props) {
   const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
   const [hotelNames, setHotelNames] = useState([]);
   const [hotelMap, setHotelMap] = useState(new Map());
+  const [hotelsInDB, setHotelsInDB] = useState([]);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
@@ -105,6 +111,7 @@ function HotelSearchPage(props) {
         }
 
         let hotelsNotInDatabase = [];
+        let hotelsInDatabase = [];
         hotelNames.forEach((hotelAI) => {
           let found = false;
 
@@ -139,10 +146,12 @@ function HotelSearchPage(props) {
               WebsiteURL: "",
               PhoneNumber: JSON.parse(hotel.ContactDetails).PhoneNumber,
             };
+            hotelsInDatabase.push(hotelObj);
             hotelList.push(hotelObj);
           });
         }
 
+        setHotelsInDB(hotelsInDatabase);
         hotelsNotInDatabase.forEach((hotel) => {
           aiHotelSearchState.hotels.forEach((aiHotel) => {
             if (aiHotel.hotel_name === hotel) {
@@ -185,6 +194,7 @@ function HotelSearchPage(props) {
   }, [hotelNames]);
 
   const onClickSearch = (city, fromDate, toDate, guests) => {
+    loadMoreHotels();
     store.dispatch(setShowScreenLoader(true));
     setHotelNames([]);
     setHotelMap(new Map());
@@ -252,44 +262,122 @@ function HotelSearchPage(props) {
     return formattedDate;
   };
 
-  // Event listener for the scroll event
-  window.addEventListener("scroll", function () {
-    if (isAtBottomOfPage()) {
-      loadMoreHotels();
-    }
-  });
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (isAtBottomOfPage()) {
+  //       showMoreHotels();
+  //     }
+  //   };
+  
+  //   window.addEventListener("scroll", handleScroll);
+  
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, [moreAiHotelSearchState.length]);
 
   function isAtBottomOfPage() {
     return window.innerHeight + window.scrollY >= document.body.offsetHeight;
   }
 
+  function showMoreHotels() {
+    // window.location.reload(true);
+    let hotelNames = [];
+    if(moreAiHotelSearchState){
+      setHotelResultListCopy([])
+      moreAiHotelSearchState.forEach((hotel) => {
+        hotelNames.push(hotel.hotel_name);
+      });
+  
+      setHotelNames(hotelNames);
+      let hotelsNotInDatabase = [];
+      hotelNames.forEach((hotelAI) => {
+        let found = false;
+  
+        // Case-insensitive wildcard match
+        const regex = new RegExp(`^${hotelAI.replace(/\*/g, ".*")}$`, "i");
+  
+        hotelsInDB.forEach((hotelDB) => {
+          if (regex.test(hotelDB.Name)) {
+            found = true;
+          }
+        });
+        if (!found) {
+          hotelsNotInDatabase.push(hotelAI);
+        }
+      });
+  
+      let hotelList = hotelsInDB;
+      hotelsNotInDatabase.forEach((hotel) => {
+        moreAiHotelSearchState.forEach((aiHotel) => {
+          if (aiHotel.hotel_name === hotel) {
+            const hotelObj = {
+              AvailableRooms: [],
+              ContactDetails: "",
+              CreatedOn: "",
+              Description: aiHotel.hotel_description,
+              Facilities: "",
+              Id: "",
+              ImageURL: aiHotel.star_ratings,
+              LastUpdateOn: "",
+              Location: aiHotel.hotel_address,
+              Name: aiHotel.hotel_name,
+              StarRatings: aiHotel.star_ratings,
+              WalletAddress: "",
+              WebsiteURL: aiHotel.website_link,
+              PhoneNumber: aiHotel.phone,
+            };
+            hotelList.push(hotelObj);
+          }
+        });
+      });
+      setHotelResultListCopy(hotelList);
+      dispatch(resetHotelSearchState());
+    }
+  }
+
   function loadMoreHotels() {
-   // window.location.reload(true);
-   console.log(moreAiHotelSearchState)
+    const promises = [openAiService.searchHotels(searchText, 25)];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
+        if (searchResult.hotels.length > 0) {
+          dispatch(setMoreAiSearchResults(searchResult.hotels));
+          localStorage.setItem(
+            LocalStorageKeys.MoreAiHotelSearchResult,
+            JSON.stringify(searchResult.hotels)
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error occurred:", error);
+      });
   }
 
   return (
     <MainContainer>
       <div className={"row_fit"} style={{ width: "100%" }}>
-        <SearchBar
-          searchCity={searchCity}
-          city={aiHotelSearchState.destination}
-          checkInDate={aiHotelSearchState.from_date}
-          checkOutDate={aiHotelSearchState.to_date}
-          numOfPeople={aiHotelSearchState.total_head_count}
-          hotelsData={hotelResultListCopy}
-          bedRooms={bedRooms}
-          setBedRooms={setBedRooms}
-          onCitySearchChanged={onCitySearchChanged}
-          searchText={searchText}
-          setSearchText={setSearchText}
-          onClearSearchText={onClearSearchText}
-          onClickSearch={onClickSearch}
-          setSearchCity={setSearchCity}
-          setGuestCount={setGuestCount}
-          setCheckInDate={setCheckInDate}
-          setCheckOutDate={setCheckOutDate}
-        />
+        {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
+          <SearchBar
+            searchCity={searchCity}
+            city={aiHotelSearchState.destination}
+            checkInDate={aiHotelSearchState.from_date}
+            checkOutDate={aiHotelSearchState.to_date}
+            numOfPeople={aiHotelSearchState.total_head_count}
+            hotelsData={hotelResultListCopy}
+            bedRooms={bedRooms}
+            setBedRooms={setBedRooms}
+            onCitySearchChanged={onCitySearchChanged}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            onClearSearchText={onClearSearchText}
+            onClickSearch={onClickSearch}
+            setSearchCity={setSearchCity}
+            setGuestCount={setGuestCount}
+            setCheckInDate={setCheckInDate}
+            setCheckOutDate={setCheckOutDate}
+          />
+        ) : null}
       </div>
 
       {isDataLoading ? (
