@@ -71,7 +71,7 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
-    loadMoreHotels();
+    //loadMoreHotels();
     setLoading(true);
     const promises = [openAiService.searchHotels(searchText)];
 
@@ -84,7 +84,7 @@ function CustomerDashboard() {
             LocalStorageKeys.AiHotelSearchResult,
             JSON.stringify(searchResult)
           );
-          navigate(`/search-hotel`);
+          navigate(`/search-hotel?searchText=${encodeURIComponent(searchText)}`);
         }
       })
       .catch((error) => {
@@ -157,7 +157,7 @@ function CustomerDashboard() {
                   <div className="container">
                     <div className="icon-and-text">
                       <div className="search-area-phrase">
-                        Ex-: I want to take my family of four to a beach resort
+                        Eg-: I want to take my family of four to a beach resort
                         in Asia from the 1st December to the 31st December 2024.
                         We are also interested in trekking.
                       </div>
