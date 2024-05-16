@@ -14,7 +14,7 @@
     width: 100%;
 
     h3 {
-      font-size: 4rem;
+      font-size: 3.7rem;
     }
 
     p {
@@ -41,11 +41,10 @@
     font-size: 20px;
   }
   
-  .search-area-phrase {
-    margin-left: 10px; 
+  .search-area-phrase { 
     color: #000000;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 15px;
   }
   
 
@@ -88,8 +87,9 @@
   }
   .listening{
     color: #c42121;
-    font-weight: 500;
-    padding-top: 10px;
+    font-weight: 600;
+    font-size: x-large;
+    padding-left: 1030px;
   }
 }
 
@@ -126,6 +126,7 @@ div.best_offers {
 .overrideSearchButton {
   height: 40px;
   width: 100%;
+  margin-bottom: 30px;
   background-color: $purple-color!important;
 }
 
@@ -137,18 +138,41 @@ div.best_offers {
 }
 
 .microphone-icon {
+  width: 100px;
+  height: 50px;
   background-color: green!important ;
-  border: 0px;
+  margin-bottom: 15px;
 }
 
 .microphone-icon:hover {
   background-color: #f6cd47 !important ;
-  border: 0px;
+  width: 100px;
+  height: 50px;
+  margin-bottom: 15px;
 }
 
 .microphone-icon-isListening {
   background-color: #c42121 !important ;
-  border: 0px;
+  width: 100px;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.search-icon{
+  width: 100px;
+  height: 50px;
+  background-color:  #2c2c76!important ;
+  margin-bottom: 15px;
+}
+
+.remove-left-border-radius {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.remove-right-border-radius {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 div.top_rated_hotels {

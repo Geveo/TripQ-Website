@@ -4,7 +4,12 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
-function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
+function SearchHotelResult({
+  hotel,
+  hotelDetails,
+  numOfPeople,
+  onViewAvailableClicked,
+}) {
   const styles = {
     image: {
       width: "284px",
@@ -13,6 +18,18 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
       borderRadius: "5px",
     },
   };
+
+  if (hotelDetails && hotel.AvailableRooms.length === 0) {
+    const updatedHotel = {
+      ...hotel,
+      Description: hotelDetails.hotel_description,
+      StarRatings: hotelDetails.star_ratings,
+      Location: hotelDetails.hotel_address,
+      PhoneNumber: hotelDetails.phone,
+      WebsiteURL: hotelDetails.website_link,
+    };
+    hotel = updatedHotel;
+  }
 
   const location = hotel.Location;
   let address = "";

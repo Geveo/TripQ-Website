@@ -6,7 +6,7 @@ import ContractService from "./services-common/contract-service";
 import HotelHomePage from "./pages/HotelHomePage";
 import LandingPageForHotelOwner from "./pages/LandingPageForHotelOwner";
 import RegisterCustomer from "./pages/RegisterCustomer";
-import HotelSearchPage from "./pages/HotelSearchPage";
+import HotelSearchPage from "./pages/HotelSearchPage/HotelSearchPage";
 import Reservations from "./pages/Reservations";
 import ConfirmBooking from "./pages/ConfirmBooking";
 import AvailabilityPage from "./pages/AvailabilityPage";

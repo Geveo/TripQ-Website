@@ -45,7 +45,8 @@ const LocalStorageKeys ={
     pkce_state: 'pkce_state',
     HotelSelectionDetails: 'hotel-selection-details',
     BookingCustomer: 'booking-customer',
-    AiHotelSearchResult: 'ai-hotel-search-result'
+    AiHotelSearchResult: 'ai-hotel-search-result',
+    MoreAiHotelSearchResult: 'more-ai-hotel-search-result'
 }
 
 const XRPLAccountEventTypes = {

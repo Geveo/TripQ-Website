@@ -19,7 +19,7 @@ import toast from "react-hot-toast";
 import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import HotelService from "../../services-domain/hotel-service copy";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
-import { faArrowAltCircleDown } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SpeechService from "../../services-common/speech-service";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -28,6 +28,7 @@ import { AzureOpenaiService } from "../../services-common/azure-openai-service";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import { useDispatch } from "react-redux";
 import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
+import { setMoreAiSearchResults } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { LocalStorageKeys } from "../../constants/constants";
 
 function CustomerDashboard() {
@@ -70,11 +71,9 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
+    //loadMoreHotels();
     setLoading(true);
-
-      const promises = [
-      openAiService.searchHotels(searchText),
-    ];
+    const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
@@ -85,7 +84,27 @@ function CustomerDashboard() {
             LocalStorageKeys.AiHotelSearchResult,
             JSON.stringify(searchResult)
           );
-          navigate(`/search-hotel`);
+          navigate(`/search-hotel?searchText=${encodeURIComponent(searchText)}`);
+        }
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Error occurred:", error);
+      });
+  }
+
+  function loadMoreHotels() {
+    const promises = [openAiService.searchHotels(searchText, 25)];
+
+    Promise.all(promises)
+      .then(([searchResult]) => {
+        setLoading(false);
+        if (searchResult.hotels.length > 0) {
+          dispatch(setMoreAiSearchResults(searchResult.hotels));
+          localStorage.setItem(
+            LocalStorageKeys.MoreAiHotelSearchResult,
+            JSON.stringify(searchResult.hotels)
+          );
         }
       })
       .catch((error) => {
@@ -114,8 +133,16 @@ function CustomerDashboard() {
       <LoadingScreen showLoadPopup={loading} />
       <div className="main-image-div">
         <Container className="main-txt">
-          <h3>Enjoy your next stay</h3>
-          <p>Search low prices on hotels, homes and much more</p>
+          <Row>
+            <Col xs={12}>
+              <h3>
+                Discover your next holiday by using our AI powered search engine
+              </h3>
+              <p>
+                Simply type in your requirements and we will do the rest
+              </p>
+            </Col>
+          </Row>
         </Container>
       </div>
       <Container>
@@ -129,61 +156,69 @@ function CustomerDashboard() {
                 <Col>
                   <div className="container">
                     <div className="icon-and-text">
-                      <FontAwesomeIcon
-                        icon={faArrowAltCircleDown}
-                        className="fa-fade"
-                        size="lg"
-                      />
                       <div className="search-area-phrase">
-                        Unlock the power of your voice! Tap the microphone and
-                        effortlessly convey your destination, check-in and
-                        check-out dates, and guest count to our AI search
+                        Eg-: I want to take my family of four to a beach resort
+                        in Asia from the 1st December to the 31st December 2024.
+                        We are also interested in trekking.
                       </div>
                     </div>
                   </div>
                 </Col>
               </Row>
               <Row style={{ justifyContent: "center" }}>
-                <Col>
+                <Col md={10}>
                   <InputGroup className="">
-                    <Button
-                      variant="outline-secondary"
-                      id="button-addon1"
-                      className={
-                        isListening
-                          ? `microphone-icon-isListening`
-                          : `microphone-icon`
-                      }
-                      onClick={handleSpeechToTextFromMic}
-                      title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
-                    >
-                      <FontAwesomeIcon
-                        size="lg"
-                        icon={faMicrophone}
-                        className="fa fa-microphone"
-                      />
-                    </Button>
-                    <Form.Control
+                    <textarea
                       placeholder="Search your next stay here..."
-                      aria-label="Username"
-                      aria-describedby="basic-addon1"
+                      aria-label="Search your next stay here..."
                       value={searchText}
                       onChange={(e) => setSearchText(e.target.value)}
+                      rows={3}
+                      cols={130}
                     />
                   </InputGroup>
                 </Col>
-                <Col md={2}>
+                <Col
+                  md={2}
+                  className="d-flex justify-content-end align-items-center"
+                >
                   <Button
-                    className="overrideSearchButton"
-                    onClick={onSearchSubmit}
-                    disabled={searchText.length == 0}
+                    variant="outline-secondary"
+                    id="button-addon1"
+                    className={`mr-2 ${
+                      isListening
+                        ? "microphone-icon-isListening remove-right-border-radius"
+                        : "microphone-icon remove-right-border-radius"
+                    }`}
+                    onClick={handleSpeechToTextFromMic}
+                    title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
                   >
-                    Search your stay
+                    <FontAwesomeIcon
+                      size="lg"
+                      icon={faMicrophone}
+                      className="fa fa-microphone"
+                    />
+                  </Button>
+                  <Button
+                    variant="outline-secondary"
+                    id="button-addon1"
+                    className={`mr-2 search-icon remove-left-border-radius`}
+                    onClick={onSearchSubmit}
+                    title="Search"
+                    disabled={searchText.length === 0}
+                  >
+                    <FontAwesomeIcon
+                      size="lg"
+                      icon={faSearch}
+                      className="fa fa-search"
+                    />
                   </Button>
                 </Col>
               </Row>
-              {isListening ? (<div className="listening">Listening..</div>): null}
-              
+
+              {isListening ? (
+                <div className="listening">Listening...</div>
+              ) : null}
             </div>
           </div>
         </div>
