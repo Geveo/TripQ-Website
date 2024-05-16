@@ -21,7 +21,7 @@ const LoadingScreen = (props) => {
               }}
               type="grow"
             />
-            Loading...
+            {props.screenLoaderText === "" ? "Loading.." : props.screenLoaderText}
           </div>
         </Modal.Body>
       </Modal>
