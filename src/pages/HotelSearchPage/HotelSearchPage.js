@@ -247,9 +247,9 @@ function HotelSearchPage(props) {
 
     if (hotel.WebsiteURL && hotel.WebsiteURL.length > 0) {
       window.open(hotel.WebsiteURL, "_blank");
-    } else if (!checkInDate || !checkOutDate) {
+    } else if (!checkInDate || !checkOutDate || guestCount == 0) {
       toast.error(
-        "Please enter valid check-in, check-out dates and guest count"
+        "Please include valid check-in, check-out dates, and guest count"
       );
     } else {
       navigate(

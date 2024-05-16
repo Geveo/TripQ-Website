@@ -25,6 +25,7 @@ import ViewCustomerReservations from "./pages/ViewReservations/ViewCustomerReser
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import MyProperties from "./pages/MyProperties/MyProperties";
 import RoomTypeDetails from "./components/HotelHomePage/RoomTypeDetails/RoomTypeDetails";
+import CGPayment from "./components/Payment/CGPayment";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
@@ -78,6 +79,7 @@ function App() {
                     <Route path="/customer-details" element={<CustomerDetails />} exact />
                     <Route path="/availability/:id/:checkInDate/:checkOutDate" element={<AvailabilityPage/>} exact />
                     <Route path="/make-reservations" element={<MakeReservations />} exact />
+                    <Route path="/cg-payment" element={<CGPayment />} exact />
                     {loginState.isLoggedIn && (
                         <>
                             <Route path="/my-transactions" element={<AccountTransactions />} exact />

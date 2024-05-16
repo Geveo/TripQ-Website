@@ -6,6 +6,7 @@ import loginStateReducer from "./LoginState/LoginStateSlice";
 import selectionDetailsReducer from "./SelectionDetails/SelectionDetailsSlice";
 import ScreenLoaderReducer from "./screenLoader/ScreenLoaderSlice";
 import AiHotelSearchStateReducer from "./AiHotelSearchState/AiHotelSearchStateSlice";
+import bookingCustomerReducer from "./BookingCustomer/BookingCustomerSlice";
 import MoreAiHotelSearchStateReducer from "./AiHotelSearchState/MoreAiSearchStateSlice";
 
 export const store = configureStore({
@@ -18,6 +19,7 @@ export const store = configureStore({
     screenLaoder: ScreenLoaderReducer,
     AiHotelSearchState: AiHotelSearchStateReducer,
     MoreAiHotelSearchState: MoreAiHotelSearchStateReducer,
+    bookingCustomer: bookingCustomerReducer
   },
 });
 

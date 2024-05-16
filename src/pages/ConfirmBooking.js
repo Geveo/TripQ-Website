@@ -3,7 +3,7 @@ import BookingDetails from "../components/BookingDetails/index";
 import BookedHotelDetails from "../components/BookedHotelDetails/index";
 import {Row, Col} from "reactstrap";
 import MainContainer from "../layout/MainContainer";
-import CustomerRegistration from "../components/CustomerRegistration";
+import CustomerRegistration from "../components/CustomerRegistration/CustometRegistration";
 import BookedHotelPrice from "../components/BookedHotelPrice";
 import "../styles/layout_styles.scss";
 import HotelService from "../services-domain/hotel-service copy";

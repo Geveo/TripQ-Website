@@ -26,8 +26,7 @@ const CustomerDetails = () => {
   const [email, setEmail] = useState("");
   const [country, setCountry] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  const loginState = useSelector((state) => state.loginState);
-
+  const loginState = useSelector((state) => state.loginState); 
   const submitForm = async () => {
     console.log("making payments..");
     const result = await showPayQRWindow(
@@ -116,7 +115,7 @@ const CustomerDetails = () => {
             <Col md={6}>
               <FormGroup>
                 <Label>
-                  Phone Number<span style={{ color: "red" }}>*</span>
+                  Contact Number<span style={{ color: "red" }}>*</span>
                 </Label>
                 <Input
                   type="text"
