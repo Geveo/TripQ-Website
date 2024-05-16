@@ -23,7 +23,8 @@ function CGPayment(props) {
     try {
       console.log(amount)
       console.log(currency)
-      const response = await axios.post('http://localhost:4200/api/payment', {
+      //const response = await axios.post('http://localhost:4200/api/payment', {
+        const response = await axios.post('https://tripq-webapi.azurewebsites.net/api/payment', {
         amount,
         currency,
       }, {

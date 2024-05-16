@@ -19,7 +19,8 @@ const StripeCheckout = (props) => {
     }
 
     console.log(value)
-    fetch('http://localhost:4200/create-payment-intent', {
+    //fetch('http://localhost:4200/create-payment-intent', {
+      fetch('https://tripq-webapi.azurewebsites.net/create-payment-intent', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(value),
