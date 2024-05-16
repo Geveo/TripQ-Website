@@ -71,13 +71,12 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
-    //loadMoreHotels();
+    loadMoreHotels();
     setLoading(true);
     const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        setLoading(false);
         if (searchResult.hotels.length > 0) {
           dispatch(setAiHotelSearchResults(searchResult));
           localStorage.setItem(
@@ -88,7 +87,7 @@ function CustomerDashboard() {
         }
       })
       .catch((error) => {
-        setLoading(false);
+        //setLoading(false);
         console.error("Error occurred:", error);
       });
   }
@@ -130,7 +129,7 @@ function CustomerDashboard() {
 
   return (
     <>
-      <LoadingScreen showLoadPopup={loading} />
+      <LoadingScreen showLoadPopup={loading} screenLoaderText={"Stay tuned! Your dream destination is just a search away"} />
       <div className="main-image-div">
         <Container className="main-txt">
           <Row>

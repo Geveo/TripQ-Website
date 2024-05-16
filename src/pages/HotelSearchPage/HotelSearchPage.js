@@ -12,6 +12,7 @@ import { add as selectionDetailsAdd } from "../../redux/SelectionDetails/Selecti
 import { store } from "../../redux/store";
 import { AzureOpenaiService } from "../../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
+import { setScreenLoaderText } from "../../redux/screenLoader/ScreenLoaderSlice";
 import { resetAiHotelSearchState } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
 import { resetHotelSearchState } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
@@ -25,7 +26,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-//http://localhost:3000/search-hotel?city=Galle&fromDate=2023-03-17&toDate=2023-03-20&people=2
 function HotelSearchPage(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -33,12 +33,12 @@ function HotelSearchPage(props) {
 
   const queryParams = new URLSearchParams(location.search);
   const searchTextMessage = queryParams.get("searchText");
+  const [city, setCity] = useState(queryParams.get("city"));
 
   const hotelService = HotelService.instance;
   const openAiService = AzureOpenaiService.getInstance();
   const speechService = new SpeechService();
 
-  const loginState = useSelector((state) => state.loginState);
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
   let moreAiHotelSearchState = useSelector(
     (state) => state.moreAihotelSearchState
@@ -51,34 +51,25 @@ function HotelSearchPage(props) {
     //localStorage.removeItem(LocalStorageKeys.MoreAiHotelSearchResult);
   }
   const [isDataLoading, setIsDataLoading] = useState(false);
-
-  const [city, setCity] = useState(queryParams.get("city"));
-
-  const [bedRooms, setBedRooms] = useState(1);
   const [searchText, setSearchText] = useState(searchTextMessage);
   const [searchCity, setSearchCity] = useState("");
   const [guestCount, setGuestCount] = useState(0);
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
-
-  const [budget, setBudget] = useState("");
-  const [distance, setDistance] = useState("");
-  const [conveniences, setConveniences] = useState([]);
-  const [roomFacilities, setRoomFacilities] = useState([]);
-
-  const [cancellationPolicy, setCancellationPolicy] = useState("None");
-  const [bedTypes, setBedTypes] = useState([]);
-  const isFilerDisable = true;
-
   const [hotelResultListCopy, setHotelResultListCopy] = useState([]);
   const [hotelNames, setHotelNames] = useState([]);
   const [hotelMap, setHotelMap] = useState(new Map());
   const [hotelsInDB, setHotelsInDB] = useState([]);
   const [isListening, setIsListening] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showMore, setShowMore] = useState(true);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
+    store.dispatch(
+      setScreenLoaderText(
+        "Stay tuned! Your dream destination is just a search away"
+      )
+    );
     // Get AI searched results
     if (!aiHotelSearchState) {
       aiHotelSearchState = localStorage.getItem(
@@ -86,7 +77,6 @@ function HotelSearchPage(props) {
       );
       localStorage.removeItem(LocalStorageKeys.AiHotelSearchResult);
     }
-
     if (
       aiHotelSearchState &&
       aiHotelSearchState.hotels &&
@@ -190,6 +180,7 @@ function HotelSearchPage(props) {
         });
         setHotelResultListCopy(hotelList);
         store.dispatch(setShowScreenLoader(false));
+        store.dispatch(setScreenLoaderText(""));
       });
     }
   }, [aiHotelSearchState]);
@@ -249,7 +240,7 @@ function HotelSearchPage(props) {
       window.open(hotel.WebsiteURL, "_blank");
     } else if (!checkInDate || !checkOutDate || guestCount == 0) {
       toast.error(
-        "Please include valid check-in, check-out dates, and guest count"
+        "Please ensure your search query includes valid check-in/check-out dates and the number of guests"
       );
     } else {
       navigate(
@@ -277,7 +268,7 @@ function HotelSearchPage(props) {
 
   // useEffect(() => {
   //   const handleScroll = () => {
-  //     if (isAtBottomOfPage()) {
+  //     if (isAtBottomOfPage() && moreAiHotelSearchState.length > 0) {
   //       showMoreHotels();
   //     }
   //   };
@@ -287,17 +278,16 @@ function HotelSearchPage(props) {
   //   return () => {
   //     window.removeEventListener("scroll", handleScroll);
   //   };
-  // }, [moreAiHotelSearchState.length]);
+  // }, []);
 
   function isAtBottomOfPage() {
     return window.innerHeight + window.scrollY >= document.body.offsetHeight;
   }
 
   function showMoreHotels() {
-    // window.location.reload(true);
+    setShowMore(false);
     let hotelNames = [];
     if (moreAiHotelSearchState) {
-      setHotelResultListCopy([]);
       moreAiHotelSearchState.forEach((hotel) => {
         hotelNames.push(hotel.hotel_name);
       });
@@ -345,7 +335,6 @@ function HotelSearchPage(props) {
         });
       });
       setHotelResultListCopy(hotelList);
-      dispatch(resetHotelSearchState());
     }
   }
 
@@ -384,12 +373,10 @@ function HotelSearchPage(props) {
 
   function onSearchSubmit() {
     loadMoreHotels();
-    setLoading(true);
     const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        setLoading(false);
         if (searchResult.hotels.length > 0) {
           dispatch(setAiHotelSearchResults(searchResult));
           localStorage.setItem(
@@ -400,121 +387,120 @@ function HotelSearchPage(props) {
         }
       })
       .catch((error) => {
-        setLoading(false);
         console.error("Error occurred:", error);
       });
   }
 
   return (
     <>
-      <div className={"row_fit"} style={{ width: "100%" }}>
-        {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
-          // <SearchBar
-          //   searchCity={searchCity}
-          //   city={aiHotelSearchState.destination}
-          //   checkInDate={aiHotelSearchState.from_date}
-          //   checkOutDate={aiHotelSearchState.to_date}
-          //   numOfPeople={aiHotelSearchState.total_head_count}
-          //   hotelsData={hotelResultListCopy}
-          //   bedRooms={bedRooms}
-          //   setBedRooms={setBedRooms}
-          //   onCitySearchChanged={onCitySearchChanged}
-          //   searchText={searchText}
-          //   setSearchText={setSearchText}
-          //   onClearSearchText={onClearSearchText}
-          //   onClickSearch={onClickSearch}
-          //   setSearchCity={setSearchCity}
-          //   setGuestCount={setGuestCount}
-          //   setCheckInDate={setCheckInDate}
-          //   setCheckOutDate={setCheckOutDate}
-          // />
-          <div className="search_section hotel-search-page">
-            <div className={"title_2"}>
-              {hotelResultListCopy.length > 0
-                ? hotelResultListCopy.length
-                : `No `}{" "}
-              Hotels in {aiHotelSearchState.destination}
-            </div>
-            <div
-              className={"subtext"}
-              style={{ lineHeight: "15px", marginBottom: "40px" }}
-            >
-              Book your next stay at one of our properties
-            </div>
-            <div className="search-area">
-              <div>
-                <Row>
-                  <Col>
-                    <div className="container">
-                      <div className="icon-and-text">
-                        <div className="search-area-phrase">
-                          Eg-: I want to take my family of four to a beach
-                          resort in Asia from the 1st December to the 31st
-                          December 2024. We are also interested in trekking.
+      <MainContainer>
+        <div className={"row_fit"} style={{ width: "100%" }}>
+          {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
+            // <SearchBar
+            //   searchCity={searchCity}
+            //   city={aiHotelSearchState.destination}
+            //   checkInDate={aiHotelSearchState.from_date}
+            //   checkOutDate={aiHotelSearchState.to_date}
+            //   numOfPeople={aiHotelSearchState.total_head_count}
+            //   hotelsData={hotelResultListCopy}
+            //   bedRooms={bedRooms}
+            //   setBedRooms={setBedRooms}
+            //   onCitySearchChanged={onCitySearchChanged}
+            //   searchText={searchText}
+            //   setSearchText={setSearchText}
+            //   onClearSearchText={onClearSearchText}
+            //   onClickSearch={onClickSearch}
+            //   setSearchCity={setSearchCity}
+            //   setGuestCount={setGuestCount}
+            //   setCheckInDate={setCheckInDate}
+            //   setCheckOutDate={setCheckOutDate}
+            // />
+            <div className="search_section hotel-search-page">
+              <div className={"title_2"}>
+                {hotelResultListCopy.length > 0
+                  ? hotelResultListCopy.length
+                  : `No `}{" "}
+                Hotels in {aiHotelSearchState.destination}
+              </div>
+              <div
+                className={"subtext"}
+                style={{ lineHeight: "15px", marginBottom: "40px" }}
+              >
+                Book your next stay at one of our properties
+              </div>
+              <div className="search-area">
+                <div>
+                  <Row>
+                    <Col>
+                      <div className="container">
+                        <div className="icon-and-text">
+                          <div className="search-area-phrase">
+                            Eg-: I want to take my family of four to a beach
+                            resort in Asia from the 1st December to the 31st
+                            December 2024. We are also interested in trekking.
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Col>
-                </Row>
-                <Row style={{ justifyContent: "center" }}>
-                  <Col md={10}>
-                    <InputGroup className="">
-                      <textarea
-                        placeholder="Search your next stay here..."
-                        aria-label="Search your next stay here..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        rows={3}
-                        cols={130}
-                      />
-                    </InputGroup>
-                  </Col>
-                  <Col
-                    md={2}
-                    className="d-flex justify-content-end align-items-center"
-                  >
-                    <Button
-                      variant="outline-secondary"
-                      id="button-addon1"
-                      className={`mr-2 ${
-                        isListening
-                          ? "microphone-icon-isListening remove-right-border-radius"
-                          : "microphone-icon remove-right-border-radius"
-                      }`}
-                      onClick={handleSpeechToTextFromMic}
-                      title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                    </Col>
+                  </Row>
+                  <Row style={{ justifyContent: "center" }}>
+                    <Col md={10}>
+                      <InputGroup className="">
+                        <textarea
+                          placeholder="Search your next stay here..."
+                          aria-label="Search your next stay here..."
+                          value={searchText}
+                          onChange={(e) => setSearchText(e.target.value)}
+                          rows={3}
+                          cols={130}
+                        />
+                      </InputGroup>
+                    </Col>
+                    <Col
+                      md={2}
+                      className="d-flex justify-content-end align-items-center"
                     >
-                      <FontAwesomeIcon
-                        size="lg"
-                        icon={faMicrophone}
-                        className="fa fa-microphone"
-                      />
-                    </Button>
-                    <Button
-                      variant="outline-secondary"
-                      id="button-addon1"
-                      className={`mr-2 search-icon remove-left-border-radius`}
-                      onClick={onClickSearch}
-                      title="Search"
-                      disabled={searchText.length === 0}
-                    >
-                      <FontAwesomeIcon
-                        size="lg"
-                        icon={faSearch}
-                        className="fa fa-search"
-                      />
-                    </Button>
-                  </Col>
-                </Row>
-                {isListening ? (
-                  <div className="listening">Listening...</div>
-                ) : null}
+                      <Button
+                        variant="outline-secondary"
+                        id="button-addon1"
+                        className={`mr-2 ${
+                          isListening
+                            ? "microphone-icon-isListening remove-right-border-radius"
+                            : "microphone-icon remove-right-border-radius"
+                        }`}
+                        onClick={handleSpeechToTextFromMic}
+                        title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                      >
+                        <FontAwesomeIcon
+                          size="lg"
+                          icon={faMicrophone}
+                          className="fa fa-microphone"
+                        />
+                      </Button>
+                      <Button
+                        variant="outline-secondary"
+                        id="button-addon1"
+                        className={`mr-2 search-icon remove-left-border-radius`}
+                        onClick={onClickSearch}
+                        title="Search"
+                        disabled={searchText.length === 0}
+                      >
+                        <FontAwesomeIcon
+                          size="lg"
+                          icon={faSearch}
+                          className="fa fa-search"
+                        />
+                      </Button>
+                    </Col>
+                  </Row>
+                  {isListening ? (
+                    <div className="listening">Listening...</div>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
-        ) : null}
-      </div>
-      <MainContainer>
+          ) : null}
+        </div>
         {isDataLoading ? (
           <div className="spinnerWrapper">
             <Spinner
@@ -546,6 +532,13 @@ function HotelSearchPage(props) {
                 ""
               )}
             </div>
+          </div>
+        )}
+        {showMore && (
+          <div className="centered-button-container">
+            <Button className="show_more" onClick={showMoreHotels}>
+              Show More
+            </Button>
           </div>
         )}
       </MainContainer>
