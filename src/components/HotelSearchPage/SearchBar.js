@@ -8,8 +8,8 @@ function SearchBar(props) {
   const [dateRange, setDateRange] = useState([]);
   const [isDirty, setIsDirty] = useState(false);
   const [guests, setGuests] = useState(props.numOfPeople);
-  const [displayCity, setDisplayCity] = useState("");
-  const [city, setCity] = useState("");
+  const [displayCity, setDisplayCity] = useState(props.city);
+  const [city, setCity] = useState(props.city);
 
   const onChangeBedRooms = (isAdding) => {
     props.setBedRooms((prevState) => {
@@ -22,7 +22,6 @@ function SearchBar(props) {
   };
 
   useEffect(() => {
-    setDisplayCity(props.city);
     dateRange.push(props.checkInDate)
     dateRange.push(props.checkOutDate)
   }, [props.city,props.checkInDate, props.checkOutDate]);
@@ -30,6 +29,7 @@ function SearchBar(props) {
   const onDateChange = (...args) => {
     setIsDirty(true);
     setDateRange(args)
+    setDisplayCity(city)
     console.log(new Date(args[0]).toISOString().split("T")[0]);
   };
 
@@ -54,6 +54,7 @@ function SearchBar(props) {
     setIsDirty(true);
     setGuests(event.target.value);
     props.setGuestCount(event.target.value);
+    setDisplayCity(city)
   };
 
   return (

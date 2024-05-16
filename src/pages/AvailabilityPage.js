@@ -44,21 +44,23 @@ function AvailabilityPage() {
     }
 
     const hotelDetails = JSON.parse(selectionDetails);
+    console.log(hotelDetails.Location)
+    console.log(hotelDetails.Location.City)
 
     let hotelData = {
       Id: hotelDetails.Id,
       Name: hotelDetails.Name,
       StarRating: hotelDetails.StarRatings,
-      Location: JSON.parse(hotelDetails.Location).City,
+      Location: hotelDetails.Location.City,
       ImageURLs: hotelDetails.ImageURL,
       HotelOwnerWalletAddress: hotelDetails.WalletAddress,
       Description: hotelDetails.Description,
     };
 
     setHotelData(hotelData);
-    setAddress1(JSON.parse(hotelDetails.Location).AddressLine01);
-    setAddress2(JSON.parse(hotelDetails.Location).AddressLine02);
-    setCity(JSON.parse(hotelDetails.Location).City);
+    setAddress1(hotelDetails.Location.AddressLine01);
+    setAddress2(hotelDetails.Location.AddressLine02);
+    setCity(hotelDetails.Location.City);
     setImages(Array.from(hotelDetails.ImageURL));
 
     let newRoomTypes = [];

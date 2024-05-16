@@ -27,6 +27,27 @@
   margin-top: -80px;
   z-index: 2;
 
+  .container {
+    display: flex;
+    padding-left: 4px;
+  }
+  
+  .icon-and-text {
+    display: flex;
+    align-items: center; 
+    padding-bottom: 20px;
+    padding-left: 2px;
+    color: #f9b625;
+    font-size: 20px;
+  }
+  
+  .search-area-phrase {
+    margin-left: 10px; 
+    color: #000000;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  
 
   .search-area {
     background-color: $light-purple-color;
@@ -64,6 +85,11 @@
     .calendar__head {
       background: $purple-color;
     }
+  }
+  .listening{
+    color: #c42121;
+    font-weight: 500;
+    padding-top: 10px;
   }
 }
 

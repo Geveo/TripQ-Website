@@ -1,6 +1,8 @@
-import React from "react";
 import { FaMapMarkerAlt, FaMobile } from "react-icons/fa";
 import StarRating from "../HotelHomePage/StarRating";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
 function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
   const styles = {
@@ -14,11 +16,13 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
 
   const location = hotel.Location;
   let address = "";
-  
-  if (!location.AddressLine01 || !location.AddressLine02) {
-    address = location;
-  } else {
-    address = `${location.AddressLine01}, ${location.AddressLine02}, ${location.City}`;
+
+  if (location) {
+    if (!location.AddressLine01 || !location.AddressLine02) {
+      address = location;
+    } else {
+      address = `${location.AddressLine01}, ${location.AddressLine02}, ${location.City}`;
+    }
   }
 
   return (
@@ -27,7 +31,7 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
         <img
           key={hotel.Id}
           src={
-            hotel.ImageURL.length > 0
+            hotel.ImageURL && hotel.ImageURL.length > 0
               ? hotel.ImageURL[0].ImageURL
               : "/Assets/Images/no_image.jpg"
           }
@@ -40,37 +44,63 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
             <StarRating ratings={hotel.StarRatings} reviews={726} />
           </div>
 
+          {hotel.Location ? (
+            <div className={"row_fit"}>
+              <div style={{ width: "20px", paddingTop: "2px" }}>
+                <FaMapMarkerAlt color={"#908F8F"} />
+              </div>
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {address}
+              </div>
+            </div>
+          ) : null}
+
+          {hotel.PhoneNumber ? (
+            <div className={"row_fit"}>
+              <div style={{ width: "20px", paddingTop: "2px" }}>
+                <FaMobile color={"#908F8F"} />
+              </div>
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {hotel.PhoneNumber}
+              </div>
+            </div>
+          ) : null}
+
           <div className={"row_fit"}>
-            <div style={{ width: "20px", paddingTop: "2px" }}>
-              <FaMapMarkerAlt color={"#908F8F"} />
-            </div>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {address}
-            </div>
-          </div>
-          <div className={"row_fit"}>
-            <div style={{ width: "20px", paddingTop: "2px" }}>
-              <FaMobile color={"#908F8F"} />
-            </div>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {hotel.PhoneNumber}
-            </div>
-          </div>
-          <div className={"row_fit"}>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {hotel.Description}
-            </div>
+            {hotel.Description ? (
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {hotel.Description}
+              </div>
+            ) : (
+              <div
+                className={"col"}
+                style={{
+                  paddingTop: "4px",
+                  color: "#2c2c76",
+                  paddingTop: "12%",
+                  paddingLeft: "22%",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faSpinner}
+                  className="fa-solid fa-spinner fa-spin-pulse fa-spin-reverse"
+                  size="2x"
+                />
+              </div>
+            )}
           </div>
 
-          <div className={"pt-3 row_right"} style={{}}>
-            <button
-              className={"view_availability_button"}
-              style={{ width: "200px" }}
-              onClick={() => onViewAvailableClicked(hotel)}
-            >
-              View Availability
-            </button>
-          </div>
+          {hotel.AvailableRooms.length > 0 || hotel.WebsiteURL ? (
+            <div className={"pt-3 row_right"} style={{}}>
+              <button
+                className={"view_availability_button"}
+                style={{ width: "200px" }}
+                onClick={() => onViewAvailableClicked(hotel)}
+              >
+                View Availability
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
