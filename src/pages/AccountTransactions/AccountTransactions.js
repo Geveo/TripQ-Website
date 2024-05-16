@@ -245,14 +245,14 @@ const  AccountTransactions = () => {
                                 balance
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
-                                <div className={`ever-balance-value`} title={`LKR ${totalEVRinUSD}`}>
+                                <div className={`ever-balance-value`} title={`USD ${totalEVRinUSD}`}>
                                     {totalEVR} <br/> <span style={{
                                     fontSize: '30px',
                                     lineHeight: '12px'
                                 }}>({totalEVRinUSD.toLocaleString(undefined, {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
-                                })} LKR)</span>
+                                })} USD)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>
@@ -265,14 +265,14 @@ const  AccountTransactions = () => {
                                 balance
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
-                                <div className={`ever-balance-value`} title={`LKR ${totalXAHinUSD}`}>
+                                <div className={`ever-balance-value`} title={`USD ${totalXAHinUSD}`}>
                                     {(parseFloat(totalXAHDrops) / 1000000).toFixed(6)} <br/> <span style={{
                                     fontSize: '30px',
                                     lineHeight: '12px'
                                 }}>({totalXAHinUSD.toLocaleString(undefined, {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
-                                })} LKR)</span>
+                                })} USD)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>

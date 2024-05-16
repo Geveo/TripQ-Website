@@ -44,6 +44,8 @@ function AvailabilityPage() {
     }
 
     const hotelDetails = JSON.parse(selectionDetails);
+    console.log(hotelDetails.Location)
+    console.log(hotelDetails.Location.City)
 
     let hotelData = {
       Id: hotelDetails.Id,
