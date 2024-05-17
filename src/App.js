@@ -29,7 +29,9 @@ import CGPayment from "./components/Payment/CGPayment";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
-  const showLoadPopup = useSelector((state) => state.screenLaoder.value);
+  const showLoadPopup = useSelector((state) => state.screenLaoder.showLoadPopup);
+  const screenLoaderText = useSelector((state) => state.screenLaoder.screenLoaderText);
+
   const [isContractInitiated, setIsContractInitiated] = useState(false);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ function App() {
 
     return (
         <>
-        {showLoadPopup && <LoadingScreen showLoadPopup={showLoadPopup} />}
+        {showLoadPopup && <LoadingScreen showLoadPopup={showLoadPopup} screenLoaderText={screenLoaderText} />}
             {isContractInitiated && (
                 <Routes>
                     <Route path="/" element={<CustomerDashboard />} />
