@@ -93,7 +93,7 @@ function CustomerDashboard() {
   }
 
   function loadMoreHotels() {
-    const promises = [openAiService.searchHotels(searchText, 25)];
+    const promises = [openAiService.searchHotels(searchText, 30)];
 
     Promise.all(promises)
       .then(([searchResult]) => {

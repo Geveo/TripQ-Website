@@ -38,6 +38,7 @@ function HotelSearchPage(props) {
   const hotelService = HotelService.instance;
   const openAiService = AzureOpenaiService.getInstance();
   const speechService = new SpeechService();
+  let hotels = new Map();
 
   let aiHotelSearchState = useSelector((state) => state.AiHotelSearchState);
   let moreAiHotelSearchState = useSelector(
@@ -62,6 +63,8 @@ function HotelSearchPage(props) {
   const [hotelsInDB, setHotelsInDB] = useState([]);
   const [isListening, setIsListening] = useState(false);
   const [showMore, setShowMore] = useState(true);
+  const [start, setStart] = useState(5);
+  const [end, setEnd] = useState(10);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
@@ -187,18 +190,25 @@ function HotelSearchPage(props) {
 
   useEffect(() => {
     if (hotelNames.length > 0) {
-      let hotels = new Map();
       hotelNames.forEach((element) => {
         openAiService.getHotelDetails(element, city).then((res) => {
-          hotels.set(element, res);
-          setHotelMap(new Map(hotels));
+          setHotelMap((prevHotelMap) => {
+            const updatedHotelMap = new Map(prevHotelMap);
+            updatedHotelMap.set(element, res);
+            return updatedHotelMap;
+          });
         });
       });
     }
-  }, [hotelNames]);
+  }, [hotelNames, city]);
+  
+  
 
   const onClickSearch = (city, fromDate, toDate, guests) => {
     loadMoreHotels();
+    setStart(5);
+    setEnd(10);
+    setShowMore(true);
     store.dispatch(setShowScreenLoader(true));
     setHotelNames([]);
     setHotelMap(new Map());
@@ -280,66 +290,63 @@ function HotelSearchPage(props) {
   //   };
   // }, []);
 
-  function isAtBottomOfPage() {
-    return window.innerHeight + window.scrollY >= document.body.offsetHeight;
-  }
+  // function isAtBottomOfPage() {
+  //   return window.innerHeight + window.scrollY >= document.body.offsetHeight;
+  // }
 
-  function showMoreHotels() {
-    setShowMore(false);
-    let hotelNames = [];
+  function showMoreHotels(start, end) {
     if (moreAiHotelSearchState) {
-      moreAiHotelSearchState.forEach((hotel) => {
-        hotelNames.push(hotel.hotel_name);
-      });
+      let newHotels = [];
 
-      setHotelNames(hotelNames);
-      let hotelsNotInDatabase = [];
-      hotelNames.forEach((hotelAI) => {
-        let found = false;
+      end = Math.min(end, moreAiHotelSearchState.length);
 
-        // Case-insensitive wildcard match
-        const regex = new RegExp(`^${hotelAI.replace(/\*/g, ".*")}$`, "i");
-
-        hotelsInDB.forEach((hotelDB) => {
-          if (regex.test(hotelDB.Name)) {
-            found = true;
-          }
-        });
-        if (!found) {
-          hotelsNotInDatabase.push(hotelAI);
+      for (let i = start; i < end; i++) {
+        const hotel = moreAiHotelSearchState[i];
+        if (
+          newHotels.length < 5 &&
+          !hotelNames.includes(hotel.hotel_name) &&
+          !newHotels.includes(hotel.hotel_name)
+        ) {
+          newHotels.push(hotel.hotel_name);
         }
-      });
+      }
 
-      let hotelList = hotelsInDB;
-      hotelsNotInDatabase.forEach((hotel) => {
-        moreAiHotelSearchState.forEach((aiHotel) => {
-          if (aiHotel.hotel_name === hotel) {
+      if (end >= moreAiHotelSearchState.length) {
+        setShowMore(false);
+      }
+
+      setHotelNames(newHotels);
+
+      let hotelList = [];
+      newHotels.forEach((hotel) => {
             const hotelObj = {
               AvailableRooms: [],
               ContactDetails: "",
               CreatedOn: "",
-              Description: aiHotel.hotel_description,
+              Description: "",
               Facilities: "",
               Id: "",
-              ImageURL: aiHotel.star_ratings,
+              ImageURL: "",
               LastUpdateOn: "",
-              Location: aiHotel.hotel_address,
-              Name: aiHotel.hotel_name,
-              StarRatings: aiHotel.star_ratings,
+              Location: "",
+              Name: hotel,
+              StarRatings: "",
               WalletAddress: "",
-              WebsiteURL: aiHotel.website_link,
-              PhoneNumber: aiHotel.phone,
+              WebsiteURL: "",
+              PhoneNumber: "",
             };
             hotelList.push(hotelObj);
-          }
-        });
       });
-      setHotelResultListCopy(hotelList);
+
+      setHotelResultListCopy((prevHotelList) => [...prevHotelList, ...hotelList]);
+
+      setStart(end);
+      setEnd(end + 5);
     }
   }
 
   function loadMoreHotels() {
-    const promises = [openAiService.searchHotels(searchText, 25)];
+    const promises = [openAiService.searchHotels(searchText, 30)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
@@ -536,7 +543,10 @@ function HotelSearchPage(props) {
         )}
         {showMore && (
           <div className="centered-button-container">
-            <Button className="show_more" onClick={showMoreHotels}>
+            <Button
+              className="show_more"
+              onClick={() => showMoreHotels(start, end)}
+            >
               Show More
             </Button>
           </div>
