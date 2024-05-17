@@ -201,8 +201,6 @@ function HotelSearchPage(props) {
       });
     }
   }, [hotelNames, city]);
-  
-  
 
   const onClickSearch = (city, fromDate, toDate, guests) => {
     loadMoreHotels();
@@ -215,7 +213,6 @@ function HotelSearchPage(props) {
     store.dispatch(resetAiHotelSearchState());
     setCity(searchCity);
 
-    //const searchText = `${searchCity} hotels from ${fromDate} to ${toDate} for ${guests} people.`;
     const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
@@ -276,24 +273,6 @@ function HotelSearchPage(props) {
     return formattedDate;
   };
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (isAtBottomOfPage() && moreAiHotelSearchState.length > 0) {
-  //       showMoreHotels();
-  //     }
-  //   };
-
-  //   window.addEventListener("scroll", handleScroll);
-
-  //   return () => {
-  //     window.removeEventListener("scroll", handleScroll);
-  //   };
-  // }, []);
-
-  // function isAtBottomOfPage() {
-  //   return window.innerHeight + window.scrollY >= document.body.offsetHeight;
-  // }
-
   function showMoreHotels(start, end) {
     if (moreAiHotelSearchState) {
       let newHotels = [];
@@ -319,26 +298,29 @@ function HotelSearchPage(props) {
 
       let hotelList = [];
       newHotels.forEach((hotel) => {
-            const hotelObj = {
-              AvailableRooms: [],
-              ContactDetails: "",
-              CreatedOn: "",
-              Description: "",
-              Facilities: "",
-              Id: "",
-              ImageURL: "",
-              LastUpdateOn: "",
-              Location: "",
-              Name: hotel,
-              StarRatings: "",
-              WalletAddress: "",
-              WebsiteURL: "",
-              PhoneNumber: "",
-            };
-            hotelList.push(hotelObj);
+        const hotelObj = {
+          AvailableRooms: [],
+          ContactDetails: "",
+          CreatedOn: "",
+          Description: "",
+          Facilities: "",
+          Id: "",
+          ImageURL: "",
+          LastUpdateOn: "",
+          Location: "",
+          Name: hotel,
+          StarRatings: "",
+          WalletAddress: "",
+          WebsiteURL: "",
+          PhoneNumber: "",
+        };
+        hotelList.push(hotelObj);
       });
 
-      setHotelResultListCopy((prevHotelList) => [...prevHotelList, ...hotelList]);
+      setHotelResultListCopy((prevHotelList) => [
+        ...prevHotelList,
+        ...hotelList,
+      ]);
 
       setStart(end);
       setEnd(end + 5);
