@@ -7,7 +7,7 @@ import PaymentSelection from "../../components/Payment/PaymentSelection";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
 import { Row, Col } from "reactstrap";
 import MainContainer from "../../layout/MainContainer";
-import CustomerRegistration from "../../components/CustomerRegistration/CustometRegistration";
+import CustomerRegistration from "../../components/CustomerRegistration/CustomerRegistration";
 import BookedHotelPrice from "../../components/BookedHotelPrice";
 import "../../styles/layout_styles.scss";
 import { useLocation, useNavigate } from "react-router-dom";

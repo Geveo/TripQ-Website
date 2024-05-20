@@ -29,6 +29,7 @@ function AvailabilityPage() {
   const [address1, setAddress1] = useState("P.O Box 11");
   const [address2, setAddress2] = useState("Heritance Kandalama");
   const [city, setCity] = useState("Sigiriya");
+  const [hotelLocation, setLocation] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [hotelData, setHotelData] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -44,15 +45,14 @@ function AvailabilityPage() {
     }
 
     const hotelDetails = JSON.parse(selectionDetails);
-    console.log(hotelDetails.Location)
-    console.log(hotelDetails.Location.City)
 
+    setLocation(hotelDetails.Location);
     let hotelData = {
       Id: hotelDetails.Id,
       Name: hotelDetails.Name,
       StarRating: hotelDetails.StarRatings,
       Location: hotelDetails.Location.City,
-      ImageURLs: hotelDetails.ImageURL,
+      ImageURL: hotelDetails.ImageURL,
       HotelOwnerWalletAddress: hotelDetails.WalletAddress,
       Description: hotelDetails.Description,
     };
@@ -194,12 +194,13 @@ function AvailabilityPage() {
       Name: hotelData.Name,
       Address: getFullAddress(),
       StarRate: hotelData.StarRating,
-      Images: hotelData.ImageURLs,
+      ImageURL: hotelData.ImageURL,
       CheckIn: checkInDate,
       CheckOut: checkOutDate,
       Nights: differenceDays,
       RoomTypes: selectedRoomsArray,
       HotelOwnerWalletAddress: hotelData.HotelOwnerWalletAddress,
+      Location: hotelLocation
     };
 
     dispatch(
