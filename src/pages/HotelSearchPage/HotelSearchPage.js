@@ -70,7 +70,7 @@ function HotelSearchPage(props) {
     store.dispatch(setShowScreenLoader(true));
     store.dispatch(
       setScreenLoaderText(
-        "Stay tuned! Your dream destination is just a search away"
+        "We are working on getting the best hotel for you"
       )
     );
     // Get AI searched results
