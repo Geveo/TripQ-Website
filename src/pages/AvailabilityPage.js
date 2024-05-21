@@ -55,6 +55,7 @@ function AvailabilityPage() {
       ImageURL: hotelDetails.ImageURL,
       HotelOwnerWalletAddress: hotelDetails.WalletAddress,
       Description: hotelDetails.Description,
+      availableRooms: hotelDetails.AvailableRooms
     };
 
     setHotelData(hotelData);
@@ -200,7 +201,8 @@ function AvailabilityPage() {
       Nights: differenceDays,
       RoomTypes: selectedRoomsArray,
       HotelOwnerWalletAddress: hotelData.HotelOwnerWalletAddress,
-      Location: hotelLocation
+      Location: hotelLocation,
+      AvailableRooms : hotelData.availableRooms
     };
 
     dispatch(
