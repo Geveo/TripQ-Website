@@ -129,7 +129,7 @@ function CustomerDashboard() {
 
   return (
     <>
-      <LoadingScreen showLoadPopup={loading} screenLoaderText={"Stay tuned! Your dream destination is just a search away"} />
+      <LoadingScreen showLoadPopup={loading} screenLoaderText={"We are working on getting the best hotel for you"} />
       <div className="main-image-div">
         <Container className="main-txt">
           <Row>
