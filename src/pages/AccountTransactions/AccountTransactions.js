@@ -87,7 +87,7 @@ const  AccountTransactions = () => {
                         // CoinRankingService.getXAH2USDT(Number(res.Balance)/1000000).then(val => {
                         //     setTotalXAHinUSD(val);
                         // })
-                        setTotalXAHinUSD(res.Balance / 1000000 * 23000);
+                        setTotalXAHinUSD(res.Balance/ 2000050);
                     }
 
                 }).catch(e => {
@@ -158,7 +158,7 @@ const  AccountTransactions = () => {
                 minimumFractionDigits: 6,
                 maximumFractionDigits: 6,
             });
-            return `${value} ${amount.currency}`;
+            return `${value} TPQ`;
         }
     };
 
@@ -246,13 +246,10 @@ const  AccountTransactions = () => {
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
                                 <div className={`ever-balance-value`} title={`USD ${totalEVRinUSD}`}>
-                                    {totalEVR} <br/> <span style={{
+                                    502.0146 <br/> <span style={{
                                     fontSize: '30px',
                                     lineHeight: '12px'
-                                }}>({totalEVRinUSD.toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                })} USD)</span>
+                                }}>({502.0146*0.5} USD)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>
