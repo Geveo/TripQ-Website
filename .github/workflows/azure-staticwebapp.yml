@@ -27,7 +27,7 @@ env:
   AZURE_STATIC_WEB_APPS_API_TOKEN: "fe3dd64248bf040503292ef2e57a7f6c5c402bfdcd7835d83967084de86069b15-6fc35b95-7dcf-454a-abd9-1fd3d8f8509a000136005" # secret containing deployment token for your static web app
   CI: false
   REACT_APP_ENVIRONMENT: "prod"
-  REACT_APP_RIPPLED_SERVER: "wss://xahau.network"
+  REACT_APP_RIPPLED_SERVER: "wss://xahau-test.net"
   REACT_APP_RIPPLE_NETWORK_ID: "21337"
   REACT_APP_CONTRACT_NODE_IP: "dapps-dev9.geveo.com"
   REACT_APP_CONTRACT_NODE_PORT: "26202"
