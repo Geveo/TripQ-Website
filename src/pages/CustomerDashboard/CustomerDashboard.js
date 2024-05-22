@@ -83,7 +83,9 @@ function CustomerDashboard() {
             LocalStorageKeys.AiHotelSearchResult,
             JSON.stringify(searchResult)
           );
-          navigate(`/search-hotel?searchText=${encodeURIComponent(searchText)}`);
+          navigate(
+            `/search-hotel?searchText=${encodeURIComponent(searchText)}`
+          );
         }
       })
       .catch((error) => {
@@ -129,17 +131,16 @@ function CustomerDashboard() {
 
   return (
     <>
-      <LoadingScreen showLoadPopup={loading} screenLoaderText={"We are working on getting the best hotel for you"} />
+      <LoadingScreen
+        showLoadPopup={loading}
+        screenLoaderText={"We are working on getting the best hotel for you"}
+      />
       <div className="main-image-div">
         <Container className="main-txt">
           <Row>
             <Col xs={12}>
-              <h3>
-                Discover your next holiday by using our AI powered search engine
-              </h3>
-              <p>
-                Simply type in your requirements and we will do the rest
-              </p>
+              <h3>Powered by AI, Secured by Blockchain</h3>
+              <p>Simply type in your requirements and we will do the rest</p>
             </Col>
           </Row>
         </Container>
