@@ -135,7 +135,7 @@ function CustomerDashboard() {
           <Row>
             <Col xs={12}>
               <h3>
-                Discover your next holiday by using our AI powered search engine
+                Powered by AI, Secured by Blockchain
               </h3>
               <p>
                 Simply type in your requirements and we will do the rest
