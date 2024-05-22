@@ -385,109 +385,102 @@ function HotelSearchPage(props) {
       <MainContainer>
         <div className={"row_fit"} style={{ width: "100%" }}>
           {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
-            // <SearchBar
-            //   searchCity={searchCity}
-            //   city={aiHotelSearchState.destination}
-            //   checkInDate={aiHotelSearchState.from_date}
-            //   checkOutDate={aiHotelSearchState.to_date}
-            //   numOfPeople={aiHotelSearchState.total_head_count}
-            //   hotelsData={hotelResultListCopy}
-            //   bedRooms={bedRooms}
-            //   setBedRooms={setBedRooms}
-            //   onCitySearchChanged={onCitySearchChanged}
-            //   searchText={searchText}
-            //   setSearchText={setSearchText}
-            //   onClearSearchText={onClearSearchText}
-            //   onClickSearch={onClickSearch}
-            //   setSearchCity={setSearchCity}
-            //   setGuestCount={setGuestCount}
-            //   setCheckInDate={setCheckInDate}
-            //   setCheckOutDate={setCheckOutDate}
-            // />
-            <div className="search_section hotel-search-page">
-              <div className={"title_2"}>
-                {hotelResultListCopy.length > 0
-                  ? hotelResultListCopy.length
-                  : `No `}{" "}
-                Hotels in {aiHotelSearchState.destination}
-              </div>
-              <div
-                className={"subtext"}
-                style={{ lineHeight: "15px", marginBottom: "40px" }}
-              >
-                Book your next stay at one of our properties
-              </div>
-              <div className="search-area">
-                <div>
-                  <Row>
-                    <Col>
-                      <div className="container">
-                        <div className="icon-and-text">
-                          <div className="search-area-phrase">
-                            Eg-: I want to take my family of four to a beach
-                            resort in Asia from the 1st December to the 31st
-                            December 2024. We are also interested in trekking.
+            <><SearchBar
+              searchCity={searchCity}
+              city={aiHotelSearchState.destination}
+              checkInDate={aiHotelSearchState.from_date}
+              checkOutDate={aiHotelSearchState.to_date}
+              numOfPeople={aiHotelSearchState.total_head_count}
+              hotelsData={hotelResultListCopy}
+              //bedRooms={bedRooms}
+             // setBedRooms={setBedRooms}
+              onCitySearchChanged={onCitySearchChanged}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              onClearSearchText={onClearSearchText}
+              onClickSearch={onClickSearch}
+              setSearchCity={setSearchCity}
+              setGuestCount={setGuestCount}
+              setCheckInDate={setCheckInDate}
+              setCheckOutDate={setCheckOutDate} /><div className="search_section hotel-search-page">
+                {/* <div className={"title_2"}>
+                  {hotelResultListCopy.length > 0
+                    ? hotelResultListCopy.length
+                    : `No `}{" "}
+                  Hotels in {aiHotelSearchState.destination}
+                </div>
+                <div
+                  className={"subtext"}
+                  style={{ lineHeight: "15px", marginBottom: "40px" }}
+                >
+                  Book your next stay at one of our properties
+                </div> */}
+                {/* <div className="search-area">
+                  <div>
+                    <Row>
+                      <Col>
+                        <div className="container">
+                          <div className="icon-and-text">
+                            <div className="search-area-phrase">
+                              Eg-: I want to take my family of four to a beach
+                              resort in Asia from the 1st December to the 31st
+                              December 2024. We are also interested in trekking.
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Col>
-                  </Row>
-                  <Row style={{ justifyContent: "center" }}>
-                    <Col md={10}>
-                      <InputGroup className="">
-                        <textarea
-                          placeholder="Search your next stay here..."
-                          aria-label="Search your next stay here..."
-                          value={searchText}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          rows={3}
-                          cols={130}
-                        />
-                      </InputGroup>
-                    </Col>
-                    <Col
-                      md={2}
-                      className="d-flex justify-content-end align-items-center"
-                    >
-                      <Button
-                        variant="outline-secondary"
-                        id="button-addon1"
-                        className={`mr-2 ${
-                          isListening
-                            ? "microphone-icon-isListening remove-right-border-radius"
-                            : "microphone-icon remove-right-border-radius"
-                        }`}
-                        onClick={handleSpeechToTextFromMic}
-                        title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                      </Col>
+                    </Row>
+                    <Row style={{ justifyContent: "center" }}>
+                      <Col md={10}>
+                        <InputGroup className="">
+                          <textarea
+                            placeholder="Search your next stay here..."
+                            aria-label="Search your next stay here..."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            rows={3}
+                            cols={130} />
+                        </InputGroup>
+                      </Col>
+                      <Col
+                        md={2}
+                        className="d-flex justify-content-end align-items-center"
                       >
-                        <FontAwesomeIcon
-                          size="lg"
-                          icon={faMicrophone}
-                          className="fa fa-microphone"
-                        />
-                      </Button>
-                      <Button
-                        variant="outline-secondary"
-                        id="button-addon1"
-                        className={`mr-2 search-icon remove-left-border-radius`}
-                        onClick={onClickSearch}
-                        title="Search"
-                        disabled={searchText.length === 0}
-                      >
-                        <FontAwesomeIcon
-                          size="lg"
-                          icon={faSearch}
-                          className="fa fa-search"
-                        />
-                      </Button>
-                    </Col>
-                  </Row>
-                  {isListening ? (
-                    <div className="listening">Listening...</div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
+                        <Button
+                          variant="outline-secondary"
+                          id="button-addon1"
+                          className={`mr-2 ${isListening
+                              ? "microphone-icon-isListening remove-right-border-radius"
+                              : "microphone-icon remove-right-border-radius"}`}
+                          onClick={handleSpeechToTextFromMic}
+                          title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
+                        >
+                          <FontAwesomeIcon
+                            size="lg"
+                            icon={faMicrophone}
+                            className="fa fa-microphone" />
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          id="button-addon1"
+                          className={`mr-2 search-icon remove-left-border-radius`}
+                          onClick={onClickSearch}
+                          title="Search"
+                          disabled={searchText.length === 0}
+                        >
+                          <FontAwesomeIcon
+                            size="lg"
+                            icon={faSearch}
+                            className="fa fa-search" />
+                        </Button>
+                      </Col>
+                    </Row>
+                    {isListening ? (
+                      <div className="listening">Listening...</div>
+                    ) : null}
+                  </div>
+                </div> */}
+              </div></>
           ) : null}
         </div>
         {isDataLoading ? (

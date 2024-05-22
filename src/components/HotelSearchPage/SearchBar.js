@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { FaCalendarAlt, FaCity, FaUsers } from "react-icons/fa";
 import "./styles.scss";
 import { RangeDatePicker } from "@y0c/react-datepicker";
+import SearchFacilities from '../HotelSearchPage/SearchFacilities';
 
 function SearchBar(props) {
   const [dateRange, setDateRange] = useState([]);
@@ -159,6 +160,7 @@ function SearchBar(props) {
               />
             </InputGroup>
           </Col>
+          
           <Col>
             <div
               className={"col-md-1 col-sm-3 mb-3"}
@@ -178,6 +180,11 @@ function SearchBar(props) {
               </button>
             </div>
           </Col>
+        </Row>
+        <Row>
+          <SearchFacilities
+              facilityNames={["Bar", "Swimming Pool", "Garden View", "Tea maker", "gyfyfyf"]}
+            />
         </Row>
       </div>
     </section>

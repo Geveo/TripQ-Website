@@ -258,3 +258,34 @@
 .view_availability_button:active {
   background-color: #060642; /* Change the background color */
 }
+
+// /* styles.css */
+// .row {
+//   //display: flex;
+//   justify-content: space-between; /* Adjust spacing between cards */
+//   margin-bottom: 10px; /* Space between rows */
+// }
+
+.cardStyle {
+  background: #f9f7f7;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+ // padding: 6px 6px;
+  //display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  margin: 5px; /* Space between cards */
+  width: 200px;
+}
+
+.name-text{
+  padding: 6px;
+}
+.deleteIcon {
+  position: relative;
+  cursor: pointer;
+  font-size: 20px;
+  color: red;
+}
