@@ -1,6 +1,6 @@
 .dropdown {
- // border: 1px solid #908F8F;
- //height: 40px;
+  // border: 1px solid #908F8F;
+  //height: 40px;
   //padding-left: 30px;
 }
 
@@ -29,16 +29,16 @@
   text-align: left;
   padding-top: 2px;
   padding-right: 10px;
-  padding-left: 7px
+  padding-left: 7px;
 }
 
 .increment_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 5px;
   background: transparent;
   height: 25px;
   width: 25px;
-  margin-top: 7px
+  margin-top: 7px;
 }
 
 .increment_button:hover {
@@ -50,13 +50,13 @@
 }
 
 .decrement_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 5px;
   background: transparent;
   height: 25px;
   width: 25px;
   margin-top: 7px;
-  margin-right: 10px
+  margin-right: 10px;
 }
 
 .decrement_button:hover {
@@ -68,10 +68,10 @@
 }
 
 .clear_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 5px;
-  background: #2C2C76;
-  color: #D9D9D9;
+  background: #2c2c76;
+  color: #d9d9d9;
   width: 100%;
   height: 38px;
   padding-left: 20px;
@@ -87,31 +87,31 @@
 }
 
 .search_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #2c2c76;
   border-radius: 5px;
-  background: #2C2C76;
-  color: #D9D9D9;
+  background: #2c2c76 !important;
+  color: #ffffff;
   width: 100%;
   height: 38px;
-  padding-left: 20px;
-  padding-right: 20px;
+  margin-top: 8px;
+  margin-left: 2px;
 }
 
 .search_button:hover {
-  background-color: #0c0c79; /* Change the background color */
+  background-color: #0c0c79;
 }
 
 .search_button:active {
-  background-color: #060642; /* Change the background color */
+  background-color: #060642;
 }
 
 .filter_card {
   box-sizing: border-box;
-  border: 2px solid #F0EFEF;
+  border: 2px solid #f0efef;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
   border-radius: 6px;
   padding: 10px 15px;
-  background: #FFFFFF;
+  background: #ffffff;
   width: 400px;
 }
 
@@ -132,7 +132,7 @@
 }
 
 .reset_text {
-  font-family: 'Inter', serif;
+  font-family: "Inter", serif;
   font-weight: 500;
   font-size: 16px;
   line-height: 29px;
@@ -140,18 +140,17 @@
 
 .input_field {
   background-color: #ffffff;
-  border-color: #908F8F;
+  border-color: #908f8f;
   width: 50%;
   height: 38px;
   margin-top: 5px;
-  font-family: 'Inter', serif;
+  font-family: "Inter", serif;
   font-weight: 500;
   line-height: 34px;
-
 }
 
 .box_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 6px;
   padding: 5px 10px;
   margin: 5px;
@@ -159,22 +158,21 @@
   width: auto;
   background-color: transparent;
   color: #000000;
-
 }
 
 .disabled_box_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 6px;
   padding: 5px 10px;
   margin: 5px;
   height: 40px;
   width: auto;
   background-color: transparent;
-  color: #908F8F;
+  color: #908f8f;
 }
 
 .box_text {
-  font-family: 'Inter', serif;
+  font-family: "Inter", serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 29px;
@@ -214,7 +212,7 @@
   width: 100%;
   height: 38px;
   //margin-top: 5px;
-  font-family: 'Inter', serif;
+  font-family: "Inter", serif;
   font-weight: 500;
   font-size: 20px;
   line-height: 34px;
@@ -226,7 +224,7 @@
   width: 50%;
   text-align: center;
   background-color: #ffffff;
-  font-family: 'Inter', serif;
+  font-family: "Inter", serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 30px;
@@ -234,16 +232,15 @@
 
 .hotel_card {
   box-sizing: border-box;
-  //color: #D9D9D9;
-  border: 1px solid #D9D9D9;
+  border: 1px solid #d9d9d9;
   border-radius: 5px;
   width: 684px;
 }
 
 .view_availability_button {
-  border: 1px solid #A9A6A6;
+  border: 1px solid #a9a6a6;
   border-radius: 5px;
-  background: #2C2C76;
+  background: #2c2c76;
   color: white;
   width: 100%;
   height: 38px;
@@ -252,40 +249,85 @@
 }
 
 .view_availability_button:hover {
-  background-color: #0c0c79; /* Change the background color */
+  background-color: #0c0c79;
 }
 
 .view_availability_button:active {
-  background-color: #060642; /* Change the background color */
+  background-color: #060642;
 }
 
-// /* styles.css */
-// .row {
-//   //display: flex;
-//   justify-content: space-between; /* Adjust spacing between cards */
-//   margin-bottom: 10px; /* Space between rows */
-// }
-
 .cardStyle {
+  position: relative;
   background: #f9f7f7;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
- // padding: 6px 6px;
-  //display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
   flex: 1;
-  margin: 5px; /* Space between cards */
-  width: 200px;
+  margin: 10px;
+  border: 1.5px solid #d9d9d9;
 }
 
-.name-text{
-  padding: 6px;
+.name-text {
+  padding-top: 6px;
+  margin-right: 10px;
 }
-.deleteIcon {
-  position: relative;
+
+.plus-circle-icon {
+  color: #2c2c76;
+  padding-top: 20px;
+  position: absolute;
+  left: 1px;
   cursor: pointer;
-  font-size: 20px;
-  color: red;
+}
+
+.facility_card {
+  margin-left: 12px;
+  margin-top: 15px !important;
+  width: 84% !important;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+}
+
+.facilities_text {
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 44px;
+  margin-bottom: 2%;
+  padding-top: 40px;
+}
+
+.facilities {
+  padding-top: 20px;
+  margin-left: 8px;
+  margin-bottom: 20px;
+}
+
+.remove-icon {
+  color: #a9a6a6;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  margin-right: 10px !important;
+}
+
+.add_button {
+  border: 1px solid #2c2c76;
+  border-radius: 5px;
+  background: #2c2c76 !important;
+  color: #ffffff;
+  width: 100%;
+  margin-left: 1% !important;
+  margin-top: 35px;
+}
+
+.sadd_button:hover {
+  background-color: #0c0c79 !important;
+}
+
+.add_button:active {
+  background-color: #060642 !important;
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Col, Container, Row, Input, Button } from "reactstrap";
 import "./customer_dashboard_styles.scss";
-import { RangeDatePicker } from "@y0c/react-datepicker";
 import "@y0c/react-datepicker/assets/styles/calendar.scss";
 import OfferCard from "../../components/OfferCard/OfferCard";
 import { useNavigate } from "react-router-dom";
@@ -15,21 +14,20 @@ import searches from "../../data/searches";
 import SearchCard from "../../components/SearchCard";
 import SearchMenu from "../../components/SearchMenu";
 import bestOffers from "../../data/bestOffers";
-import toast from "react-hot-toast";
-import ToastInnerElement from "../../components/ToastInnerElement/ToastInnerElement";
 import HotelService from "../../services-domain/hotel-service copy";
 import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SpeechService from "../../services-common/speech-service";
 import InputGroup from "react-bootstrap/InputGroup";
-import Form from "react-bootstrap/Form";
 import { AzureOpenaiService } from "../../services-common/azure-openai-service";
-import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
 import { useDispatch } from "react-redux";
 import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
 import { setMoreAiSearchResults } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { LocalStorageKeys } from "../../constants/constants";
+import { store } from "../../redux/store";
+import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
+import { setScreenLoaderText } from "../../redux/screenLoader/ScreenLoaderSlice";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
@@ -37,20 +35,11 @@ function CustomerDashboard() {
   const dispatch = useDispatch();
 
   const hotelService = HotelService.instance;
-  const [open, setOpen] = useState(false);
-  const [dateRange, setDateRange] = useState(null);
-  const [city, setCity] = useState("");
-  const [peopleCount, setPeopleCount] = useState(0);
   const [recentHotels, setRecentHotel] = useState([]);
-  const [errorMessage, setErrorMessge] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
 
   const speechService = new SpeechService();
-  const onDateChange = (...args) => {
-    setDateRange(args);
-  };
 
   useEffect(() => {
     let hotelList = [];
@@ -71,8 +60,11 @@ function CustomerDashboard() {
   }, []);
 
   function onSearchSubmit() {
+    store.dispatch(setShowScreenLoader(true));
+    store.dispatch(
+      setScreenLoaderText("We are working on getting the best hotel for you")
+    );
     loadMoreHotels();
-    setLoading(true);
     const promises = [openAiService.searchHotels(searchText)];
 
     Promise.all(promises)
@@ -83,11 +75,13 @@ function CustomerDashboard() {
             LocalStorageKeys.AiHotelSearchResult,
             JSON.stringify(searchResult)
           );
-          navigate(`/search-hotel?searchText=${encodeURIComponent(searchText)}`);
+          navigate(
+            `/search-hotel?searchText=${encodeURIComponent(searchText)}`
+          );
         }
       })
       .catch((error) => {
-        //setLoading(false);
+        store.dispatch(setShowScreenLoader(false));
         console.error("Error occurred:", error);
       });
   }
@@ -97,7 +91,6 @@ function CustomerDashboard() {
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        setLoading(false);
         if (searchResult.hotels.length > 0) {
           dispatch(setMoreAiSearchResults(searchResult.hotels));
           localStorage.setItem(
@@ -107,7 +100,7 @@ function CustomerDashboard() {
         }
       })
       .catch((error) => {
-        setLoading(false);
+        store.dispatch(setShowScreenLoader(false));
         console.error("Error occurred:", error);
       });
   }
@@ -129,7 +122,6 @@ function CustomerDashboard() {
 
   return (
     <>
-      <LoadingScreen showLoadPopup={loading} screenLoaderText={"We are working on getting the best hotel for you"} />
       <div className="main-image-div">
         <Container className="main-txt">
           <Row>
@@ -137,9 +129,7 @@ function CustomerDashboard() {
               <h3>
                 Discover your next holiday by using our AI powered search engine
               </h3>
-              <p>
-                Simply type in your requirements and we will do the rest
-              </p>
+              <p>Simply type in your requirements and we will do the rest</p>
             </Col>
           </Row>
         </Container>

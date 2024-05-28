@@ -1,37 +1,32 @@
-import { Input, Row, Col, InputGroup } from "reactstrap";
-import React, { useState, useEffect } from "react";
+import { Input, Row, Col, InputGroup, Button } from "reactstrap";
+import React, { useState } from "react";
 import { FaCalendarAlt, FaCity, FaUsers } from "react-icons/fa";
 import "./styles.scss";
 import { RangeDatePicker } from "@y0c/react-datepicker";
-import SearchFacilities from '../HotelSearchPage/SearchFacilities';
+import SearchFacilities from "../HotelSearchPage/SearchFacilities";
+import { AzureOpenaiService } from "../../services-common/azure-openai-service";
+import toast from "react-hot-toast";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function SearchBar(props) {
+  const openAiService = AzureOpenaiService.getInstance();
+
   const [dateRange, setDateRange] = useState([]);
-  const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(true);
   const [guests, setGuests] = useState(props.numOfPeople);
   const [displayCity, setDisplayCity] = useState(props.city);
   const [city, setCity] = useState(props.city);
   const [checkInDate, setCheckInDate] = useState(props.checkInDate);
   const [checkOutDate, setCheckOutDate] = useState(props.checkOutDate);
-
-  const onChangeBedRooms = (isAdding) => {
-    props.setBedRooms((prevState) => {
-      return (isAdding ? prevState + 1 : prevState - 1) >= 0
-        ? isAdding
-          ? prevState + 1
-          : prevState - 1
-        : 0;
-    });
-  };
+  const [facilities, setFacilities] = useState(props.facilities);
+  const [facilitiesText, setFacilitiesText] = useState("");
+  const [isFacilityValidating, setIsFacilityValidating] = useState(false);
 
   const onDateChange = (...args) => {
-    setIsDirty(true);
+    setIsDirty(false);
     setDateRange(args);
     setDisplayCity(city);
-  };
-
-  const onChangeSearchText = (event) => {
-    props.setSearchText(event.target.value);
   };
 
   const onSearchClick = () => {
@@ -41,6 +36,8 @@ function SearchBar(props) {
 
     props.setSearchCity(city);
     props.setGuestCount(guests);
+    props.setFacilities(facilities);
+
     if (dateRange.length > 0) {
       props.setCheckInDate(new Date(dateRange[0]).toISOString().split("T")[0]);
       props.setCheckOutDate(new Date(dateRange[1]).toISOString().split("T")[0]);
@@ -48,30 +45,53 @@ function SearchBar(props) {
       props.setCheckInDate(checkInDate);
       props.setCheckOutDate(checkOutDate);
     }
-
-    props.onClickSearch(
-      city,
-      dateRange.length > 0
-        ? new Date(dateRange[0]).toISOString().split("T")[0]
-        : checkInDate,
-      dateRange.length > 0
-        ? new Date(dateRange[1]).toISOString().split("T")[0]
-        : checkOutDate,
-      guests
-    );
+    props.onClickSearch();
   };
 
   const onChangeCity = (event) => {
-    setIsDirty(true);
+    setIsDirty(false);
     setCity(event.target.value);
     props.setSearchCity(event.target.value);
   };
 
   const onChangeGuestCount = (event) => {
-    setIsDirty(true);
+    setIsDirty(false);
     setGuests(event.target.value);
     props.setGuestCount(event.target.value);
     setDisplayCity(city);
+  };
+
+  const onChangeAddFacility = (event) => {
+    setIsDirty(false);
+    setFacilitiesText(event.target.value);
+    };
+
+  const handleDelete = (namesToDelete) => {
+    setIsDirty(false);
+    setFacilities(namesToDelete);
+  };
+
+  const onAddFacilityClick = () => {
+    setIsFacilityValidating(true);
+    setFacilitiesText("");
+    const promises = [openAiService.getHotelFacilities(facilitiesText)];
+
+    Promise.all(promises)
+      .then(([facilitiesResult]) => {
+        let newFacilities = facilitiesResult.hotelFacilities;
+        if (facilitiesResult.hotelFacilities.length > 0) {
+          const mergedArray = [...new Set([...facilities, ...newFacilities])];
+
+          setFacilities(mergedArray);
+          setIsFacilityValidating(false);
+        } else {
+          setIsFacilityValidating(false);
+          toast.error("Please mention your requirements clearly");
+        }
+      })
+      .catch((error) => {
+        console.error("Error occurred:", error);
+      });
   };
 
   return (
@@ -160,32 +180,93 @@ function SearchBar(props) {
               />
             </InputGroup>
           </Col>
-          
+
           <Col>
             <div
               className={"col-md-1 col-sm-3 mb-3"}
               style={{
                 width: "auto",
                 display: "flex",
-                justifyContent: "flex-end",
-                paddingLeft: "100px",
+                justifyContent: "flex-start",
+                paddingLeft: "10px",
               }}
             >
-              <button
+              <Button
                 className={"search_button"}
-                style={{ maxWidth: "100px", marginTop: "10px" }}
+                style={{ width: "100px" }}
                 onClick={onSearchClick}
+                disabled={isDirty}
               >
-                <span className={"title_4"}>Search</span>
-              </button>
+                Search
+              </Button>
             </div>
           </Col>
         </Row>
-        <Row>
-          <SearchFacilities
-              facilityNames={["Bar", "Swimming Pool", "Garden View", "Tea maker", "gyfyfyf"]}
-            />
-        </Row>
+        <div className="facility_card">
+          <Row>
+            <Col md={7}>
+              <Input
+                placeholder="Type Facilities"
+                value={facilitiesText}
+                onChange={(e) => onChangeAddFacility(e)}
+                style={{
+                  height: "50px",
+                  width: "100%",
+                  marginTop: "30px",
+                  borderRadius: "0",
+                }}
+              />
+            </Col>
+            <Col md={3}>
+              <div
+                style={{
+                  width: "auto",
+                  display: "flex",
+                  justifyContent: "flex-start",
+                  paddingLeft: "10px",
+                }}
+              >
+                <Button
+                  className={"add_button"}
+                  style={{ width: "100px" }}
+                  disabled={facilitiesText.length <= 0}
+                  onClick={onAddFacilityClick}
+                >
+                  Add
+                </Button>
+              </div>
+            </Col>
+            {isFacilityValidating && (
+              <div
+                className={"col"}
+                style={{
+                  paddingTop: "20px",
+                  color: "#2c2c76",
+                  paddingLeft: "22%",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <FontAwesomeIcon
+                    icon={faSpinner}
+                    className="fa-solid fa-spinner fa-spin-pulse fa-spin-reverse"
+                    size="2x"
+                  />
+                  <span style={{ paddingLeft: "20px" }}>
+                    Validating your input....
+                  </span>
+                </div>
+              </div>
+            )}
+          </Row>
+          <Row>
+            <Col className={"facilities"}>
+              <SearchFacilities
+                facilityNames={facilities}
+                handleDelete={handleDelete}
+              />
+            </Col>
+          </Row>
+        </div>
       </div>
     </section>
   );
