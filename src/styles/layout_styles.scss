@@ -101,9 +101,9 @@ section {
 .row_fit {
   display: flex;
   justify-content: flex-start;
-  //width: 400px;
   flex-wrap: wrap;
   padding-top: 4px;
+  padding-left: 10%
 }
 
 .row_right {
