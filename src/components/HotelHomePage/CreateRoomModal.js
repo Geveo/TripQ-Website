@@ -1,7 +1,6 @@
 import Card1 from "../../layout/Card";
 import React, { useEffect, useState } from "react";
 import RoomFacilities from "./RoomFacilities";
-import {Spinner} from "reactstrap";
 
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -139,21 +138,6 @@ function CreateRoomModal(props) {
     }, [roomName, description, numOfRooms, numOfSingleBeds, numOfDoubleBeds, pricePerDay, numOfTripleBeds, checkedFacilities])
 
     return (
-        <div>
-             {isLoading ? (
-                <div className="spinnerWrapper">
-                    <Spinner
-                        color="primary"
-                        style={{
-                            height: '3rem',
-                            width: '3rem'
-                        }}
-                        type="grow"
-                    >
-                        Loading...
-                    </Spinner>
-                </div>
-            ) : (
         <div className={"room_modal pt-5 mt-8"}>
             <Card1 width={"850px"} className={"mt-7 pt-15"}> 
                <div className="row">
@@ -221,7 +205,6 @@ function CreateRoomModal(props) {
 
 
             </Card1>
-        </div> )}
         </div>
     );
 }

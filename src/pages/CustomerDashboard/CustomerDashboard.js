@@ -28,6 +28,7 @@ import { LocalStorageKeys } from "../../constants/constants";
 import { store } from "../../redux/store";
 import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import { setScreenLoaderText } from "../../redux/screenLoader/ScreenLoaderSlice";
+import toast from "react-hot-toast";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
@@ -44,17 +45,20 @@ function CustomerDashboard() {
   useEffect(() => {
     let hotelList = [];
     hotelService.getRecentHotels().then((data) => {
-      data.forEach((element) => {
-        let hotel = {
-          name: element.Name,
-          location: JSON.parse(element.Location).City,
-          image: element.ImageURL,
-          price: element.Price,
-          rating: element.StarRatings,
-          ratingCount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
-        };
-        hotelList.push(hotel);
-      });
+      if (data) {
+        data.forEach((element) => {
+          let hotel = {
+            name: element.Name,
+            location: JSON.parse(element.Location).City,
+            image: element.ImageURL,
+            price: element.Price,
+            rating: element.StarRatings,
+            ratingCount: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
+          };
+          hotelList.push(hotel);
+        });
+      }
+
       setRecentHotel(hotelList);
     });
   }, []);
@@ -64,20 +68,76 @@ function CustomerDashboard() {
     store.dispatch(
       setScreenLoaderText("We are working on getting the best hotel for you")
     );
-    loadMoreHotels();
-    const promises = [openAiService.searchHotels(searchText)];
 
-    Promise.all(promises)
-      .then(([searchResult]) => {
-        if (searchResult.hotels.length > 0) {
-          dispatch(setAiHotelSearchResults(searchResult));
-          localStorage.setItem(
-            LocalStorageKeys.AiHotelSearchResult,
-            JSON.stringify(searchResult)
-          );
-          navigate(
-            `/search-hotel?searchText=${encodeURIComponent(searchText)}`
-          );
+    const parameterPromises = [openAiService.getSearchParameters(searchText)];
+
+    Promise.all(parameterPromises)
+      .then(([searchParameters]) => {
+        const currentDate = new Date();
+        let fromDate = "";
+        let toDate = "";
+
+        // Get the timestamp in milliseconds
+        if (searchParameters.from_date) {
+          const [fromDay, fromMonth, fromYear] = searchParameters.from_date
+            .split("/")
+            .map(Number);
+          fromDate = new Date(fromYear, fromMonth - 1, fromDay);
+        }
+        if (searchParameters.to_date) {
+          const [toDay, toMonth, toYear] = searchParameters.to_date
+            .split("/")
+            .map(Number);
+          toDate = new Date(toYear, toMonth - 1, toDay);
+        }
+
+        // Date validations
+        if (
+          (fromDate && fromDate.getTime() < currentDate.getTime()) ||
+          (toDate && toDate.getTime() < currentDate.getTime())
+        ) {
+          store.dispatch(setShowScreenLoader(false));
+          toast.error("Please provide valid check-in and check-out dates.");
+        } else {
+          if (searchParameters.destination && searchParameters.destination.length > 0) {
+            loadMoreHotels(
+              searchParameters.destination,
+              searchParameters.facilities,
+              30
+            );
+            const promises = [
+              openAiService.searchHotels(
+                searchParameters.destination,
+                searchParameters.facilities
+              ),
+            ];
+
+            Promise.all(promises)
+              .then(([searchResult]) => {
+                if (searchResult.hotels.length > 0) {
+                  let obj = {
+                    hotels: searchResult.hotels,
+                    from_date: searchParameters.from_date,
+                    to_date: searchParameters.to_date,
+                    destination: searchParameters.destination,
+                    total_head_count: searchParameters.total_head_count,
+                    facilities: searchParameters.facilities,
+                  };
+                  dispatch(setAiHotelSearchResults(obj));
+                  localStorage.setItem(
+                    LocalStorageKeys.AiHotelSearchResult,
+                    JSON.stringify(obj)
+                  );
+                  navigate(
+                    `/search-hotel?searchText=${encodeURIComponent(searchText)}`
+                  );
+                }
+              })
+              .catch((error) => {
+                store.dispatch(setShowScreenLoader(false));
+                console.error("Error occurred:", error);
+              });
+          }
         }
       })
       .catch((error) => {
@@ -86,8 +146,8 @@ function CustomerDashboard() {
       });
   }
 
-  function loadMoreHotels() {
-    const promises = [openAiService.searchHotels(searchText, 30)];
+  function loadMoreHotels(destination, facilities) {
+    const promises = [openAiService.searchHotels(destination, facilities, 30)];
 
     Promise.all(promises)
       .then(([searchResult]) => {

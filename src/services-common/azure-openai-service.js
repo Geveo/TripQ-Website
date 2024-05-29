@@ -20,7 +20,7 @@ export class AzureOpenaiService {
   cleanJsonInput(jsonString) {
     return jsonString.replace(/```json|```|```js/g, "").trim();
   }
-  
+
   stringToArray(inputString) {
     try {
       const array = JSON.parse(inputString);
@@ -36,37 +36,34 @@ export class AzureOpenaiService {
 
   /**
    *
-   * @param message
+   * @param destination
+   * @param facilities
    * @param count
    * @returns {Promise<any>}
    */
-  async searchHotels(message, count = 5) {
-    message += `. Give me only a json output in the following format.  { hotels: [hotel_name: ""], destination: "", from_date: "", to_date: "", total_head_count: 1, facilities: []} , where hotels is an array of searched ${count} hotels that suit the requirement mentioned earlier or closer to the requirement, hotel_name shouldn't include the city if it is not in it's name,destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description. If the year is not specified in the description, default it to 2024 or later, formatted as dd/mm/yyyy or null. total_head_count is an integer value extracted, if not found its value is 1. facilities should be extracted from description. Language must be english. While searching, only consider the destination`;
-    console.log(message);
+  async searchHotels(destination, facilities, count = 5) {
+    let searchText = `Give me ${count} hotels in ${destination}`;
+  
+    if (facilities.length > 0) {
+      searchText += ` with `;
+      facilities.forEach((facility, index) => {
+        searchText += facility;
+        if (index !== facilities.length - 1) {
+          searchText += ", ";
+        }
+      });
+    }
+    
+    searchText += `. Give me only a json output(english) in the following format.  { hotels: [hotel_name: ""]} `;
+  
+    console.log(searchText)
     const reply = await this.client.getChatCompletions(
-      this.modelInstanceName, // assumes a matching model deployment or model name
-      [{ role: "user", content: message }]
+      this.modelInstanceName,
+      [{ role: "user", content: searchText }]
     );
-
+  
     return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
   }
-
-    /**
-   *
-   * @param message
-   * @param count
-   * @returns {Promise<any>}
-   */
-    async searchMoreHotels(message) {
-      message += `. Give me only a json output in the following format.  { hotels: [hotel_name: ""]} , where hotels is an array of searched hotels that suit the requirement mentioned earlier or closer to the requirement, hotel_name shouldn't include the city if it is not in it's name,destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description year should be in 2024 or higher and in the form of dd/mm/yyyy or null. total_head_count is an integer value extracted, if not found its value is 0. Language must be english. While searching, only consider the destination`;
-      //console.log(message);
-      const reply = await this.client.getChatCompletions(
-        this.modelInstanceName, // assumes a matching model deployment or model name
-        [{ role: "user", content: message }]
-      );
-  
-      return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
-    }
 
   /**
    *
@@ -80,22 +77,38 @@ export class AzureOpenaiService {
     const reply = await this.client.getChatCompletions(
       this.modelInstanceName, // assumes a matching model deployment or model name
       [{ role: "user", content: message }]
-      );
+    );
 
     return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
   }
 
-    /**
+  /**
    *
    * @param facilitiesText
    * @returns {Promise<any>}
    */
-    async getHotelFacilities(facilitiesText) {
-      let message = `Extract valid hotel facilities from this user input only as a json output in the following format. { hotelFacilities: [""]}. User input -: ${facilitiesText}. `;
-      const reply = await this.client.getChatCompletions(
-        this.modelInstanceName, 
-        [{ role: "user", content: message }]
-        );
-      return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
-    }
+  async getHotelFacilities(facilitiesText) {
+    let message = `Extract valid hotel facilities from this user input only as a json output in the following format. { hotelFacilities: [""]}. User input -: ${facilitiesText}. `;
+    const reply = await this.client.getChatCompletions(this.modelInstanceName, [
+      { role: "user", content: message },
+    ]);
+    return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
+  }
+
+  /**
+   *
+   * @param message
+   * @returns {Promise<any>}
+   */
+  async getSearchParameters(message) {
+    const currentYear = new Date().getFullYear();
+    message += `. Give me only a json output in the following format.  { destination: "", from_date: "", to_date: "", total_head_count: 1, facilities: []} , where destination is a string extracted from the description(check for correct location name) or null, to_date and from_date are also extracted from description. If the year is not specified in the description, it should be ${currentYear}, formatted as dd/mm/yyyy or null. total_head_count is an integer value extracted, if not found its value is 1. facilities should be extracted from description. Language must be english.`;
+    console.log(message);
+    const reply = await this.client.getChatCompletions(
+      this.modelInstanceName, // assumes a matching model deployment or model name
+      [{ role: "user", content: message }]
+    );
+
+    return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
+  }
 }
