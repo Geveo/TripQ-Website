@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import SearchBar from "../../components/HotelSearchPage/SearchBar";
 import HotelList from "../../components/HotelSearchPage/HotelList";
 import HotelService from "../../services-domain/hotel-service copy";
-import { Alert, Spinner } from "reactstrap";
+import { Alert } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { LocalStorageKeys } from "../../constants/constants";
 import { add as selectionDetailsAdd } from "../../redux/SelectionDetails/SelectionDetailsSlice";
@@ -14,17 +14,11 @@ import { AzureOpenaiService } from "../../services-common/azure-openai-service";
 import { setShowScreenLoader } from "../../redux/screenLoader/ScreenLoaderSlice";
 import { setScreenLoaderText } from "../../redux/screenLoader/ScreenLoaderSlice";
 import { resetAiHotelSearchState } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
-import { resetHotelSearchState } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import { setAiHotelSearchResults } from "../../redux/AiHotelSearchState/AiHotelSearchStateSlice";
 import { setMoreAiSearchResults } from "../../redux/AiHotelSearchState/MoreAiSearchStateSlice";
 import toast from "react-hot-toast";
-import SearchMenu from "../../components/SearchMenu";
-import { Col, Container, Row, Input, Button } from "reactstrap";
-import InputGroup from "react-bootstrap/InputGroup";
+import { Button } from "reactstrap";
 import SpeechService from "../../services-common/speech-service";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/free-solid-svg-icons";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 function HotelSearchPage(props) {
   const navigate = useNavigate();
@@ -49,7 +43,6 @@ function HotelSearchPage(props) {
     moreAiHotelSearchState = JSON.parse(
       localStorage.getItem(LocalStorageKeys.MoreAiHotelSearchResult)
     );
-    //localStorage.removeItem(LocalStorageKeys.MoreAiHotelSearchResult);
   }
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [searchText, setSearchText] = useState(searchTextMessage);
@@ -65,13 +58,12 @@ function HotelSearchPage(props) {
   const [showMore, setShowMore] = useState(true);
   const [start, setStart] = useState(5);
   const [end, setEnd] = useState(10);
+  const [facilities, setFacilities] = useState([]);
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
     store.dispatch(
-      setScreenLoaderText(
-        "We are working on getting the best hotel for you"
-      )
+      setScreenLoaderText("We are working on getting the best hotel for you")
     );
     // Get AI searched results
     if (!aiHotelSearchState) {
@@ -79,7 +71,8 @@ function HotelSearchPage(props) {
         LocalStorageKeys.AiHotelSearchResult
       );
       localStorage.removeItem(LocalStorageKeys.AiHotelSearchResult);
-    }
+      }
+
     if (
       aiHotelSearchState &&
       aiHotelSearchState.hotels &&
@@ -104,10 +97,10 @@ function HotelSearchPage(props) {
 
       setCity(aiHotelSearchState.destination);
       setSearchCity(aiHotelSearchState.destination);
-      //setSearchText(aiHotelSearchState.destination);
       setCheckInDate(aiHotelSearchState.from_date);
       setCheckOutDate(aiHotelSearchState.to_date);
       setGuestCount(aiHotelSearchState.total_head_count);
+      setFacilities(aiHotelSearchState.facilities);
 
       hotelService.GetHotelsListMappedWithAISearch(obj).then((res) => {
         if (res) {
@@ -202,7 +195,7 @@ function HotelSearchPage(props) {
     }
   }, [hotelNames, city]);
 
-  const onClickSearch = (city, fromDate, toDate, guests) => {
+  const onClickSearch = () => {
     loadMoreHotels();
     setStart(5);
     setEnd(10);
@@ -213,7 +206,23 @@ function HotelSearchPage(props) {
     store.dispatch(resetAiHotelSearchState());
     setCity(searchCity);
 
-    const promises = [openAiService.searchHotels(searchText)];
+    let newSearchText = "I want to find a hotel with ";
+
+    facilities.forEach((facility) => {
+      newSearchText += facility + " ";
+    });
+    newSearchText +=
+      "in " +
+      searchCity +
+      " from " +
+      checkInDate +
+      " " +
+      checkOutDate +
+      " for " +
+      guestCount +
+      " people";
+
+    const promises = [openAiService.searchHotels(newSearchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
@@ -385,125 +394,31 @@ function HotelSearchPage(props) {
       <MainContainer>
         <div className={"row_fit"} style={{ width: "100%" }}>
           {hotelResultListCopy && hotelResultListCopy.length > 0 ? (
-            // <SearchBar
-            //   searchCity={searchCity}
-            //   city={aiHotelSearchState.destination}
-            //   checkInDate={aiHotelSearchState.from_date}
-            //   checkOutDate={aiHotelSearchState.to_date}
-            //   numOfPeople={aiHotelSearchState.total_head_count}
-            //   hotelsData={hotelResultListCopy}
-            //   bedRooms={bedRooms}
-            //   setBedRooms={setBedRooms}
-            //   onCitySearchChanged={onCitySearchChanged}
-            //   searchText={searchText}
-            //   setSearchText={setSearchText}
-            //   onClearSearchText={onClearSearchText}
-            //   onClickSearch={onClickSearch}
-            //   setSearchCity={setSearchCity}
-            //   setGuestCount={setGuestCount}
-            //   setCheckInDate={setCheckInDate}
-            //   setCheckOutDate={setCheckOutDate}
-            // />
-            <div className="search_section hotel-search-page">
-              <div className={"title_2"}>
-                {hotelResultListCopy.length > 0
-                  ? hotelResultListCopy.length
-                  : `No `}{" "}
-                Hotels in {aiHotelSearchState.destination}
-              </div>
-              <div
-                className={"subtext"}
-                style={{ lineHeight: "15px", marginBottom: "40px" }}
-              >
-                Book your next stay at one of our properties
-              </div>
-              <div className="search-area">
-                <div>
-                  <Row>
-                    <Col>
-                      <div className="container">
-                        <div className="icon-and-text">
-                          <div className="search-area-phrase">
-                            Eg-: I want to take my family of four to a beach
-                            resort in Asia from the 1st December to the 31st
-                            December 2024. We are also interested in trekking.
-                          </div>
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                  <Row style={{ justifyContent: "center" }}>
-                    <Col md={10}>
-                      <InputGroup className="">
-                        <textarea
-                          placeholder="Search your next stay here..."
-                          aria-label="Search your next stay here..."
-                          value={searchText}
-                          onChange={(e) => setSearchText(e.target.value)}
-                          rows={3}
-                          cols={130}
-                        />
-                      </InputGroup>
-                    </Col>
-                    <Col
-                      md={2}
-                      className="d-flex justify-content-end align-items-center"
-                    >
-                      <Button
-                        variant="outline-secondary"
-                        id="button-addon1"
-                        className={`mr-2 ${
-                          isListening
-                            ? "microphone-icon-isListening remove-right-border-radius"
-                            : "microphone-icon remove-right-border-radius"
-                        }`}
-                        onClick={handleSpeechToTextFromMic}
-                        title="Speak freely in your native tongue. Remember to include your preferences, check-in and check-out dates, and the number of guests while you talk."
-                      >
-                        <FontAwesomeIcon
-                          size="lg"
-                          icon={faMicrophone}
-                          className="fa fa-microphone"
-                        />
-                      </Button>
-                      <Button
-                        variant="outline-secondary"
-                        id="button-addon1"
-                        className={`mr-2 search-icon remove-left-border-radius`}
-                        onClick={onClickSearch}
-                        title="Search"
-                        disabled={searchText.length === 0}
-                      >
-                        <FontAwesomeIcon
-                          size="lg"
-                          icon={faSearch}
-                          className="fa fa-search"
-                        />
-                      </Button>
-                    </Col>
-                  </Row>
-                  {isListening ? (
-                    <div className="listening">Listening...</div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
+            <>
+              <SearchBar
+                searchCity={searchCity}
+                city={aiHotelSearchState.destination}
+                checkInDate={aiHotelSearchState.from_date}
+                checkOutDate={aiHotelSearchState.to_date}
+                numOfPeople={aiHotelSearchState.total_head_count}
+                facilities={aiHotelSearchState.facilities}
+                setFacilities={setFacilities}
+                hotelsData={hotelResultListCopy}
+                onCitySearchChanged={onCitySearchChanged}
+                searchText={searchText}
+                setSearchText={setSearchText}
+                onClearSearchText={onClearSearchText}
+                onClickSearch={onClickSearch}
+                setSearchCity={setSearchCity}
+                setGuestCount={setGuestCount}
+                setCheckInDate={setCheckInDate}
+                setCheckOutDate={setCheckOutDate}
+              />
+              <div className="search_section hotel-search-page"></div>
+            </>
           ) : null}
         </div>
-        {isDataLoading ? (
-          <div className="spinnerWrapper">
-            <Spinner
-              color="primary"
-              style={{
-                height: "3rem",
-                width: "3rem",
-              }}
-              type="grow"
-            >
-              Loading...
-            </Spinner>
-          </div>
-        ) : hotelResultListCopy?.length < 1 ? (
+        {hotelResultListCopy?.length < 1 ? (
           <Alert color="warning" style={{ marginBottom: "40vh" }}>
             No Hotels Found!
           </Alert>
