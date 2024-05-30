@@ -44,7 +44,7 @@ export class AzureOpenaiService {
   async searchHotels(destination, facilities, count = 5) {
     let searchText = `Give me ${count} hotels in ${destination}`;
   
-    if (facilities.length > 0) {
+    if (facilities?.length > 0) {
       searchText += ` with `;
       facilities.forEach((facility, index) => {
         searchText += facility;
