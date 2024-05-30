@@ -99,7 +99,7 @@ function CustomerDashboard() {
           store.dispatch(setShowScreenLoader(false));
           toast.error("Please provide valid check-in and check-out dates.");
         } else {
-          if (searchParameters.destination && searchParameters.destination.length > 0) {
+          if (searchParameters?.destination?.length > 0) {
             loadMoreHotels(
               searchParameters.destination,
               searchParameters.facilities,
@@ -114,7 +114,7 @@ function CustomerDashboard() {
 
             Promise.all(promises)
               .then(([searchResult]) => {
-                if (searchResult.hotels.length > 0) {
+                if (searchResult?.hotels?.length > 0) {
                   let obj = {
                     hotels: searchResult.hotels,
                     from_date: searchParameters.from_date,
@@ -151,7 +151,7 @@ function CustomerDashboard() {
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        if (searchResult.hotels.length > 0) {
+        if (searchResult?.hotels?.length > 0) {
           dispatch(setMoreAiSearchResults(searchResult.hotels));
           localStorage.setItem(
             LocalStorageKeys.MoreAiHotelSearchResult,
