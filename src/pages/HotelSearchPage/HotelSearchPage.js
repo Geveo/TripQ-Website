@@ -182,7 +182,7 @@ function HotelSearchPage(props) {
   }, [aiHotelSearchState]);
 
   useEffect(() => {
-    if (hotelNames.length > 0) {
+    if (hotelNames?.length > 0) {
       hotelNames.forEach((element) => {
         openAiService.getHotelDetails(element, city).then((res) => {
           setHotelMap((prevHotelMap) => {
@@ -196,7 +196,7 @@ function HotelSearchPage(props) {
   }, [hotelNames, city]);
 
   const onClickSearch = () => {
-    loadMoreHotels();
+    loadMoreHotels(searchCity, facilities, 30);
     setStart(5);
     setEnd(10);
     setShowMore(true);
@@ -206,27 +206,11 @@ function HotelSearchPage(props) {
     store.dispatch(resetAiHotelSearchState());
     setCity(searchCity);
 
-    let newSearchText = "I want to find a hotel with ";
-
-    facilities.forEach((facility) => {
-      newSearchText += facility + " ";
-    });
-    newSearchText +=
-      "in " +
-      searchCity +
-      " from " +
-      checkInDate +
-      " " +
-      checkOutDate +
-      " for " +
-      guestCount +
-      " people";
-
-    const promises = [openAiService.searchHotels(newSearchText)];
+    const promises = [openAiService.searchHotels(searchCity, facilities, 5)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        if (searchResult.hotels.length > 0) {
+        if (searchResult?.hotels?.length > 0) {
           dispatch(setAiHotelSearchResults(searchResult));
           localStorage.setItem(
             LocalStorageKeys.AiHotelSearchResult,
@@ -252,7 +236,7 @@ function HotelSearchPage(props) {
       JSON.stringify(hotel)
     );
 
-    if (hotel.WebsiteURL && hotel.WebsiteURL.length > 0) {
+    if (hotel?.WebsiteURL?.length > 0) {
       window.open(hotel.WebsiteURL, "_blank");
     } else if (!checkInDate || !checkOutDate || guestCount == 0) {
       toast.error(
@@ -291,7 +275,7 @@ function HotelSearchPage(props) {
       for (let i = start; i < end; i++) {
         const hotel = moreAiHotelSearchState[i];
         if (
-          newHotels.length < 5 &&
+          newHotels?.length < 5 &&
           !hotelNames.includes(hotel.hotel_name) &&
           !newHotels.includes(hotel.hotel_name)
         ) {
@@ -337,11 +321,11 @@ function HotelSearchPage(props) {
   }
 
   function loadMoreHotels() {
-    const promises = [openAiService.searchHotels(searchText, 30)];
+    const promises = [openAiService.searchHotels(searchCity, facilities, 30)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
-        if (searchResult.hotels.length > 0) {
+        if (searchResult?.hotels?.length > 0) {
           dispatch(setMoreAiSearchResults(searchResult.hotels));
           localStorage.setItem(
             LocalStorageKeys.MoreAiHotelSearchResult,
@@ -366,26 +350,6 @@ function HotelSearchPage(props) {
       .catch((error) => {
         console.error("Error:", error);
         setIsListening(false);
-      });
-  }
-
-  function onSearchSubmit() {
-    loadMoreHotels();
-    const promises = [openAiService.searchHotels(searchText)];
-
-    Promise.all(promises)
-      .then(([searchResult]) => {
-        if (searchResult.hotels.length > 0) {
-          dispatch(setAiHotelSearchResults(searchResult));
-          localStorage.setItem(
-            LocalStorageKeys.AiHotelSearchResult,
-            JSON.stringify(searchResult)
-          );
-          navigate(`/search-hotel`);
-        }
-      })
-      .catch((error) => {
-        console.error("Error occurred:", error);
       });
   }
 
