@@ -97,7 +97,8 @@ export class AzureOpenaiService {
 
   /**
    *
-   * @param message
+   * @param hotelName
+   * @param destination
    * @returns {Promise<any>}
    */
   async getSearchParameters(message) {
@@ -111,4 +112,18 @@ export class AzureOpenaiService {
 
     return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
   }
+
+    /**
+   *
+   * @param facilitiesText
+   * @returns {Promise<any>}
+   */
+    async getHotelFacilities(facilitiesText) {
+      let message = `Extract valid hotel facilities from this user input only as a json output in the following format. { hotelFacilities: [""]}. User input -: ${facilitiesText}. `;
+      const reply = await this.client.getChatCompletions(
+        this.modelInstanceName, 
+        [{ role: "user", content: message }]
+        );
+      return JSON.parse(this.cleanJsonInput(reply.choices[0].message.content));
+    }
 }

@@ -29,9 +29,11 @@ import ToastInnerElement from "../components/ToastInnerElement/ToastInnerElement
 import { HotelDto } from "../dto/HotelDto";
 import { ContactDetailsDto } from "../dto/ContactDetailsDto";
 import { LocationDetailsDto } from "../dto/LocationDto";
-import { LocalStorageKeys } from "../constants/constants";
 import { store } from "../redux/store";
 import { setShowScreenLoader } from "../redux/screenLoader/ScreenLoaderSlice";
+import PaymentOptions from "../components/RegisterHotelComponents/PaymentOptions";
+import { AccountDetailsDto } from "../dto/AccountDetailsDto";
+import { PaymentOption } from "../constants/Enums/Hotels";
 
 const { useSelector, useDispatch } = require("react-redux");
 
@@ -40,10 +42,9 @@ function RegisterHotel() {
   const hotelService = HotelService.instance;
   let emailRegex = new RegExp("[a-z0-9]+@[a-z]+.[a-z]{2,3}");
   let phoneNoRegex = new RegExp("^[0-9 ]*$");
+  let walletAddressRegex = new RegExp("^r[a-zA-Z0-9]+$");
   const navigate = useNavigate();
 
-  let user = "User";
-  const [isDataLoading, setIsDataLoading] = useState(false);
   const [dropDownOpen, setDropDownOpen] = useState(false);
   const [registerButtonDisable, setRegisterButtonDisable] = useState(false);
 
@@ -77,6 +78,11 @@ function RegisterHotel() {
     useState(false);
   const [hotelFacilitiesInvaid, setHotelFacilitiesInvaid] = useState(false);
   const [uploadedImagesInvaid, setUploadedImagesInvaid] = useState(false);
+  const [accountNumberInvalid, setAccountNumberInvalid] = useState(false);
+  const [bankHolderNameInvalid, setBankHolderNameInvalid] = useState(false);
+  const [bankNameInvalid, setBankNameInvalid] = useState(false);
+  const [branchNameInvalid, setBranchNameInvalid] = useState(false);
+  const [walletAddressInvalid, setWalletAddressInvalid] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [scannedText, setScannedText] = useState("");
@@ -100,19 +106,13 @@ function RegisterHotel() {
     ImageURLs: [],
     WalletAddress: "",
   });
-
-  const contractWalletAddress = process.env.REACT_APP_CONTRACT_WALLET_ADDRESS;
-  const hotelRegiFee = process.env.REACT_APP_HOTEL_REGISTRATION_FEE;
-
-  const handleScanSuccess = (decodedText) => {
-    setScannedText(decodedText);
-    setShowQRModal(false);
-    setShowQRScanner(false);
-
-    if (decodedText !== "") {
-      setOwnerWalletAddress((prevOwnerWalletAddress) => decodedText);
-    }
-  };
+  const [accountNumber, setAccountNumber] = useState("");
+  const [bankHolderName, setBankHolderName] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [branchName, setBranchName] = useState("");
+  const [paymentOptions, setPaymentOptions] = useState(0);
+  const [creditCard, setCreditCard] = useState(false);
+  const [cryptoCurrency, setCryptoCurrency] = useState(false);
 
   const toggleDropDown = () => {
     setDropDownOpen((prevState) => !prevState);
@@ -146,11 +146,9 @@ function RegisterHotel() {
     if (!emailRegex.test(Email)) {
       setEmailInvaid(true);
     }
-
     if (!phoneNoRegex.test(ContactNumber1)) {
       setContactNumber1Invaid(true);
     }
-
     if (!(ContactNumber1.length === 10 || ContactNumber1.length === 11)) {
       setContactNumber1Invaid(true);
     }
@@ -163,12 +161,32 @@ function RegisterHotel() {
     if (!DistanceFromCenter) {
       setDistanceFromCenterInvaid(true);
     }
-
     if (HotelFacilities.length <= 0) {
       setHotelFacilitiesInvaid(true);
     }
     if (uploadedImages.length < 3) {
       setUploadedImagesInvaid(true);
+    }
+    if (creditCard) {
+      if (accountNumber.length <= 0) {
+        setAccountNumberInvalid(true);
+      }
+      if (bankHolderName.length <= 0) {
+        setBankHolderNameInvalid(true);
+      }
+      if (bankName.length <= 0) {
+        setBankNameInvalid(true);
+      }
+      if (branchName.length <= 0) {
+        setBranchNameInvalid(true);
+      }
+    }
+    if (cryptoCurrency) {
+      if (
+        ownerWalletAddress.length <= 0 ||
+        !walletAddressRegex.test(ownerWalletAddress)
+      )
+        setWalletAddressInvalid(true);
     }
   };
 
@@ -188,6 +206,18 @@ function RegisterHotel() {
       if (uploadedImages.length > 0) {
         const urls = await FirebaseService.uploadFiles(Name, uploadedImages);
 
+        let paymentOption = "";
+        if (creditCard && cryptoCurrency) {
+          paymentOption = PaymentOption.CRYPTOCREDITCARD;
+        } else if (creditCard) {
+          paymentOption = PaymentOption.CREDITCARD;
+        } else if (cryptoCurrency) {
+          paymentOption = PaymentOption.CRYPTOCURRENCIES;
+        } else {
+          paymentOption = PaymentOption.NONE;
+        }
+
+        setPaymentOptions(paymentOption);
         if (urls.length > 0) {
           // Create request object
           let contactDetails = new ContactDetailsDto({
@@ -204,6 +234,13 @@ function RegisterHotel() {
             DistanceFromCity: DistanceFromCenter,
           });
 
+          let accountDetails = new AccountDetailsDto({
+            AccountNumber: accountNumber,
+            BankHolderName: bankHolderName,
+            BankName: bankName,
+            BranchName: branchName,
+          });
+
           let hotelData = new HotelDto({
             Id: 0,
             Name: Name,
@@ -213,10 +250,11 @@ function RegisterHotel() {
             Location: JSON.stringify(locationDto),
             Facilities: JSON.stringify(HotelFacilities),
             ImageURLs: urls,
-            WalletAddress: localStorage.getItem(
-              LocalStorageKeys.AccountAddress
-            ),
+            WalletAddress: ownerWalletAddress,
+            AccountDetails: accountDetails,
+            PaymentOption: paymentOption,
           });
+
           setHotelData(hotelData);
           // only if the required validations are met, form will submit
           if (
@@ -229,11 +267,12 @@ function RegisterHotel() {
             phoneNoRegex.test(ContactNumber1) &&
             DistanceFromCenter &&
             HotelFacilities.length > 0 &&
-            uploadedImages.length > 2
+            uploadedImages.length > 2 &&
+            walletAddressRegex.test(ownerWalletAddress)
           ) {
             hotelService.registerHotel(hotelData).then((res) => {
               store.dispatch(setShowScreenLoader(false));
-            
+
               if (res.rowId.lastId > 0) {
                 toast.success("Registered successfully!", {
                   duration: 10000,
@@ -248,7 +287,7 @@ function RegisterHotel() {
                     />
                   ),
                   {
-                    duration: Infinity,
+                    duration: 50000,
                   }
                 );
               }
@@ -256,35 +295,19 @@ function RegisterHotel() {
           } else {
             setRegisterButtonDisable(false);
             store.dispatch(setShowScreenLoader(false));
-            toast(
-              (element) => (
-                <ToastInnerElement
-                  message={"Check the details again!"}
-                  id={element.id}
-                />
-              ),
-              {
-                duration: Infinity,
-              }
-            );
+            toast.error("Check the details again!");
           }
         }
+      } else {
+        store.dispatch(setShowScreenLoader(false));
+        setRegisterButtonDisable(false);
+        toast.error("Error occurred in Registration.!");
       }
     } catch (err) {
       store.dispatch(setShowScreenLoader(false));
       setRegisterButtonDisable(false);
       console.log(err);
-      toast(
-        (element) => (
-          <ToastInnerElement
-            message={"Error occurred in Registration.!"}
-            id={element.id}
-          />
-        ),
-        {
-          duration: Infinity,
-        }
-      );
+      toast.error("Error occurred in Registration.!");
     }
   };
 
@@ -371,11 +394,9 @@ function RegisterHotel() {
                 invalid={propertyDescriptionInvaid}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              {/* <FormFeedback>Hotel description is required!</FormFeedback> */}
             </FormGroup>
           </Card1>
         </section>
-
         <ContactDetails
           setOwnerName={setOwnerName}
           setEmail={setEmail}
@@ -392,12 +413,10 @@ function RegisterHotel() {
           cityInvaid={cityInvaid}
           distanceFromCenterInvaid={distanceFromCenterInvaid}
         />
-
         <Facilities
           setHotelFacilities={setHotelFacilities}
           hotelFacilitiesInvaid={hotelFacilitiesInvaid}
         />
-
         <PropertyPhotos
           onChangeUploadImages={onChangeUploadImages}
           uploadedImagesInvaid={uploadedImagesInvaid}
@@ -405,6 +424,20 @@ function RegisterHotel() {
         {uploadedImages.length !== 0 && (
           <ImagePreviewSection images={uploadedImages} />
         )}
+        <PaymentOptions
+          setAccountNumber={setAccountNumber}
+          setBankHolderName={setBankHolderName}
+          setBankName={setBankName}
+          setBranchName={setBranchName}
+          setOwnerWalletAddress={setOwnerWalletAddress}
+          setCreditCard={setCreditCard}
+          setCryptoCurrency={setCryptoCurrency}
+          accountNumberInvalid={accountNumberInvalid}
+          bankHolderNameInvalid={bankHolderNameInvalid}
+          bankNameInvalid={bankHolderNameInvalid}
+          branchNameInvalid={branchNameInvalid}
+          walletAddressInvalid={walletAddressInvalid}
+        />
         <section>
           <h5 style={{ lineHeight: "25px" }}>
             You’re almost done.
@@ -455,7 +488,8 @@ function RegisterHotel() {
             style={{ width: "650px" }}
             disabled={
               registerButtonDisable ||
-              !(isCondition1Checked && isCondition2Checked)
+              !(isCondition1Checked && isCondition2Checked) ||
+              (!creditCard && !cryptoCurrency)
             }
             onClick={() => {
               submitForm();
