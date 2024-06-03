@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
-import { Spinner } from "reactstrap";
 import "./LoadingScreen.scss";
+import loadingGif from "../../Assets/Gifs/tripQ.gif";
 
 const LoadingScreen = (props) => {
   return (
@@ -13,15 +13,17 @@ const LoadingScreen = (props) => {
       >
         <Modal.Body>
           <div className="spinnerWrapper">
-            <Spinner
-              color="primary"
+            <img
+              src={loadingGif}
+              alt="Loading..."
               style={{
                 height: "3rem",
                 width: "3rem",
               }}
-              type="grow"
             />
-            Loading...
+            <div>
+              {props.screenLoaderText === "" ? "Loading.." : props.screenLoaderText}
+            </div>
           </div>
         </Modal.Body>
       </Modal>

@@ -29,6 +29,7 @@ function AvailabilityPage() {
   const [address1, setAddress1] = useState("P.O Box 11");
   const [address2, setAddress2] = useState("Heritance Kandalama");
   const [city, setCity] = useState("Sigiriya");
+  const [hotelLocation, setLocation] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [hotelData, setHotelData] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -45,20 +46,22 @@ function AvailabilityPage() {
 
     const hotelDetails = JSON.parse(selectionDetails);
 
+    setLocation(hotelDetails.Location);
     let hotelData = {
       Id: hotelDetails.Id,
       Name: hotelDetails.Name,
       StarRating: hotelDetails.StarRatings,
-      Location: JSON.parse(hotelDetails.Location).City,
-      ImageURLs: hotelDetails.ImageURL,
+      Location: hotelDetails.Location.City,
+      ImageURL: hotelDetails.ImageURL,
       HotelOwnerWalletAddress: hotelDetails.WalletAddress,
       Description: hotelDetails.Description,
+      availableRooms: hotelDetails.AvailableRooms
     };
 
     setHotelData(hotelData);
-    setAddress1(JSON.parse(hotelDetails.Location).AddressLine01);
-    setAddress2(JSON.parse(hotelDetails.Location).AddressLine02);
-    setCity(JSON.parse(hotelDetails.Location).City);
+    setAddress1(hotelDetails.Location.AddressLine01);
+    setAddress2(hotelDetails.Location.AddressLine02);
+    setCity(hotelDetails.Location.City);
     setImages(Array.from(hotelDetails.ImageURL));
 
     let newRoomTypes = [];
@@ -192,12 +195,14 @@ function AvailabilityPage() {
       Name: hotelData.Name,
       Address: getFullAddress(),
       StarRate: hotelData.StarRating,
-      Images: hotelData.ImageURLs,
+      ImageURL: hotelData.ImageURL,
       CheckIn: checkInDate,
       CheckOut: checkOutDate,
       Nights: differenceDays,
       RoomTypes: selectedRoomsArray,
       HotelOwnerWalletAddress: hotelData.HotelOwnerWalletAddress,
+      Location: hotelLocation,
+      AvailableRooms : hotelData.availableRooms
     };
 
     dispatch(

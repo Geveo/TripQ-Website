@@ -87,7 +87,7 @@ const  AccountTransactions = () => {
                         // CoinRankingService.getXAH2USDT(Number(res.Balance)/1000000).then(val => {
                         //     setTotalXAHinUSD(val);
                         // })
-                        setTotalXAHinUSD(res.Balance / 1000000 * 23000);
+                        setTotalXAHinUSD(res.Balance/ 2000050);
                     }
 
                 }).catch(e => {
@@ -158,7 +158,7 @@ const  AccountTransactions = () => {
                 minimumFractionDigits: 6,
                 maximumFractionDigits: 6,
             });
-            return `${value} ${amount.currency}`;
+            return `${value} TPQ`;
         }
     };
 
@@ -245,14 +245,11 @@ const  AccountTransactions = () => {
                                 balance
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
-                                <div className={`ever-balance-value`} title={`LKR ${totalEVRinUSD}`}>
-                                    {totalEVR} <br/> <span style={{
+                                <div className={`ever-balance-value`} title={`USD ${totalEVRinUSD}`}>
+                                    502.0146 <br/> <span style={{
                                     fontSize: '30px',
                                     lineHeight: '12px'
-                                }}>({totalEVRinUSD.toLocaleString(undefined, {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2
-                                })} LKR)</span>
+                                }}>({502.0146*0.5} USD)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>
@@ -265,14 +262,14 @@ const  AccountTransactions = () => {
                                 balance
                             </div>
                             <Card.Body style={{marginTop: '33px'}}>
-                                <div className={`ever-balance-value`} title={`LKR ${totalXAHinUSD}`}>
+                                <div className={`ever-balance-value`} title={`USD ${totalXAHinUSD}`}>
                                     {(parseFloat(totalXAHDrops) / 1000000).toFixed(6)} <br/> <span style={{
                                     fontSize: '30px',
                                     lineHeight: '12px'
                                 }}>({totalXAHinUSD.toLocaleString(undefined, {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2
-                                })} LKR)</span>
+                                })} USD)</span>
                                 </div>
                                 {/*<div className={`font-size-10 evr-label mt-5`}>TPQ.{issuer}</div>*/}
                             </Card.Body>

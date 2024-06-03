@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialSearchedState = {
-    hotel_names: [],
+    hotels: [],
     from_date: null,
     to_date: null,
     destination: null,
-    total_head_count: 0
+    total_head_count: 0,
+    facilities: []
 };
 
 export const AiHotelSearchStateSlice = createSlice({
@@ -13,18 +14,20 @@ export const AiHotelSearchStateSlice = createSlice({
     initialState: initialSearchedState,
     reducers: {
         setAiHotelSearchResults: (state, action) => {
-            state.hotel_names = action.payload.hotel_names;
+            state.hotels = action.payload.hotels;
             state.from_date = action.payload.from_date;
             state.to_date = action.payload.to_date;
             state.destination = action.payload.destination;
             state.total_head_count = action.payload.total_head_count;
-        },
+            state.facilities = action.payload.facilities;
+        }, 
         resetAiHotelSearchState: (state) => {
-            state.hotel_names = [];
+            state.hotels = [];
             state.from_date = null;
             state.to_date = null;
             state.destination = null;
             state.total_head_count = 0;
+            state.facilities = [];
         }
     },
 });

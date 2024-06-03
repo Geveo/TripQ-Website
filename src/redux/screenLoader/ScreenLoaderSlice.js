@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
-  value: false,
+  showLoadPopup: false,
+  screenLoaderText: "",
 };
 
 export const screenLoaderSlice = createSlice({
@@ -8,12 +10,15 @@ export const screenLoaderSlice = createSlice({
   initialState,
   reducers: {
     setShowScreenLoader: (state, action) => {
-      state.value = action.payload;
+      state.showLoadPopup = action.payload;
+    },
+    setScreenLoaderText: (state, action) => {
+      state.screenLoaderText = action.payload;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { setShowScreenLoader } = screenLoaderSlice.actions;
+export const { setShowScreenLoader, setScreenLoaderText } = screenLoaderSlice.actions;
 
 export default screenLoaderSlice.reducer;

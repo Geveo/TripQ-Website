@@ -44,7 +44,9 @@ const LocalStorageKeys ={
     XummPkceJwt: 'XummPkceJwt',
     pkce_state: 'pkce_state',
     HotelSelectionDetails: 'hotel-selection-details',
-    AiHotelSearchResult: 'ai-hotel-search-result'
+    BookingCustomer: 'booking-customer',
+    AiHotelSearchResult: 'ai-hotel-search-result',
+    MoreAiHotelSearchResult: 'more-ai-hotel-search-result'
 }
 
 const XRPLAccountEventTypes = {

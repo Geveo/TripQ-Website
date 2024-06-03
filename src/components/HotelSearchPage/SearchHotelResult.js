@@ -1,8 +1,15 @@
-import React from "react";
 import { FaMapMarkerAlt, FaMobile } from "react-icons/fa";
 import StarRating from "../HotelHomePage/StarRating";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
-function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
+function SearchHotelResult({
+  hotel,
+  hotelDetails,
+  numOfPeople,
+  onViewAvailableClicked,
+}) {
   const styles = {
     image: {
       width: "284px",
@@ -12,61 +19,105 @@ function SearchHotelResult({ hotel, numOfPeople, onViewAvailableClicked }) {
     },
   };
 
-  let location = "";
-  if (hotel.Location) {
-    location = JSON.parse(hotel.Location);
-  } else {
-    location = JSON.parse(hotel.City);
+  if (hotelDetails && hotel.AvailableRooms.length === 0) {
+    const updatedHotel = {
+      ...hotel,
+      Description: hotelDetails.hotel_description,
+      StarRatings: hotelDetails.star_ratings,
+      Location: hotelDetails.hotel_address,
+      PhoneNumber: hotelDetails.phone,
+      WebsiteURL: hotelDetails.website_link,
+    };
+    hotel = updatedHotel;
   }
-  const contact = JSON.parse(hotel.ContactDetails);
+
+  const location = hotel.Location;
+  let address = "";
+
+  if (location) {
+    if (!location.AddressLine01 || !location.AddressLine02) {
+      address = location;
+    } else {
+      address = `${location.AddressLine01}, ${location.AddressLine02}, ${location.City}`;
+    }
+  }
 
   return (
     <div className={"hotel_card mb-5"} style={{ width: "1000px" }}>
       <div className={"row_fit p-5"}>
         <img
           key={hotel.Id}
-          src={hotel.ImageURL[0].ImageURL}
+          src={
+            hotel.ImageURL && hotel.ImageURL.length > 0
+              ? hotel.ImageURL[0].ImageURL
+              : "/Assets/Images/no_image.jpg"
+          }
           alt={"Hotel image"}
           style={styles.image}
         />
-
         <div className={"col-md"} style={{ paddingLeft: "20px" }}>
           <div className={"title_2"} style={{ fontSize: "22px" }}>
             {hotel.Name}{" "}
             <StarRating ratings={hotel.StarRatings} reviews={726} />
           </div>
 
+          {hotel.Location ? (
+            <div className={"row_fit"}>
+              <div style={{ width: "20px", paddingTop: "2px" }}>
+                <FaMapMarkerAlt color={"#908F8F"} />
+              </div>
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {address}
+              </div>
+            </div>
+          ) : null}
+
+          {hotel.PhoneNumber ? (
+            <div className={"row_fit"}>
+              <div style={{ width: "20px", paddingTop: "2px" }}>
+                <FaMobile color={"#908F8F"} />
+              </div>
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {hotel.PhoneNumber}
+              </div>
+            </div>
+          ) : null}
+
           <div className={"row_fit"}>
-            <div style={{ width: "20px", paddingTop: "2px" }}>
-              <FaMapMarkerAlt color={"#908F8F"} />
-            </div>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {location.AddressLine01},{location.AddressLine02},{location.City}
-            </div>
-          </div>
-          <div className={"row_fit"}>
-            <div style={{ width: "20px", paddingTop: "2px" }}>
-              <FaMobile color={"#908F8F"} />
-            </div>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {contact.PhoneNumber}
-            </div>
-          </div>
-          <div className={"row_fit"}>
-            <div className={"col"} style={{ paddingTop: "4px" }}>
-              {hotel.Description}
-            </div>
+            {hotel.Description ? (
+              <div className={"col"} style={{ paddingTop: "4px" }}>
+                {hotel.Description}
+              </div>
+            ) : (
+              <div
+                className={"col"}
+                style={{
+                  paddingTop: "4px",
+                  color: "#2c2c76",
+                  paddingTop: "12%",
+                  paddingLeft: "22%",
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faSpinner}
+                  className="fa-solid fa-spinner fa-spin-pulse fa-spin-reverse"
+                  size="2x"
+                />
+              </div>
+            )}
           </div>
 
-          <div className={"pt-3 row_right"} style={{}}>
-            <button
-              className={"view_availability_button"}
-              style={{ width: "200px" }}
-              onClick={() => onViewAvailableClicked(hotel)}
-            >
-              View Availability
-            </button>
-          </div>
+          {hotel.AvailableRooms.length > 0 || hotel.WebsiteURL ? (
+            <div className={"pt-3 row_right"} style={{}}>
+              <button
+                className={"view_availability_button"}
+                style={{ width: "200px" }}
+                onClick={() => onViewAvailableClicked(hotel)}
+              >
+                View Availability
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

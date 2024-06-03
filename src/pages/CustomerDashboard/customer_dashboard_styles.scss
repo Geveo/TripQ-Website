@@ -8,25 +8,51 @@
 
 
   .main-txt {
-    padding-top: 50px;
-    margin-left: 5%;
-    margin-right: 5%;
-    width: 100%;
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 25%;
+    width: 100%; 
+    height: 100vh;
+  
     h3 {
-      font-size: 4rem;
+      font-size: 3.7rem;
+      text-align: center; 
     }
-
+  
     p {
       font-size: 2rem;
+      text-align: center;
     }
   }
+  
 }
 
 .search_section {
   margin-top: -80px;
   z-index: 2;
 
+  .container {
+    display: flex;
+    padding-left: 4px;
+  }
+  
+  .icon-and-text {
+    display: flex;
+    align-items: center; 
+    padding-bottom: 20px;
+    padding-left: 2px;
+    color: #f9b625;
+    font-size: 20px;
+  }
+  
+  .search-area-phrase { 
+    color: #000000;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  
 
   .search-area {
     background-color: $light-purple-color;
@@ -65,6 +91,12 @@
       background: $purple-color;
     }
   }
+  .listening{
+    color: #c42121;
+    font-weight: 600;
+    font-size: x-large;
+    padding-left: 1030px;
+  }
 }
 
 div.best_offers {
@@ -100,6 +132,7 @@ div.best_offers {
 .overrideSearchButton {
   height: 40px;
   width: 100%;
+  margin-bottom: 30px;
   background-color: $purple-color!important;
 }
 
@@ -111,18 +144,41 @@ div.best_offers {
 }
 
 .microphone-icon {
+  width: 100px;
+  height: 50px;
   background-color: green!important ;
-  border: 0px;
+  margin-bottom: 15px;
 }
 
 .microphone-icon:hover {
   background-color: #f6cd47 !important ;
-  border: 0px;
+  width: 100px;
+  height: 50px;
+  margin-bottom: 15px;
 }
 
 .microphone-icon-isListening {
   background-color: #c42121 !important ;
-  border: 0px;
+  width: 100px;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.search-icon{
+  width: 100px;
+  height: 50px;
+  background-color:  #2c2c76!important ;
+  margin-bottom: 15px;
+}
+
+.remove-left-border-radius {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.remove-right-border-radius {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
 }
 
 div.top_rated_hotels {
@@ -249,5 +305,14 @@ div.quickPlanner {
     font-weight: 500;
     font-size: 16px;
     line-height: 19px;
+  }
+
+  .dashboard-main-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100vh; 
   }
 }

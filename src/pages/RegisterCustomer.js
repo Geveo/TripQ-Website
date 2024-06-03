@@ -1,5 +1,5 @@
 import React from "react";
-import CustomerRegistration from "../components/CustomerRegistration/index";
+import CustomerRegistration from "../components/CustomerRegistration/CustomerRegistration";
 
 const RegisterCustomer = () => {
   return (

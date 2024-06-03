@@ -1,0 +1,41 @@
+.hotel-search-page {
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
+
+  .hotel-list{
+    padding-left: 120px;
+    padding-right: 120px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+  }
+
+  .show_more {
+    border: 1px solid #A9A6A6;
+    border-radius: 5px;
+    background:  rgb(44 44 118);
+    background-color:   rgb(44 44 118) !important; 
+    width: 15%;
+    height: 38px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .show_more:hover {
+    background-color: #0c0c79; 
+  }
+  
+  .show_more:active {
+    background-color: #060642; 
+  }
+
+  .centered-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    color:  #060642 !important;
+  }

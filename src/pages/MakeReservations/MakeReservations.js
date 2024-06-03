@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 import BookingDetails from "../../components/BookingDetails/index";
+import StripeCheckout from "../../components/Payment/StripeCheckout";
+import CoingatePayment from "../../components/Payment/CGPayment";
+import PaymentSelection from "../../components/Payment/PaymentSelection";
 import BookedHotelDetails from "../../components/BookedHotelDetails/index";
 import { Row, Col } from "reactstrap";
 import MainContainer from "../../layout/MainContainer";
-import CustomerRegistration from "../../components/CustomerRegistration";
+import CustomerRegistration from "../../components/CustomerRegistration/CustomerRegistration";
 import BookedHotelPrice from "../../components/BookedHotelPrice";
 import "../../styles/layout_styles.scss";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,6 +35,8 @@ const ReservationForm = () => {
   });
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [disableConfirm, setDisableConfirm] = useState(true);
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [selectedGateway, setSelectedGateway] = useState('');
   const [totalPrice, setTotalPrice] = useState(0);
   const loginState = useSelector((state) => state.loginState);
 
@@ -55,7 +60,7 @@ const ReservationForm = () => {
       let totalPrice = 0;
       selectedDetails.RoomTypes.forEach((element) => {
         totalPrice +=
-          parseFloat(element.roomData.Price) *
+          parseFloat(element.roomData.Price).toFixed(4) *
           element.count *
           parseInt(selectedDetails.Nights);
       });
@@ -68,6 +73,17 @@ const ReservationForm = () => {
 
   const handleConfirm = (finalDetails) => {
     console.log("Reservation confirmed:", finalDetails);
+  };
+  const handlePaymentEnabled = (data) => {
+    setPaymentEnabled(data);
+  };
+  
+  const handleBackToPayment = (data) => {
+    setPaymentEnabled(data);
+  };
+
+  const handleSelectedGateway = (data) => {
+    setSelectedGateway(data);
   };
 
   return (
@@ -86,19 +102,41 @@ const ReservationForm = () => {
           </Col>
 
           <Col md={8}>
+            <div>
             <BookedHotelDetails
-              hotelName={searchDetails.Name}
-              hotelAddress={searchDetails.Address}
-              starRate={searchDetails.StarRate}
-              image={searchDetails.Images}
-            />
-            <CustomerRegistration
-              totalPrice={totalPrice}
-              disableConfirm={disableConfirm}
-              setDisableConfirm={setDisableConfirm}
-              confirmLoading={confirmLoading}
-              setConfirmLoading={setConfirmLoading}
-            />
+                    hotelName={searchDetails.Name}
+                    hotelAddress={searchDetails.Address}
+                    starRate={searchDetails.StarRate}
+                    image={searchDetails.Images} />
+
+              {!paymentEnabled ? (
+                <>
+                  <CustomerRegistration
+                    totalPrice={totalPrice}
+                    disableConfirm={disableConfirm}
+                    setDisableConfirm={setDisableConfirm}
+                    confirmLoading={confirmLoading}
+                    setConfirmLoading={setConfirmLoading}
+                    setPaymentEnabled={handlePaymentEnabled} />
+                </>
+              ) : (
+                <>
+                  { selectedGateway == '' ? 
+                    (
+                      <PaymentSelection
+                        //totalPrice={totalPrice}
+                        setSelectedGateway={handleSelectedGateway} />
+                    ) : selectedGateway == 'Stripe' ?
+                      (
+                        <StripeCheckout  totalPrice={totalPrice}/>
+                      ) : selectedGateway == 'Coingate' ?
+                        (
+                        <CoingatePayment totalPrice={totalPrice}/>
+                        ) : null
+                  }
+                </>
+              )}
+            </div>
           </Col>
         </Row>
       </MainContainer>
@@ -107,3 +145,38 @@ const ReservationForm = () => {
 };
 
 export default ReservationForm;
+
+
+/* { !paymentEnabled ?
+                <>
+                <BookedHotelDetails
+                  hotelName={searchDetails.Name}
+                  hotelAddress={searchDetails.Address}
+                  starRate={searchDetails.StarRate}
+                  image={searchDetails.Images} />
+                  
+                  <CustomerRegistration
+                    totalPrice={totalPrice}
+                    disableConfirm={disableConfirm}
+                    setDisableConfirm={setDisableConfirm}
+                    confirmLoading={confirmLoading}
+                    setConfirmLoading={setConfirmLoading}
+                    setPaymentEnabled={handlePaymentEnabled} />
+                </>
+                :
+                <PaymentSelection 
+                //totalPrice={totalPrice}
+                setSelectedGateway={handleSelectedGateway}/>}
+            </div>
+
+            <div>
+              {  selectedGateway == 'Stripe' ?
+                <>
+                 <StripePayment 
+                totalPrice={totalPrice}
+                setBackToPayment={handleBackToPayment}/>
+                </>
+                :
+                <CoingatePayment/>}
+            </div>
+*/
