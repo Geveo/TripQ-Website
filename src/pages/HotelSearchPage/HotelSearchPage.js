@@ -207,6 +207,23 @@ function HotelSearchPage(props) {
     setCity(searchCity);
 
     const promises = [openAiService.searchHotels(searchCity, facilities, 5)];
+    let newSearchText = "I want to find a hotel with ";
+
+    facilities.forEach((facility) => {
+      newSearchText += facility + " ";
+    });
+    newSearchText +=
+      "in " +
+      searchCity +
+      " from " +
+      checkInDate +
+      " " +
+      checkOutDate +
+      " for " +
+      guestCount +
+      " people";
+
+    const promises = [openAiService.searchHotels(newSearchText)];
 
     Promise.all(promises)
       .then(([searchResult]) => {
