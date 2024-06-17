@@ -23,6 +23,8 @@ import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import MyProperties from "./pages/MyProperties/MyProperties";
 import RoomTypeDetails from "./components/HotelHomePage/RoomTypeDetails/RoomTypeDetails";
 import CGPayment from "./components/Payment/CGPayment";
+import SignUp from "./pages/UserAuthentication/SignUp";
+import SignIn from "./pages/UserAuthentication/SignIn";
 
 function App() {
   const loginState = useSelector((state) => state.loginState);
@@ -70,6 +72,7 @@ function App() {
       )}
       {isContractInitiated && (
         <Routes>
+           
           <Route path="/" element={<CustomerDashboard />} />
           <Route path="/list-property" element={<MyProperties />} exact />
           <Route
@@ -84,6 +87,8 @@ function App() {
           <Route path="/roomType/:id" element={<RoomTypeDetails />} exact />
           <Route path="/scan-qr-code" element={<ScanQRCode />} exact />
           <Route path="/customer-details" element={<CustomerDetails />} exact />
+          <Route path="/signin" element={<SignIn />} exact />
+          <Route path="/signup" element={<SignUp />} exact />
           <Route
             path="/availability/:id/:checkInDate/:checkOutDate"
             element={<AvailabilityPage />}
@@ -112,6 +117,7 @@ function App() {
             </>
           )}
           <Route path="*" element={<CustomerDashboard />} />
+       
         </Routes>
       )}
       {!isContractInitiated && (

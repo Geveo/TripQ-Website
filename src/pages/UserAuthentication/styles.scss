@@ -10,7 +10,7 @@ $light-purple-color: #ececf2;
   width: 60%;
   display: flex;
 
-  .row{
+  .row {
     --bs-gutter-x: 0 !important;
   }
   .blue-bar {
@@ -20,18 +20,51 @@ $light-purple-color: #ececf2;
     .logo-container {
       display: flex;
       justify-content: center;
-      
+
       .logo-image {
         width: 30%;
-        height: 20%;
+        height: 10% !important;
       }
     }
   }
 
-  .signup-text {
-    padding-left: 42%;
+  .title-text {
+    justify-content: center;
+    display: flex;
+    padding-top: 20px;
+    padding-bottom: 2px;
     font-size: 35px;
     font-weight: 700;
     margin-bottom: "20px";
   }
+  .subtitle-text {
+    justify-content: center;
+    display: flex;
+    padding-bottom: 20px;
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: "20px";
+    color: #908f8f;
+  }
+}
+
+.field {
+  padding-top: 20px;
+  //padding-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 100px;
+}
+.label{
+  padding-left: 60px;
+}
+
+.signup-btn {
+  align-items: flex-end;
+  display: flex;
+  justify-content: end;
+  padding-top: 20px;
+  padding-right: 50px;
+}
+.signup-link {
+  margin-left: 5px;
 }

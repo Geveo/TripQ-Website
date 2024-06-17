@@ -40,7 +40,7 @@ function NavBar(props) {
 
   const login = async () => {
     try {
-      navigate(`signup`)
+      navigate(`signin`)
       //await xummAuthorize();
     } catch (e) {
       console.log(e);

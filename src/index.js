@@ -17,7 +17,7 @@ root.render(
     <Provider store={store}>
       <NavBar />
       <div style={{ marginTop: "100px" }}>
-        <App />
+          <App />
       </div>
       <div style={{ marginTop: "110px" }}>
         <Footer />
