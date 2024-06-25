@@ -87,6 +87,7 @@ export async function createPayload(sourceAccount, destinationAccount, amount, d
             issuer: issuer
         }
     }
+    console.log(amountField)
 
     return await xumm.payload?.create({
         TransactionType: 'Payment',
@@ -112,7 +113,11 @@ export async function subscribe(createdPayload) {
  * @returns {Promise<constants.PaymentResults>}
  */
 export async function showPayQRWindow(sourceAddress, destinationAddress, amount, destinationTag, currency, issuer) {
+    console.log("Source address:", sourceAddress)
+    console.log("Destination address:", destinationAddress)
+    console.log("Amount:", amount)
     const payload = await createPayload(sourceAddress, destinationAddress, amount, destinationTag, currency, issuer);
+  
     const subscription = await subscribe(payload);
 
     const newWindow = window.open(payload.next.no_push_msg_received, 'Xaman Pay','height=750,width=600, right=300, resizable=no, left=300,top=100');

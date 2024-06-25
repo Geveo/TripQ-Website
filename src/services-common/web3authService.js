@@ -1,8 +1,21 @@
 import { Web3Auth } from "@web3auth/modal";
+//import { WalletConnectV1Adapter } from "@web3auth/wallet-connect-v1-adapter";
+//import { WalletConnectv2Adapter } from "@web3auth/wallet-connect-v2-adapter";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { XrplPrivateKeyProvider } from "@web3auth/xrpl-provider";
-import { CHAIN_NAMESPACES, UX_MODE, WEB3AUTH_NETWORK } from "@web3auth/base";
-import { Client } from "xrpl";
+import { ADAPTER_STATUS, CHAIN_NAMESPACES, UX_MODE, WEB3AUTH_NETWORK } from "@web3auth/base";
+import CustomXrplAdapter from "../services-common/xrplAdapter";
+import {
+  deinit,
+  init,
+  getTransactions,
+  getTrustlines,
+  getAccountInfo,
+} from "../services-common/evernode-xrpl-service";
+import {
+  showPayQRWindow
+} from "../services-common/xumm-api-service";
+import { LocalStorageKeys,DestinationTags } from "../constants/constants";
 
 const clientId =
   "BN-2L6cmeBTe-cxrlRDmU3rXCX2Mqzp3eVZwl3FzD3ErySkfUS_Dw1w9n5-yTUcXVJ_SNTutAa3NErPmJDdErUc";
@@ -30,7 +43,7 @@ const chainConfigDevnet = {
 
 let web3auth;
 let xrplClient;
-
+const customXrplAdapter = new CustomXrplAdapter();
 export const initWeb3Auth = async () => {
   try {
     console.log("Initializing Web3Auth...");
@@ -43,13 +56,14 @@ export const initWeb3Auth = async () => {
     web3auth = new Web3Auth({
       clientId: clientId,
       uiConfig: {
-        appName: "W3A",
+        appName: "TripQ",
         theme: {
-          primary: "red",
+          primary: "darkblue",
         },
         mode: "dark",
-        logoLight: "https://web3auth.io/images/web3authlog.png",
-        logoDark: "https://web3auth.io/images/web3authlogodark.png",
+        displayErrorsOnModal:true,
+        //logoLight: "https://web3auth.io/images/web3authlog.png",
+       // logoDark: "https://web3auth.io/images/web3authlogodark.png",
         defaultLanguage: "en",
         loginGridCol: 3,
         primaryButton: "externalLogin",
@@ -58,6 +72,7 @@ export const initWeb3Auth = async () => {
       web3AuthNetwork: "sapphire_devnet",
       privateKeyProvider: xrplProvider,
     });
+  
 
     const openloginAdapter = new OpenloginAdapter({
       loginSettings: {
@@ -95,7 +110,26 @@ export const initWeb3Auth = async () => {
       },
     });
 
+    // const walletConnectV1Adapter = new WalletConnectV1Adapter({
+    //   adapterSettings: {
+    //     bridge: "https://bridge.walletconnect.org", // WalletConnect bridge URL
+    //     rpc: {
+    //       rpcUrl: chainConfig.rpcTarget, // XRPL Testnet RPC endpoint
+    //       wsUrl: chainConfig.wsTarget, // WebSocket endpoint for real-time updates
+    //     },
+    //     chainConfig:chainConfig
+    //   },
+    //   chainConfig: chainConfig,
+    //   clientId: clientId,
+    //   sessionTime: 3600,
+    //   web3AuthNetwork: "sapphire_devnet",
+    // });
+
+    // console.log("testing");
+    // web3auth.configureAdapter(walletConnectV1Adapter);
     web3auth.configureAdapter(openloginAdapter);
+    web3auth.configureAdapter(customXrplAdapter);
+
     await web3auth.initModal();
     console.log("Web3Auth initialized successfully.");
   } catch (error) {
@@ -106,25 +140,28 @@ export const initWeb3Auth = async () => {
 export const login = async () => {
   try {
     console.log("Attempting to log in...");
+    if (web3auth.provider) {
+      console.log("Wallet is already connected",web3auth);
+  }
     if (web3auth) {
-      await web3auth.connect();
-      const user = await web3auth.getUserInfo();
-      console.log("User Info:", user);
+      const res = await web3auth.connect();
+      console.log("res::",web3auth.provider)
+     
+      return res;
     }
   } catch (error) {
     console.error("Error during login:", error);
+    return null;
   }
 };
 
 export const logout = async () => {
   try {
-    console.log("Attempting to log out...");
-    if (web3auth) {
-      await web3auth.logout();
-      console.log("Logged out successfully.");
-    }
+    //await customXrplAdapter.logout();
+    console.log(customXrplAdapter)
+    await customXrplAdapter.disconnect();
   } catch (error) {
-    console.error("Error during logout:", error);
+    console.error('Error during logout:', error);
   }
 };
 
@@ -134,6 +171,8 @@ export const authenticateUser = async () => {
     return;
   }
   try {
+    console.log("Authenticating user account...", web3auth.provider)
+   
     const idToken = await web3auth.authenticateUser();
     console.log("ID Token:", idToken);
   } catch (error) {
@@ -172,7 +211,19 @@ export const getAccounts = async () => {
 };
 
 export const getBalance = async () => {
+  if (web3auth.provider) {
+    console.log("Wallet is already connected");
+    }
+
+ await init();
+  getAccountInfo("rLuYy66zndMYVsxmqwAFrxMQjXHEmBwJDA").then(res => {
+    if (res && res.Balance && res.Balance.length > 0) {
+      console.log("account balance:::::::::;;", res.Balance)
+    }
   
+  }).catch(e => {
+    throw e
+  });
   if (!web3auth || !web3auth.provider) {
     console.log("Provider not initialized yet");
     return;
@@ -197,6 +248,22 @@ export const getBalance = async () => {
       });
       console.log("XRPL account info", accInfo);
     }
+  } catch (error) {
+    console.error("Error fetching accounts or account info:", error);
+  }
+};
+
+export const sendTransaction = async () => {
+  if (!web3auth || !web3auth.provider) {
+    console.log("Provider not initialized yet");
+    return;
+  }
+
+  try {
+    await showPayQRWindow(localStorage.getItem(LocalStorageKeys.AccountAddress), `rEUxB3VR6CgPsKmY67LzNgzrAU3sRbfRng`,
+      "0.6",
+      DestinationTags.RESERVATION_PAYMENT,
+      "XRP" )
   } catch (error) {
     console.error("Error fetching accounts or account info:", error);
   }

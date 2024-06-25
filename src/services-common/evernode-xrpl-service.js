@@ -130,7 +130,6 @@ export async function getTransactions(accountAddress) {
 }
 
 export async function getAccountInfo(accountAddress) {
-
     const client = new evernode.XrplAccount(accountAddress, null , {xrplApi: xrplApi});
     clients.push(client)
 

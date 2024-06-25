@@ -8,7 +8,6 @@ class XrplRPC {
   }
 
   getAccounts = async () => {
-    console.log("SSSSSSSSSSSSSSSsss")
     try {
       const accounts = await this.provider.request({
         method: "xrpl_getAccounts",
