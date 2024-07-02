@@ -2,19 +2,27 @@ import React, { useEffect } from "react";
 import { Xumm } from "xumm";
 import {
   initWeb3Auth,
-  login,
-  logout,
+  //login,
+  // logout,
   getUserInfo,
   getAccounts,
   getBalance,
-  sendTransaction
+  sendTransaction,
 } from "../../services-common/web3authService";
+
+import {
+  initializeWeb3AuthConfig,
+  login,
+  logout,
+} from "../../services-common/web3authServiceEthereum";
+import { Button } from "reactstrap";
 
 const SignIn = () => {
   useEffect(() => {
     const initializeWeb3Auth = async () => {
       try {
-        await initWeb3Auth();
+        await initializeWeb3AuthConfig();
+        //await initWeb3Auth();
         console.log("Web3Auth initialized");
       } catch (error) {
         console.error("Error initializing Web3Auth:", error);
@@ -73,7 +81,7 @@ const SignIn = () => {
 
   return (
     <>
-      <div>
+      {/* <div>
         <h1>Sign In</h1>
         <button onClick={handleLogin}>Login with Web3Auth</button>
       </div>
@@ -92,7 +100,15 @@ const SignIn = () => {
       <div>
         <h1>Send transaction</h1>
         <button onClick={handleSendTransaction}>Send Transaction</button>
-      </div>
+      </div> */}
+{/* 
+      <Card>
+        <div>
+          <Button className="btn-style" id="loginWithMetaMask">
+            Login with MetaMask
+          </Button>
+        </div>
+      </Card> */}
     </>
   );
 };

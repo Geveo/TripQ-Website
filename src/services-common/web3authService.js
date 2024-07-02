@@ -1,10 +1,10 @@
 import { Web3Auth } from "@web3auth/modal";
-//import { WalletConnectV1Adapter } from "@web3auth/wallet-connect-v1-adapter";
-//import { WalletConnectv2Adapter } from "@web3auth/wallet-connect-v2-adapter";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { XrplPrivateKeyProvider } from "@web3auth/xrpl-provider";
 import { ADAPTER_STATUS, CHAIN_NAMESPACES, UX_MODE, WEB3AUTH_NETWORK } from "@web3auth/base";
-import CustomXrplAdapter from "../services-common/xrplAdapter";
+
+import { XrplPrivateKeyProvider } from "@web3auth/xrpl-provider";
+import CustomXrplAdapter from "../adapters/xrplAdapter";
+
 import {
   deinit,
   init,
@@ -19,7 +19,8 @@ import { LocalStorageKeys,DestinationTags } from "../constants/constants";
 
 const clientId =
   "BN-2L6cmeBTe-cxrlRDmU3rXCX2Mqzp3eVZwl3FzD3ErySkfUS_Dw1w9n5-yTUcXVJ_SNTutAa3NErPmJDdErUc";
-const chainConfig = {
+
+  const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.XRPL,
   chainId: "0x1",
   rpcTarget: "https://testnet.xrpl-labs.com/",
@@ -41,9 +42,21 @@ const chainConfigDevnet = {
   blockExplorerUrl: "https://mainnet.xrpl.org",
 };
 
+// const ethereumChainConfig = {
+//   chainNamespace: CHAIN_NAMESPACES.EIP155,
+//   chainId: "0x5", 
+//   rpcTarget: "https://rpc.ankr.com/eth_goerli",
+//   displayName: "Ethereum Testnet",
+//   blockExplorerUrl: "https://goerli.etherscan.io",
+//   ticker: "ETH",
+//   tickerName: "Ethereum testnet",
+//   logo: "https://images.toruswallet.io/eth.svg",
+// };
+
 let web3auth;
 let xrplClient;
 const customXrplAdapter = new CustomXrplAdapter();
+
 export const initWeb3Auth = async () => {
   try {
     console.log("Initializing Web3Auth...");
@@ -52,6 +65,8 @@ export const initWeb3Auth = async () => {
         chainConfig: chainConfig,
       },
     });
+
+    //const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig : ethereumChainConfig } });
 
     web3auth = new Web3Auth({
       clientId: clientId,
@@ -110,23 +125,6 @@ export const initWeb3Auth = async () => {
       },
     });
 
-    // const walletConnectV1Adapter = new WalletConnectV1Adapter({
-    //   adapterSettings: {
-    //     bridge: "https://bridge.walletconnect.org", // WalletConnect bridge URL
-    //     rpc: {
-    //       rpcUrl: chainConfig.rpcTarget, // XRPL Testnet RPC endpoint
-    //       wsUrl: chainConfig.wsTarget, // WebSocket endpoint for real-time updates
-    //     },
-    //     chainConfig:chainConfig
-    //   },
-    //   chainConfig: chainConfig,
-    //   clientId: clientId,
-    //   sessionTime: 3600,
-    //   web3AuthNetwork: "sapphire_devnet",
-    // });
-
-    // console.log("testing");
-    // web3auth.configureAdapter(walletConnectV1Adapter);
     web3auth.configureAdapter(openloginAdapter);
     web3auth.configureAdapter(customXrplAdapter);
 
@@ -157,7 +155,7 @@ export const login = async () => {
 
 export const logout = async () => {
   try {
-    //await customXrplAdapter.logout();
+    await customXrplAdapter.logout();
     console.log(customXrplAdapter)
     await customXrplAdapter.disconnect();
   } catch (error) {

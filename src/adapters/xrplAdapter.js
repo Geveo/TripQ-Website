@@ -45,7 +45,7 @@ class WalletConnectXrplAdapter extends BaseAdapter {
           chainConfig: chainConfig,
         },
       });
-
+      await this.provider.init();
       console.log("Initializing XRPL Client...");
       await this.client.connect();
       this.status = ADAPTER_STATUS.READY;
