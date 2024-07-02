@@ -1,0 +1,29 @@
+.payment-options {
+  display: flex;
+  margin-top: 5px;
+  gap: 40px;
+  align-items: flex-start;
+}
+.payment-option-label {
+  margin-right: 100px;
+  margin-top: 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+.payment-option-checkbox {
+  margin-right: 10px;
+  width: 25px !important;
+  height: 25px !important;
+  margin-bottom: 8px;
+}
+.payment-option-box {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+.payment-option-details {
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-left: 10px;
+}

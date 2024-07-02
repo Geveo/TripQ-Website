@@ -3,7 +3,6 @@ import "../components/HotelHomePage/StarRating";
 import StarRating from "../components/HotelHomePage/StarRating";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { FaPlusCircle } from "react-icons/fa";
-import HotelImages from "../components/HotelHomePage/HotelImages";
 import FacilitiesReadOnly from "../components/HotelHomePage/FacilitiesReadOnly";
 import React, { useRef, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -42,72 +41,68 @@ function HotelHomePage() {
 
   useEffect(() => {
     store.dispatch(setShowScreenLoader(true));
-    //getRoomTypes();
-    const walletAddress = localStorage.getItem(LocalStorageKeys.AccountAddress);
-
     hotelService
-      .getHotelsList(walletAddress)
+      .getHotelById(id)
       .then((data) => {
-        if (data && data.length > 0) {
-          const matchingHotel = data.filter((element) => element.id === id);
-          if (matchingHotel.length > 0) {
-            let selectedHotel = new HotelDto({
-              Id: matchingHotel[0].id,
-              Name: matchingHotel[0].name,
-              Description: matchingHotel[0].description,
-              StarRate: matchingHotel[0].starRate,
-              ContactDetails: matchingHotel[0].contactDetails,
-              Location: matchingHotel[0].location,
-              Facilities: matchingHotel[0].facilities,
-              ImageURLs: matchingHotel[0].imageUrls,
-              WalletAddress: localStorage.getItem(
-                LocalStorageKeys.AccountAddress
-              ),
+        if (data) {
+          const hotelDetails = data.hotelDetails[0];
+          let selectedHotel = new HotelDto({
+            Id: hotelDetails.Id,
+            Name: hotelDetails.Name,
+            Description: hotelDetails.Description,
+            StarRate: hotelDetails.StarRatings,
+            ContactDetails: hotelDetails.ContactDetails,
+            Location: hotelDetails.Location,
+            Facilities: hotelDetails.Facilities,
+            ImageURLs: data.hotelImages,
+            WalletAddress: localStorage.getItem(
+              LocalStorageKeys.AccountAddress
+            ),
+          });
+
+          store.dispatch(setShowScreenLoader(false));
+          setIsDataLoading(false);
+          setHotelName(selectedHotel.Name);
+          const location = JSON.parse(selectedHotel.Location);
+          setAddress1(location.AddressLine01 ?? null);
+          setAddress2(location.AddressLine02 ?? null);
+          setCity(location.City);
+          setSelectedHotel(selectedHotel);
+          setDescription(hotelDetails.Description);
+
+          let facilities = JSON.parse(hotelDetails.Facilities);
+
+          let selectedFacilitiesIDs = [];
+
+          facilities.forEach((element) => {
+            selectedFacilitiesIDs.push(element.Id);
+          });
+          setSelectedFacilityIds(selectedFacilitiesIDs);
+
+          getRoomTypes(id)
+            .then((rms) => {
+              setRooms(rms);
+
+              // Get hotel images
+              hotelService
+                .getHotelImagesById(id)
+                .then((data) => {
+                  if (data && data.length > 0) setImages(data);
+                })
+                .catch((err) => {
+                  console.log(err);
+                  toast.error("Error in fetching hotel images.");
+                });
+            })
+            .catch((e) => {
+              console.log(e);
             });
-            store.dispatch(setShowScreenLoader(false));
-            setIsDataLoading(false);
-            setHotelName(selectedHotel.Name);
-            const location = JSON.parse(selectedHotel.Location);
-            setAddress1(location.AddressLine01 ?? null);
-            setAddress2(location.AddressLine02 ?? null);
-            setCity(location.City);
-            setSelectedHotel(selectedHotel);
-            setDescription(matchingHotel[0].Description);
-
-            let facilities = JSON.parse(matchingHotel[0].facilities);
-
-            let selectedFacilitiesIDs = [];
-
-            facilities.forEach((element) => {
-              selectedFacilitiesIDs.push(element.Id);
-            });
-            setSelectedFacilityIds(selectedFacilitiesIDs);
-
-            getRoomTypes(id)
-              .then((rms) => {
-                setRooms(rms);
-
-                // Get hotel images
-                hotelService
-                  .getHotelImagesById(id)
-                  .then((data) => {
-                    if (data && data.length > 0) setImages(data);
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                    toast.error("Error in fetching hotel images.");
-                  });
-              })
-              .catch((e) => {
-                console.log(e);
-              });
-          }
         }
         store.dispatch(setShowScreenLoader(false));
       })
       .catch((err) => {
         store.dispatch(setShowScreenLoader(false));
-        console.log(err.thrownError);
+          console.log(err.thrownError);
         toast.error("Error in fetching hotels list.");
       });
   }, [id]);
@@ -318,31 +313,20 @@ function HotelHomePage() {
             </div>
           </section>
           <section ref={infoSection} id="info_section" className={""}>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               {images &&
-                images.slice(0,3).map((image, index) => (
-                  <img
-                    key={index}
-                    style={{ margin: 10, width: 350, height: 250 }}
-                    src={image.ImageURL}
-                    alt={`Displayed Image ${index}`}
-                  />
-                ))}
+                images
+                  .slice(0, 3)
+                  .map((image, index) => (
+                    <img
+                      key={index}
+                      style={{ margin: 10, width: 350, height: 250 }}
+                      src={image.ImageURL}
+                      alt={`Displayed Image ${index}`}
+                    />
+                  ))}
             </div>
           </section>
-          {/* <section ref={infoSection} id="info_section" className={"pt-2"}>
-              <div
-                className={"subtext"}
-                style={{
-                  lineHeight: "25px",
-                  textAlign: "justify",
-                  padding: "0 10px",
-                }}
-              >
-                {description}
-              </div>
-            </section> */}
-
           <section ref={facilitiesSection} id="facilities" className={""}>
             <FacilitiesReadOnly
               facilitiesSection={facilitiesSection}
